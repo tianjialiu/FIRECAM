@@ -6,11 +6,11 @@
 /*
 // Documentation: https://github.com/tianjialiu/FIRECAM
 // Author: Tianjia Liu
-// Last updated: September 17, 2018
+// Last updated: September 18, 2018
 
 // Purpose: explore regional differences in fire emissions from five
-// global fire emissions inventories for six species:
-// CO, CO2, CH4, OC, BC, PM2.5
+// global fire emissions inventories (GFED, FINN, GFAS, QFED, FEER)
+// for six species (CO, CO2, CH4, OC, BC, PM2.5)
 */
 // =================================================================
 // *****************   --    User Interface    --   ****************
@@ -23,10 +23,7 @@ var nMonth = (eYear-sYear+1)*12-1;
 var projFolder = 'users/tl2581/';
 
 var invNames = ['GFEDv4s','FINNv1p5','GFASv1p2','QFEDv2p5r1','FEERv1p0_G1p2'];
-var bandNames = ['CO','CO2','CH4','OC','BC','PM2/5'];
-var bandLabel = ee.List(['CO','CO2','CH4','OC','BC','PM2.5']);
-
-var bandNames = ['CO','CO2','CH4','OC','BC','PM2/5'];
+var bandNames = ['CO','CO2','CH4','OC','BC','PM2p5'];
 var bandMulti = ee.Image([1e3,1e3,1e6,1e6,1e6,1e6]).rename(bandNames);
 var bandMaxVal = ee.List([100,2000,2000,3000,500,5000]);
 var bandMaxPos = ee.List([235,228,228,228,235,228]);
@@ -362,11 +359,14 @@ submitButton.onClick(function() {
   var maxPos = bandMaxPos.get(speciesIdx).getInfo();
   var speciesLabel = bandLabel.get(speciesIdx).getInfo();
   var unitsLabel = bandUnits.get(speciesIdx).getInfo();
+  var spBandName = ee.List(bandNames).get(speciesIdx).getInfo();
   var vizParams = {palette: colPal_Spectral, min: 0, max: maxVal};
   
   var emiByMonth = getEmiByMonth(species);
   var emiByYr = getEmiByYr(emiByMonth);
-  var emiByYrMean = emiByYr.mean().multiply(bandMulti.select(species))
+  
+  var emiByYrMean = ee.Image([projFolder + 'GFEIyrMean_sp/GFEIyrMean_' + spBandName])
+    .multiply(bandMulti.select(species))
     .clip(basisRegions).reproject({crs: 'EPSG:4326', crsTransform: [0.5,0,-180,0,-0.5,90]});
  
   // Display Maps:

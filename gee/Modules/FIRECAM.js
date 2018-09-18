@@ -1,16 +1,16 @@
 /**** Start of imports. If edited, may not auto-convert in the playground. ****/
-var metric1 = ee.Image("projects/GlobalFires/RelFireConfidence/BA_AF_discrepancy"),
-    metric2 = ee.Image("projects/GlobalFires/RelFireConfidence/MODIScloudFracFRP"),
-    metric3 = ee.Image("projects/GlobalFires/RelFireConfidence/fireBAComponentSize"),
-    metric4 = ee.Image("projects/GlobalFires/RelFireConfidence/topoVariance_m2"),
-    metric5 = ee.Image("projects/GlobalFires/RelFireConfidence/additionalFRP_VIIRS"),
+var metric1 = ee.Image("projects/GlobalFires/RelFireConfidence/RFCM1_areal_BA_AF_discrepancy"),
+    metric2 = ee.Image("projects/GlobalFires/RelFireConfidence/RFCM2_cloud_haze_burden"),
+    metric3 = ee.Image("projects/GlobalFires/RelFireConfidence/RFCM3_fireBAComponentSize"),
+    metric4 = ee.Image("projects/GlobalFires/RelFireConfidence/RFCM4_topo_variance"),
+    metric5 = ee.Image("projects/GlobalFires/RelFireConfidence/RFCM5_additionalFRP_VIIRS"),
     gfedv4s = ee.ImageCollection("projects/GlobalFires/GFEDv4s_sp"),
     finnv1p5 = ee.ImageCollection("projects/GlobalFires/FINNv1p5_sp"),
     gfasv1p2 = ee.ImageCollection("projects/GlobalFires/GFASv1p2_sp"),
     qfedv2p5 = ee.ImageCollection("projects/GlobalFires/QFEDv2p5r1_sp"),
     feerv1p0_g1p2 = ee.ImageCollection("projects/GlobalFires/FEERv1p0_G1p2_sp"),
     gfedv4_ancill = ee.Image("projects/GlobalFires/GFEDv4ancill"),
-    basisRegions = ee.FeatureCollection("users/tl2581/basisRegions_0p5deg");
+    basisRegions = ee.FeatureCollection("projects/GlobalFires/basisRegions_0p5deg");
 /***** End of imports. If edited, may not auto-convert in the playground. *****/
 
 // ----------------------------------

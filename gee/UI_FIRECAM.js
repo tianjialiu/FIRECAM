@@ -6,11 +6,11 @@
 /*
 // Documentation: https://github.com/tianjialiu/FIRECAM
 // Author: Tianjia Liu
-// Last updated: September 17, 2018
+// Last updated: September 18, 2018
 
 // Purpose: explore regional differences in fire emissions from five
-// global fire emissions inventories for six species:
-// CO, CO2, CH4, OC, BC, PM2.5
+// global fire emissions inventories (GFED, FINN, GFAS, QFED, FEER)
+// for six species (CO, CO2, CH4, OC, BC, PM2.5)
 */
 // =================================================================
 // *****************   --    User Interface    --   ****************
@@ -92,14 +92,16 @@ submitButton.onClick(function() {
   var maxPos = bandMaxPos.get(speciesIdx).getInfo();
   var speciesLabel = bandLabel.get(speciesIdx).getInfo();
   var unitsLabel = bandUnits.get(speciesIdx).getInfo();
+  var spBandName = ee.List(bandNames).get(speciesIdx).getInfo();
   var vizParams = {palette: plotParams.colPal_Spectral, min: 0, max: maxVal};
   
   var emiByMonth = FIRECAM.getEmiByMonth(species);
   var emiByYr = FIRECAM.getEmiByYr(emiByMonth);
-  var emiByYrMean = emiByYr.mean().multiply(bandMulti.select(species))
-    .clip(FIRECAM.basisRegions)
-    .reproject({crs: 'EPSG:4326', crsTransform: [0.5,0,-180,0,-0.5,90]});
- 
+  
+  var emiByYrMean = ee.Image(['projects/GlobalFires/GFEIyrMean_sp/GFEIyrMean_' + spBandName])
+    .multiply(bandMulti.select(species))
+    .clip(FIRECAM.basisRegions).reproject({crs: 'EPSG:4326', crsTransform: [0.5,0,-180,0,-0.5,90]});
+
   // Display Maps:
   map.clear(); map.centerObject(regionShp);
   map.addLayer(FIRECAM.RFCM1.multiply(1e3), {palette: plotParams.colPal_RdBu, min: -1e3, max: 1e3}, 'Metric 1: Areal BA-AF Discrepancy', false);
