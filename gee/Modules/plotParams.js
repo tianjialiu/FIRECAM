@@ -15,11 +15,47 @@ exports.infoPanel = function() {
     ]);
 };
 
+// ------------
+// Year Panel
+// ------------
+exports.yearSelectPanel = function() {
+  var timeRangeLabel = ui.Label('1) Select Time Range:', {margin: '8px 8px 8px 8px', fontSize: '14.5px'});
+  var startYearLabel = ui.Label('Start Year:', {margin: '8px 20px 8px 20px', fontSize: '14.5px'});
+  var startYearSlider = ui.Slider({min: 2003, max: 2016, value: 2005, step: 1});
+  startYearSlider.style().set('stretch', 'horizontal');
+  
+  var endYearLabel = ui.Label('End Year:', {margin: '8px 20px 8px 20px', fontSize: '14.5px'});
+  var endYearSlider = ui.Slider({min: 2003, max: 2016, value: 2015, step: 1, style: {margin: '8px 8px 8px 14px'}});
+  endYearSlider.style().set('stretch', 'horizontal');
+  
+  var changeSliderYr = function() {
+    var startYr = startYearSlider.getValue();
+    var endYr = endYearSlider.getValue();
+    if (endYr < startYr) {endYearSlider.setValue(startYr)}
+  };
+  
+  startYearSlider.onChange(changeSliderYr);
+  endYearSlider.onChange(changeSliderYr);
+  
+  return ui.Panel([
+      timeRangeLabel,
+      ui.Panel([startYearLabel, startYearSlider], ui.Panel.Layout.Flow('horizontal'), {stretch: 'horizontal'}), //
+      ui.Panel([endYearLabel, endYearSlider], ui.Panel.Layout.Flow('horizontal'), {stretch: 'horizontal'}),
+    ]);
+};
+
+exports.getYears = function(yearSelectPanel) {
+  return {
+    startYear:yearSelectPanel.widgets().get(1).widgets().get(1).getValue(),
+    endYear:yearSelectPanel.widgets().get(2).widgets().get(1).getValue()
+  };
+};
+
 // -----------------
 // Region Panel
 // -----------------
 exports.regionSelectPanel = function(regionNames) {
-  var regionLabel = ui.Label('1) Select Region:', {padding: '5px 0px 0px 0px', fontSize: '14.5px'});
+  var regionLabel = ui.Label('2) Select Region:', {padding: '5px 0px 0px 0px', fontSize: '14.5px'});
   var regionSelect = ui.Select({items: regionNames.sort(), value: 'EQAS - Equatorial Asia', style: {stretch: 'horizontal'}});
   return ui.Panel([regionLabel, regionSelect], ui.Panel.Layout.Flow('horizontal'), {stretch: 'horizontal'});
 };
@@ -32,7 +68,7 @@ exports.getRegions = function(regionSelectPanel) {
 // Species Panel
 // -----------------
 exports.speciesSelectPanel = function() {
-  var speciesLabel = ui.Label('2) Select Species:', {padding: '5px 0px 0px 0px', fontSize: '14.5px'});
+  var speciesLabel = ui.Label('3) Select Species:', {padding: '5px 0px 0px 0px', fontSize: '14.5px'});
   var speciesList = ['CO','CO2','CH4','OC','BC','PM2.5'];
   var speciesSelect = ui.Select({items: speciesList, value: 'CO2', style: {stretch: 'horizontal'}});
   return ui.Panel([speciesLabel, speciesSelect], ui.Panel.Layout.Flow('horizontal'), {stretch: 'horizontal'});
@@ -48,8 +84,6 @@ exports.getSpecies = function(speciesSelectPanel) {
 exports.submitButton = function() {
   return ui.Button({label: 'Submit',  style: {stretch: 'horizontal'}});
 };
-
-exports.waitMessage = ui.Label(' *** Computations will take a few seconds to be completed *** ', {margin: '-4px 8px 12px 8px', fontSize: '11.6px', textAlign: 'center', stretch: 'horizontal'});
 
 // --------
 // Legends
@@ -100,7 +134,7 @@ var continuousLegend = function(controlPanel, title, colPal, minVal,
 };
 
 exports.legendPanel = function(controlPanel) {
-  controlPanel.add(ui.Label('----------------------------------------------------------------------------------', {margin: '-10px 8px 12px 8px', stretch: 'horizontal'}));
+  controlPanel.add(ui.Label('----------------------------------------------------------------------------------', {margin: '-5px 8px 12px 8px', stretch: 'horizontal'}));
   controlPanel.add(ui.Label('Legends', {fontWeight: 'bold', fontSize: '20px', margin: '-3px 8px 8px 8px'}));
 
   controlPanel.add(ui.Label('', {margin: '0px 0px 4px 0px'}));

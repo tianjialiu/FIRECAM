@@ -8,13 +8,18 @@ FIRECAM is an explorer for regional differences in fire emissions from five glob
 4. Quick Fire Emissions Dataset (QFEDv2.5r1; Darmenov and da Silva, 2013)
 5. Fire Energetics and Emissions Research (FEERv1.0-G1.2; Ichoku and Ellison, 2014)
 
+FIRECAM can be accessed through 1) Earth Engine Apps and 2) Google Earth Engine playground.
+
 ## Public Apps
 (*Earth Engine Apps, no Google Earth Engine account required*)
 <br><br>
 ![banner image](https://github.com/tianjialiu/FIRECAM/blob/master/docs/imgs/FIRECAM.jpeg)
 
-### Step 1: Region
-*Select a region.* Choose one of 14 "basis" regions, based on GFEDv4 (see table).
+### Step 1: Time Range
+*Select a time range* Use the start year and end year sliders to select a time range for the annual and monthly regional emissions time series charts.
+
+### Step 2: Region
+*Select a region.* Choose one of 14 "basis" regions, based on GFEDv4s (see table).
 
 ### GFEDv4 Basis Regions
 | ID | Region Code | Region Name |
@@ -34,11 +39,11 @@ FIRECAM is an explorer for regional differences in fire emissions from five glob
 | 13 | EQAS | Equatorial Asia |
 | 14 | AUST | Australia and New Zealand |
 
-### Step 2: Species
+### Step 3: Species
 *Select a species.* The six available species are CO<sub>2</sub>, CO, CH<sub>4</sub>, organic carbon (OC), black carbon (BC), and fine particulate matter (PM<sub>2.5</sub>)
 
 ### Regional Emissions
-After clicking the submit button, please wait a few seconds for the default map layers and two time series plots to display. Map layers consist of emissions at 0.5 deg x 0.5 deg spatial resolution for a given species for each of the five global fire emissions inventories and fire relative fire confidence metrics at 0.25 deg x 0.25 deg spatial resolution. The two time series plots, yearly and monthly emissions by inventory, can be viewed in a new tab and exported as tables or images.
+After clicking the submit button, please wait a few seconds for the default map layers and three charts to display. Note that for large regions, such as BOAS, and long time ranges, calculations for the monthly and annual time series can take up to a few minutes. Map layers consist of emissions at 0.5° x 0.5° spatial resolution for a given species for each of the five global fire emissions inventories and fire relative fire confidence metrics at 0.25° x 0.25° spatial resolution. The three charts (annual average from 2003-2016 and two time series charts, yearly and monthly emissions by inventory), can be viewed in a new tab and exported as tables or images.
 <br><br>
 
 ## Google Earth Engine Code Editor GUI
@@ -54,7 +59,7 @@ https://code.earthengine.google.com/?accept_repo=users/tl2581/FIRECAM
 The repository should then appear in the top-left panel under 'Reader' as 'users/tl2581/FIRECAM'. The GEE Javascript playground is a code editor with a map and console to display or print results.
 
 ### Step 3: Diving into the GUI
-Click the 'UI_FIRECAM.js' script in the 'users/tl2581/FIRECAM' repository. The script should appear in the code editor. Click 'Run' in the top-right corner of the code editor to activate the UI.
+Click the 'UI_FIRECAM.js' script in the 'users/tl2581/FIRECAM' repository. The script should appear in the code editor. Click 'Run' in the top-right corner of the code editor to activate the UI. The repository also contains two export scripts, one for the basis regions and one for custom regions (e.g. country, continent).
 
 ## Publications
 1. Liu, T., L.J. Mickley, R.S. DeFries, M.E. Marlier, M.F. Khan, M.T. Latif, and A. Karambelas (in prep). Diagnosing spatial uncertainties and relative biases in global fire emissions inventories: Indonesia as regional case study

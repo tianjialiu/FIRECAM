@@ -6,11 +6,13 @@
 /*
 // Documentation: https://github.com/tianjialiu/FIRECAM
 // Author: Tianjia Liu
-// Last updated: September 18, 2018
+// Last updated: September 19, 2018
 
 // Purpose: explore regional differences in fire emissions from five
 // global fire emissions inventories (GFED, FINN, GFAS, QFED, FEER)
 // for six species (CO, CO2, CH4, OC, BC, PM2.5)
+
+// Click 'Run' to initialize the user interface
 */
 // =================================================================
 // *****************   --    User Interface    --   ****************
@@ -64,15 +66,16 @@ map.setControlVisibility({fullscreenControl: false});
 
 var submitButton = plotParams.submitButton();
 var infoPanel = plotParams.infoPanel();
+var yearSelectPanel = plotParams.yearSelectPanel();
 var regionSelectPanel = plotParams.regionSelectPanel(regionNames);
 var speciesSelectPanel = plotParams.speciesSelectPanel();
 
 // Display Panels
 controlPanel.add(infoPanel);
+controlPanel.add(yearSelectPanel);
 controlPanel.add(regionSelectPanel);
 controlPanel.add(speciesSelectPanel);
 controlPanel.add(submitButton);
-controlPanel.add(plotParams.waitMessage);
 plotParams.legendPanel(controlPanel);
 ui.root.clear(); ui.root.add(controlPanel);
 ui.root.add(map); ui.root.add(plotPanelParent);
@@ -81,6 +84,9 @@ ui.root.add(map); ui.root.add(plotPanelParent);
 submitButton.onClick(function() {
   
   // Input Parameters:
+  var sYear = plotParams.getYears(yearSelectPanel).startYear;
+  var eYear = plotParams.getYears(yearSelectPanel).endYear;
+ 
   var region = plotParams.getRegions(regionSelectPanel);
   var species = plotParams.getRegions(speciesSelectPanel);
   
@@ -95,13 +101,14 @@ submitButton.onClick(function() {
   var spBandName = ee.List(bandNames).get(speciesIdx).getInfo();
   var vizParams = {palette: plotParams.colPal_Spectral, min: 0, max: maxVal};
   
-  var emiByMonth = FIRECAM.getEmiByMonth(species);
-  var emiByYr = FIRECAM.getEmiByYr(emiByMonth);
+  var emiByMonth = FIRECAM.getEmiByMonth(species, sYear, eYear);
+  var emiByYr = FIRECAM.getEmiByYr(emiByMonth, sYear, eYear);
   
   var emiByYrMean = ee.Image(['projects/GlobalFires/GFEIyrMean_sp/GFEIyrMean_' + spBandName])
-    .multiply(bandMulti.select(species))
     .clip(FIRECAM.basisRegions).reproject({crs: 'EPSG:4326', crsTransform: [0.5,0,-180,0,-0.5,90]});
-
+    
+  var emiByYrMeanAdj = emiByYrMean.multiply(bandMulti.select(species));
+  
   // Display Maps:
   map.clear(); map.centerObject(regionShp);
   map.addLayer(FIRECAM.RFCM1.multiply(1e3), {palette: plotParams.colPal_RdBu, min: -1e3, max: 1e3}, 'Metric 1: Areal BA-AF Discrepancy', false);
@@ -110,11 +117,11 @@ submitButton.onClick(function() {
   map.addLayer(FIRECAM.RFCM4, {palette: plotParams.colPal_Grays, min: 0, max: 1e3}, 'Metric 4: Topography Variance', false);
   map.addLayer(FIRECAM.RFCM5.multiply(1e3), {palette: plotParams.colPal_Reds, min: 0, max: 1e3}, 'Metric 5: VIIRS FRP Outside MODIS Burn Extent', false);
 
-  map.addLayer(emiByYrMean.select('FEERv1p0_G1p2').selfMask(), vizParams, 'FEERv1.0-G1.2', false);
-  map.addLayer(emiByYrMean.select('QFEDv2p5r1').selfMask(), vizParams, 'QFEDv2.5r1', false);
-  map.addLayer(emiByYrMean.select('GFASv1p2').selfMask(), vizParams, 'GFASv1.2', false);
-  map.addLayer(emiByYrMean.select('FINNv1p5').selfMask(), vizParams, 'FINNv1.5', false);
-  map.addLayer(emiByYrMean.select('GFEDv4s').selfMask(), vizParams, 'GFEDv4s');
+  map.addLayer(emiByYrMeanAdj.select('FEERv1p0_G1p2').selfMask(), vizParams, 'FEERv1.0-G1.2', false);
+  map.addLayer(emiByYrMeanAdj.select('QFEDv2p5r1').selfMask(), vizParams, 'QFEDv2.5r1', false);
+  map.addLayer(emiByYrMeanAdj.select('GFASv1p2').selfMask(), vizParams, 'GFASv1.2', false);
+  map.addLayer(emiByYrMeanAdj.select('FINNv1p5').selfMask(), vizParams, 'FINNv1.5', false);
+  map.addLayer(emiByYrMeanAdj.select('GFEDv4s').selfMask(), vizParams, 'GFEDv4s');
   
   map.addLayer(ee.Image().byte().rename('Selected Basis Region')
     .paint(ee.FeatureCollection(regionShp), 0, 2), {palette:'#000000'}, 'Selected Region');
@@ -123,6 +130,23 @@ submitButton.onClick(function() {
   
   // Display Charts:
   plotPanel = plotPanel.clear();
-  FIRECAM.plotEmiTS(plotPanel, emiByYr, regionShp, species, 'Annual');
-  FIRECAM.plotEmiTS(plotPanel, emiByMonth, regionShp, species, 'Monthly');
+  
+  var totalChart = FIRECAM.plotEmiBar(plotPanel, emiByYrMean, regionShp, species, 'Annual');
+  plotPanel.add(totalChart); plotPanel.add(ui.Label('', {margin: '-28px 8px 8px'}));
+  
+  var annualChart = FIRECAM.plotEmiTS(plotPanel, emiByYr, regionShp,
+    species, 'Annual', 'Y', sYear, eYear, 1, 1, null);
+  
+  if (eYear-sYear <= 5) {
+    var nYear = eYear-sYear+1;
+    annualChart = FIRECAM.updateOpts(annualChart, species, 'Annual', 'Y', (sYear-1), eYear, 12, 2, nYear);
+    annualChart.setChartType('ScatterChart');
+  }
+  
+  plotPanel.add(annualChart); plotPanel.add(ui.Label('', {margin: '-25px 8px 8px'}));
+  
+  var monthlyChart = FIRECAM.plotEmiTS(plotPanel, emiByMonth, regionShp,
+    species, 'Monthly', 'MMM Y', sYear, eYear, 1, 12, null);
+  plotPanel.add(monthlyChart);
+  
 });

@@ -6,7 +6,7 @@
 /*
 // Documentation: https://github.com/tianjialiu/FIRECAM
 // Author: Tianjia Liu
-// Last updated: September 18, 2018
+// Last updated: September 19, 2018
 
 // Purpose: explore regional differences in fire emissions from five
 // global fire emissions inventories (GFED, FINN, GFAS, QFED, FEER)
@@ -18,8 +18,6 @@
 // --------------
 // Input Params |
 // --------------
-var sYear = 2003; var eYear = 2016;
-var nMonth = (eYear-sYear+1)*12-1;
 var projFolder = 'users/tl2581/';
 
 var invNames = ['GFEDv4s','FINNv1p5','GFASv1p2','QFEDv2p5r1','FEERv1p0_G1p2'];
@@ -73,15 +71,9 @@ var gfasv1p2 = ee.ImageCollection(projFolder + 'GFASv1p2_sp');
 var qfedv2p5 = ee.ImageCollection(projFolder + 'QFEDv2p5r1_sp');
 var feerv1p0_g1p2 = ee.ImageCollection(projFolder + 'FEERv1p0_G1p2_sp');
 
-var aggProj = ee.Image(gfedv4s.first())
+var aggProj = gfedv4s.first()
   .reproject({crs: 'EPSG:4326', crsTransform: [0.5,0,-180,0,-0.5,90]})
   .projection();
-  
-var gfedList = gfedv4s.toList(500,0);
-var finnList = finnv1p5.toList(500,0);
-var gfasList = gfasv1p2.toList(500,0);
-var qfedList = qfedv2p5.toList(500,0);
-var feerList = feerv1p0_g1p2.toList(500,0);
 
 var getBand = function(imageList, iMonth, renameBands, species) {
   var image = ee.Image(imageList.get(iMonth));
@@ -93,7 +85,16 @@ var getBand = function(imageList, iMonth, renameBands, species) {
 };
 
 
-var getEmiByMonth = function(species) {
+var getEmiByMonth = function(species, sYear, eYear) {
+  
+  var nMonth = (eYear-sYear+1)*12-1;
+  var filterAllYrs = ee.Filter.calendarRange(sYear,eYear,'year');
+  
+  var gfedList = gfedv4s.filter(filterAllYrs).toList(500,0);
+  var finnList = finnv1p5.filter(filterAllYrs).toList(500,0);
+  var gfasList = gfasv1p2.filter(filterAllYrs).toList(500,0);
+  var qfedList = qfedv2p5.filter(filterAllYrs).toList(500,0);
+  var feerList = feerv1p0_g1p2.filter(filterAllYrs).toList(500,0);
   
   var emiByMonth = ee.List.sequence(0,nMonth,1).map(function(iMonth) {
     var gfed = getBand(gfedList,iMonth,gfedBandNames,species);
@@ -111,9 +112,8 @@ var getEmiByMonth = function(species) {
   
   return ee.ImageCollection(emiByMonth);
 };
-
   
-var getEmiByYr = function(emiByMonth) {
+var getEmiByYr = function(emiByMonth, sYear, eYear) {
 
   var emiByYr = ee.List.sequence(sYear,eYear,1).map(function(iYear) {
     var filterYr = ee.Filter.calendarRange(iYear,iYear,'year');
@@ -132,10 +132,19 @@ var getRegionShp = function(basisID) {
   return basisRegions.filterMetadata('basis','equals',basisID);
 };
 
+var colPal = {
+        0: {color: '777777'},
+        1: {color: '87CEEB'},
+        2: {color: 'FF0000'},
+        3: {color: 'FDB751'},
+        4: {color: '800080'},
+      };
+      
 var plotEmiTS = function(plotPanel, imageCol, regionShp,
-  speciesLabel, timePeriod) {
-  
-  var chart = ui.Chart.image.series({
+  speciesLabel, timePeriod, dateFormat, 
+  sYear, eYear, sMonth, eMonth, nLines) {
+    
+  return ui.Chart.image.series({
     imageCollection: imageCol.select(invNames,['b1','b2','b3','b4','b5']),
     region: regionShp,
     reducer: ee.Reducer.sum().unweighted(),
@@ -146,17 +155,62 @@ var plotEmiTS = function(plotPanel, imageCol, regionShp,
     .setOptions({
       title: timePeriod + ' Regional Fire Emissions',
       vAxis: {title: ['Emissions (Tg ' + speciesLabel + ')']},
+      hAxis: {
+        format: dateFormat, 
+        viewWindowMode:'explicit',
+        viewWindow: {
+          min: ee.Date.fromYMD(sYear,sMonth,1).millis().getInfo(),
+          max: ee.Date.fromYMD(eYear,eMonth,1).millis().getInfo()
+        },
+        gridlines: {count: nLines}
+      },
       height: '230px',
-      series: {
-        0: {color: '777777'},
-        1: {color: '87CEEB'},
-        2: {color: 'FF0000'},
-        3: {color: 'FDB751'},
-        4: {color: '800080'},
-      }
+      series: colPal
     });
+};
+
+var updateOpts = function(emiTS, speciesLabel, timePeriod, dateFormat, 
+  sYear, eYear, sMonth, eMonth, nLines) {
   
-  plotPanel.add(chart);
+  return emiTS.setOptions({
+      title: timePeriod + ' Regional Fire Emissions',
+      vAxis: {title: ['Emissions (Tg ' + speciesLabel + ')']},
+      hAxis: {
+        format: dateFormat, 
+        viewWindowMode:'explicit',
+        viewWindow: {
+          min: ee.Date.fromYMD(sYear,sMonth,1).millis().getInfo(),
+          max: ee.Date.fromYMD(eYear,eMonth,1).millis().getInfo()
+        },
+        gridlines: {count: nLines}
+      },
+      height: '230px',
+      series: colPal
+    });
+};
+
+var plotEmiBar = function(plotPanel, imageCol, regionShp,
+  speciesLabel, timePeriod) {
+  
+  var ts_chart = ui.Chart.image.series({
+    imageCollection: imageCol
+      .select(invNames,['b1','b2','b3','b4','b5'])
+      .set('xName','Avg., 2003-2016'),
+    region: regionShp,
+    reducer: ee.Reducer.sum().unweighted(),
+    scale: aggProj.nominalScale(),
+    xProperty: 'xName',
+  }).setChartType('ColumnChart')
+  .setSeriesNames(['GFEDv4s','FINNv1.5','GFASv1.2','QFEDv2.5r1','FEERv1.0-G1.2'])
+    .setOptions({
+      title: 'Average ' + timePeriod + ' Regional Fire Emissions (2003-2016)',
+      vAxis: {title: ['Emissions (Tg ' + speciesLabel + ')']},
+      hAxis: {gridlines: {count: 0}},
+      height: '230px',
+      series: colPal
+    });
+    
+  return ts_chart;
 };
 
 // ---------------------------------------
@@ -176,11 +230,47 @@ var infoPanel = function() {
     ]);
 };
 
+// -----------
+// Year Panel
+// -----------
+var yearSelectPanel = function() {
+  var timeRangeLabel = ui.Label('1) Select Time Range:', {margin: '8px 8px 8px 8px', fontSize: '14.5px'});
+  var startYearLabel = ui.Label('Start Year:', {margin: '8px 20px 8px 20px', fontSize: '14.5px'});
+  var startYearSlider = ui.Slider({min: 2003, max: 2016, value: 2005, step: 1});
+  startYearSlider.style().set('stretch', 'horizontal');
+  
+  var endYearLabel = ui.Label('End Year:', {margin: '8px 20px 8px 20px', fontSize: '14.5px'});
+  var endYearSlider = ui.Slider({min: 2003, max: 2016, value: 2015, step: 1, style: {margin: '8px 8px 8px 14px'}});
+  endYearSlider.style().set('stretch', 'horizontal');
+  
+  var changeSliderYr = function() {
+    var startYr = startYearSlider.getValue();
+    var endYr = endYearSlider.getValue();
+    if (endYr < startYr) {endYearSlider.setValue(startYr)}
+  };
+  
+  startYearSlider.onChange(changeSliderYr);
+  endYearSlider.onChange(changeSliderYr);
+  
+  return ui.Panel([
+      timeRangeLabel,
+      ui.Panel([startYearLabel, startYearSlider], ui.Panel.Layout.Flow('horizontal'), {stretch: 'horizontal'}), //
+      ui.Panel([endYearLabel, endYearSlider], ui.Panel.Layout.Flow('horizontal'), {stretch: 'horizontal'}),
+    ]);
+};
+
+var getYears = function(yearSelectPanel) {
+  return {
+    startYear:yearSelectPanel.widgets().get(1).widgets().get(1).getValue(),
+    endYear:yearSelectPanel.widgets().get(2).widgets().get(1).getValue()
+  };
+};
+
 // -----------------
 // Region Panel
 // -----------------
 var regionSelectPanel = function(regionNames) {
-  var regionLabel = ui.Label('1) Select Region:', {padding: '5px 0px 0px 0px', fontSize: '14.5px'});
+  var regionLabel = ui.Label('2) Select Region:', {padding: '5px 0px 0px 0px', fontSize: '14.5px'});
   var regionSelect = ui.Select({items: regionNames.sort(), value: 'EQAS - Equatorial Asia', style: {stretch: 'horizontal'}});
   return ui.Panel([regionLabel, regionSelect], ui.Panel.Layout.Flow('horizontal'), {stretch: 'horizontal'});
 };
@@ -193,7 +283,7 @@ var getRegions = function(regionSelectPanel) {
 // Species Panel
 // -----------------
 var speciesSelectPanel = function() {
-  var speciesLabel = ui.Label('2) Select Species:', {padding: '5px 0px 0px 0px', fontSize: '14.5px'});
+  var speciesLabel = ui.Label('3) Select Species:', {padding: '5px 0px 0px 0px', fontSize: '14.5px'});
   var speciesList = ['CO','CO2','CH4','OC','BC','PM2.5'];
   var speciesSelect = ui.Select({items: speciesList, value: 'CO2', style: {stretch: 'horizontal'}});
   return ui.Panel([speciesLabel, speciesSelect], ui.Panel.Layout.Flow('horizontal'), {stretch: 'horizontal'});
@@ -207,7 +297,6 @@ var getSpecies = function(speciesSelectPanel) {
 // Submit Button
 // -----------------
 var submitButton = ui.Button({label: 'Submit',  style: {stretch: 'horizontal'}});
-var waitMessage = ui.Label(' *** Computations will take a few seconds to be completed *** ', {margin: '-4px 8px 12px 8px', fontSize: '11.6px', textAlign: 'center', stretch: 'horizontal'});
 
 // --------
 // Legends
@@ -253,7 +342,7 @@ var continuousLegend = function(controlPanel, title, colPal, minVal,
 
 
 var legendPanel = function(controlPanel) {
-  controlPanel.add(ui.Label('----------------------------------------------------------------------------------', {margin: '-10px 8px 12px 8px', stretch: 'horizontal'}));
+  controlPanel.add(ui.Label('----------------------------------------------------------------------------------', {margin: '-5px 8px 12px 8px', stretch: 'horizontal'}));
   controlPanel.add(ui.Label('Legends', {fontWeight: 'bold', fontSize: '20px', margin: '-3px 8px 8px 8px'}));
 
   controlPanel.add(ui.Label('', {margin: '0px 0px 4px 0px'}));
@@ -331,15 +420,16 @@ map.setCenter(0,10,2);
 map.setControlVisibility({fullscreenControl: false});
 
 var infoPanel = infoPanel();
+var yearSelectPanel = yearSelectPanel();
 var regionSelectPanel = regionSelectPanel(regionNames);
 var speciesSelectPanel = speciesSelectPanel();
 
 // Display Panels
 controlPanel.add(infoPanel);
+controlPanel.add(yearSelectPanel);
 controlPanel.add(regionSelectPanel);
 controlPanel.add(speciesSelectPanel);
 controlPanel.add(submitButton);
-controlPanel.add(waitMessage);
 legendPanel(controlPanel);
 ui.root.clear(); ui.root.add(controlPanel);
 ui.root.add(map); ui.root.add(plotPanelParent);
@@ -348,6 +438,9 @@ ui.root.add(map); ui.root.add(plotPanelParent);
 submitButton.onClick(function() {
   
   // Input Parameters:
+  var sYear = getYears(yearSelectPanel).startYear;
+  var eYear = getYears(yearSelectPanel).endYear;
+  
   var region = getRegions(regionSelectPanel);
   var species = getRegions(speciesSelectPanel);
   
@@ -362,13 +455,14 @@ submitButton.onClick(function() {
   var spBandName = ee.List(bandNames).get(speciesIdx).getInfo();
   var vizParams = {palette: colPal_Spectral, min: 0, max: maxVal};
   
-  var emiByMonth = getEmiByMonth(species);
-  var emiByYr = getEmiByYr(emiByMonth);
+  var emiByMonth = getEmiByMonth(species, sYear, eYear);
+  var emiByYr = getEmiByYr(emiByMonth, sYear, eYear);
   
   var emiByYrMean = ee.Image([projFolder + 'GFEIyrMean_sp/GFEIyrMean_' + spBandName])
-    .multiply(bandMulti.select(species))
     .clip(basisRegions).reproject({crs: 'EPSG:4326', crsTransform: [0.5,0,-180,0,-0.5,90]});
  
+  var emiByYrMeanAdj = emiByYrMean.multiply(bandMulti.select(species));
+    
   // Display Maps:
   map.clear(); map.centerObject(regionShp);
   map.addLayer(RFCM1.multiply(1e3), {palette: colPal_RdBu, min: -1e3, max: 1e3}, 'Metric 1: Areal BA-AF Discrepancy', false);
@@ -377,11 +471,11 @@ submitButton.onClick(function() {
   map.addLayer(RFCM4, {palette: colPal_Grays, min: 0, max: 1e3}, 'Metric 4: Topography Variance', false);
   map.addLayer(RFCM5.multiply(1e3), {palette: colPal_Reds, min: 0, max: 1e3}, 'Metric 5: VIIRS FRP Outside MODIS Burn Extent', false);
 
-  map.addLayer(emiByYrMean.select('FEERv1p0_G1p2').selfMask(), vizParams, 'FEERv1.0-G1.2', false);
-  map.addLayer(emiByYrMean.select('QFEDv2p5r1').selfMask(), vizParams, 'QFEDv2.5r1', false);
-  map.addLayer(emiByYrMean.select('GFASv1p2').selfMask(), vizParams, 'GFASv1.2', false);
-  map.addLayer(emiByYrMean.select('FINNv1p5').selfMask(), vizParams, 'FINNv1.5', false);
-  map.addLayer(emiByYrMean.select('GFEDv4s').selfMask(), vizParams, 'GFEDv4s');
+  map.addLayer(emiByYrMeanAdj.select('FEERv1p0_G1p2').selfMask(), vizParams, 'FEERv1.0-G1.2', false);
+  map.addLayer(emiByYrMeanAdj.select('QFEDv2p5r1').selfMask(), vizParams, 'QFEDv2.5r1', false);
+  map.addLayer(emiByYrMeanAdj.select('GFASv1p2').selfMask(), vizParams, 'GFASv1.2', false);
+  map.addLayer(emiByYrMeanAdj.select('FINNv1p5').selfMask(), vizParams, 'FINNv1.5', false);
+  map.addLayer(emiByYrMeanAdj.select('GFEDv4s').selfMask(), vizParams, 'GFEDv4s');
   
   map.addLayer(ee.Image().byte().rename('Selected Basis Region')
     .paint(ee.FeatureCollection(regionShp), 0, 2), {palette: '#000000'}, 'Selected Region');
@@ -390,6 +484,23 @@ submitButton.onClick(function() {
   
   // Display Charts:
   plotPanel = plotPanel.clear();
-  plotEmiTS(plotPanel, emiByYr, regionShp, species, 'Annual');
-  plotEmiTS(plotPanel, emiByMonth, regionShp, species, 'Monthly');
+  
+  var totalChart = plotEmiBar(plotPanel, emiByYrMean, regionShp, species, 'Annual');
+  plotPanel.add(totalChart); plotPanel.add(ui.Label('', {margin: '-28px 8px 8px'}));
+  
+  var annualChart = plotEmiTS(plotPanel, emiByYr, regionShp,
+    species, 'Annual', 'Y', sYear, eYear, 1, 1, null);
+  
+  if (eYear-sYear <= 5) {
+    var nYear = eYear-sYear+1;
+    annualChart = updateOpts(annualChart, species, 'Annual', 'Y', (sYear-1), eYear, 12, 2, nYear);
+    annualChart.setChartType('ScatterChart');
+  }
+  
+  plotPanel.add(annualChart); plotPanel.add(ui.Label('', {margin: '-25px 8px 8px'}));
+  
+  var monthlyChart = plotEmiTS(plotPanel, emiByMonth, regionShp,
+    species, 'Monthly', 'MMM Y', sYear, eYear, 1, 12, null);
+  plotPanel.add(monthlyChart);
+  
 });
