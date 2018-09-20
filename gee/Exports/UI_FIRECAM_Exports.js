@@ -6,7 +6,7 @@
 /*
 // Documentation: https://github.com/tianjialiu/FIRECAM
 // Author: Tianjia Liu
-// Last updated: September 18, 2018
+// Last updated: September 20, 2018
 
 // Purpose: explore regional differences in fire emissions from five
 // global fire emissions inventories (GFED, FINN, GFAS, QFED, FEER)
@@ -78,7 +78,7 @@ var getBand = function(imageList, iMonth, renameBands, species) {
 var getEmiByMonth = function(species) {
   
   var nMonth = (eYear-sYear+1)*12-1;
-  var filterAllYrs = ee.Filter.calendarRange(sYear,eYear,iYear);
+  var filterAllYrs = ee.Filter.calendarRange(sYear,eYear,'year');
   
   var gfedList = gfedv4s.filter(filterAllYrs).toList(500,0);
   var finnList = finnv1p5.filter(filterAllYrs).toList(500,0);

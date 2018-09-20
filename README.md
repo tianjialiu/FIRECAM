@@ -2,11 +2,11 @@
 [FIRECAM](https://globalfires.earthengine.app/view/firecam): Fire Inventories - Regional Evaluation, Comparison, and Metrics
 
 FIRECAM is an explorer for regional differences in fire emissions from five global fire emissions inventories:
-1. Global Fire Emissions Database (GFEDv4s; van der Werf et al., 2017)
-2. Fire Inventory from NCAR (FINNv1.5; Wiedinmyer et al. 2011)
-3. Global Fire Assimilation System (GFASv1.2; Kaiser et al. 2012)
-4. Quick Fire Emissions Dataset (QFEDv2.5r1; Darmenov and da Silva, 2013)
-5. Fire Energetics and Emissions Research (FEERv1.0-G1.2; Ichoku and Ellison, 2014)
+1. Global Fire Emissions Database ([GFEDv4s](https://www.globalfiredata.org/); van der Werf et al., 2017)
+2. Fire Inventory from NCAR ([FINNv1.5](http://bai.acom.ucar.edu/Data/fire); Wiedinmyer et al. 2011)
+3. Global Fire Assimilation System ([GFASv1.2](http://gmes-atmosphere.eu/about/project_structure/input_data/d_fire/); Kaiser et al. 2012)
+4. Quick Fire Emissions Dataset ([QFEDv2.5r1](https://gmao.gsfc.nasa.gov/research/science_snapshots/global_fire_emissions.php); Darmenov and da Silva, 2013)
+5. Fire Energetics and Emissions Research ([FEERv1.0-G1.2](https://feer.gsfc.nasa.gov/data/emissions/); Ichoku and Ellison, 2014)
 
 FIRECAM can be accessed through 1) Earth Engine Apps and 2) Google Earth Engine playground.
 
@@ -59,7 +59,7 @@ https://code.earthengine.google.com/?accept_repo=users/tl2581/FIRECAM
 The repository should then appear in the top-left panel under 'Reader' as 'users/tl2581/FIRECAM'. The GEE Javascript playground is a code editor with a map and console to display or print results.
 
 ### Step 3: Diving into the GUI
-Click the 'UI_FIRECAM.js' script in the 'users/tl2581/FIRECAM' repository. The script should appear in the code editor. Click 'Run' in the top-right corner of the code editor to activate the UI. The repository also contains two export scripts, one for the basis regions and one for custom regions (e.g. country, continent).
+Click the 'UI_FIRECAM.js' script in the 'users/tl2581/FIRECAM' repository. The script should appear in the code editor. Click 'Run' in the top-right corner of the code editor to activate the UI. The repository also contains two export scripts, one for the GFEDv4s basis regions and one for custom regions (e.g. country, continent).
 
 ## Publications
 1. Liu, T., L.J. Mickley, R.S. DeFries, M.E. Marlier, M.F. Khan, M.T. Latif, and A. Karambelas (in prep). Diagnosing spatial uncertainties and relative biases in global fire emissions inventories: Indonesia as regional case study
