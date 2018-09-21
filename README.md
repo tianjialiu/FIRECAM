@@ -3,8 +3,8 @@
 
 FIRECAM is an explorer for regional differences in fire emissions from five global fire emissions inventories:
 1. Global Fire Emissions Database ([GFEDv4s](https://www.globalfiredata.org/); van der Werf et al., 2017)
-2. Fire Inventory from NCAR ([FINNv1.5](http://bai.acom.ucar.edu/Data/fire); Wiedinmyer et al. 2011)
-3. Global Fire Assimilation System ([GFASv1.2](http://gmes-atmosphere.eu/about/project_structure/input_data/d_fire/); Kaiser et al. 2012)
+2. Fire Inventory from NCAR ([FINNv1.5](http://bai.acom.ucar.edu/Data/fire); Wiedinmyer et al., 2011)
+3. Global Fire Assimilation System ([GFASv1.2](http://gmes-atmosphere.eu/about/project_structure/input_data/d_fire/); Kaiser et al., 2012)
 4. Quick Fire Emissions Dataset ([QFEDv2.5r1](https://gmao.gsfc.nasa.gov/research/science_snapshots/global_fire_emissions.php); Darmenov and da Silva, 2013)
 5. Fire Energetics and Emissions Research ([FEERv1.0-G1.2](https://feer.gsfc.nasa.gov/data/emissions/); Ichoku and Ellison, 2014)
 
@@ -19,25 +19,9 @@ FIRECAM can be accessed through 1) Earth Engine Apps and 2) Google Earth Engine 
 *Select a time range* Use the start year and end year sliders to select a time range for the annual and monthly regional emissions time series charts.
 
 ### Step 2: Region
-*Select a region.* Choose one of 14 "basis" regions, based on GFEDv4s (see table).
-
-### GFEDv4 Basis Regions
-| ID | Region Code | Region Name |
-| :---: | :--- | :--- |
-| 1 | BONA | Boreal North America |
-| 2 | TENA | Temperate North America |
-| 3 | CEAM | Central America |
-| 4 | NHSA | Northern Hemisphere South America |
-| 5 | SHSA | Southern Hemisphere South America |
-| 6 | EURO | Europe |
-| 7 | MIDE | Middle East |
-| 8 | NHAF | Northern Hemisphere Africa |
-| 9 | SHAF | Southern Hemisphere Africa |
-| 10 | BOAS | Boreal Asia |
-| 11 | CEAS | Central Asia |
-| 12 | SEAS | Southeast Asia |
-| 13 | EQAS | Equatorial Asia |
-| 14 | AUST | Australia and New Zealand |
+*Select a region.* Choose one of 14 "basis" regions, based on GFEDv4s (van der Werf et al., 2017).
+<br><br>
+![banner image](https://github.com/tianjialiu/FIRECAM/blob/master/docs/imgs/basisRegions.png)
 
 ### Step 3: Species
 *Select a species.* The six available species are CO<sub>2</sub>, CO, CH<sub>4</sub>, organic carbon (OC), black carbon (BC), and fine particulate matter (PM<sub>2.5</sub>)
