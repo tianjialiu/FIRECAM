@@ -6,7 +6,7 @@
 /*
 // Documentation: https://github.com/tianjialiu/FIRECAM
 // Author: Tianjia Liu
-// Last updated: September 19, 2018
+// Last updated: September 22, 2018
 
 // Purpose: explore regional differences in fire emissions from five
 // global fire emissions inventories (GFED, FINN, GFAS, QFED, FEER)
@@ -213,6 +213,57 @@ var plotEmiBar = function(plotPanel, imageCol, regionShp,
   return ts_chart;
 };
 
+// ---------------------------------
+// - - - - - - LULC.js - - - - - - |
+// ---------------------------------
+// ------------------------------
+// MODIS MCD12Q1 aggregated LULC
+// based on FINNv1.0 delineation
+// ------------------------------
+/*
+1: Evergreen Needleleaf Forests (BOR)
+2: Evergreen Broadleaf Forests (TROP)
+3: Deciduous Needleleaf Forests (BOR)
+4: Deciduous Broadleaf Forests (TEMP)
+5: Mixed Forests (TEMP)
+6: Closed Shrublands (WS)
+7: Open Shrublands (WS)
+8: Woody Savannas (WS)
+9: Savannas (SG)
+10: Grasslands (SG)
+11: Permanent Wetlands (SG)
+12: Croplands (CROP)
+13: Urban and Built-up Lands
+14: Cropland/Natural Vegetation Mosaics (SG)
+15: Permanent Snow and Ice
+16: Barren (SG)
+17: Water Bodies
+*/
+
+var getLULCmap = function(mapYr) {
+  var mcd12q1Yr = ee.Image(ee.ImageCollection('MODIS/006/MCD12Q1')
+    .filter(ee.Filter.calendarRange(mapYr,mapYr,'year')).first())
+    .select('LC_Type1');
+
+  var BOR = mcd12q1Yr.eq(1).add(mcd12q1Yr.eq(3)).gt(0);
+  var TROP = mcd12q1Yr.eq(2).multiply(2);
+  var TEMP = mcd12q1Yr.eq(4).add(mcd12q1Yr.eq(5)).gt(0).multiply(3);
+  var WS = mcd12q1Yr.eq(6).add(mcd12q1Yr.eq(7)).add(mcd12q1Yr.eq(8))
+  .gt(0).multiply(4);
+  var SG = mcd12q1Yr.eq(9).add(mcd12q1Yr.eq(10)).add(mcd12q1Yr.eq(11))
+  .add(mcd12q1Yr.eq(14)).add(mcd12q1Yr.eq(16)).gt(0).multiply(5);
+  var CROP = mcd12q1Yr.eq(12).multiply(6);
+  var URBAN = mcd12q1Yr.eq(13).multiply(7);
+  
+  return BOR.add(TROP).add(TEMP).add(WS).add(SG)
+    .add(CROP).add(URBAN).selfMask();
+};
+
+// -----------------------------------
+// Peatland distribution from GFEDv4s
+// -----------------------------------
+var peat = ee.Image(projFolder + 'GFEDv4s_peatCfrac');
+
 // ---------------------------------------
 // - - - - - - plotParams.js - - - - - - |
 // ---------------------------------------
@@ -395,6 +446,43 @@ var emiLegend = function(speciesLabel, units, maxVal, maxValPos) {
   return emiLegendPanel;
 };
 
+var lulc_colPal = ['#000000','#05450A','#92AF1F','#6A2424','#D99125','#F7E174','#FF0000'];
+
+var lulcLegend = function(colPal) {
+  colPal[7] = '#800080';
+  var labels = ['Boreal Forest','Tropical Forest','Temperate Forest',
+    'Woody Savanna/Shrubland','Savanna/Grassland','Cropland','Urban/Built-Up','Peatland'];
+  
+  var lulcLegendPanel = ui.Panel({
+    style: {
+      padding: '2px 9px 8px 9px',
+      position: 'bottom-left'
+    }
+  });
+   
+  lulcLegendPanel.add(ui.Label('Land Use/Land Cover', {fontWeight: 'bold', fontSize: '18px', margin: '0px 0 7px 8px'}));
+  
+  var makeRow = function(colPal, labels) {
+    var colorBox = ui.Label({
+      style: {
+        padding: '10px',
+        margin: '0px 0 4px 8px',
+        fontSize: '15px',
+        backgroundColor: colPal
+      }
+    });
+
+    var description = ui.Label({value: labels, style: {margin: '2px 1px 4px 6px', fontSize: '14.7px'}});
+    return ui.Panel({widgets: [colorBox, description], layout: ui.Panel.Layout.Flow('horizontal')});
+  };
+  
+  for (var i = 0; i < labels.length; i++) {
+    lulcLegendPanel.add(makeRow(colPal[i], labels[i]));
+  }
+  
+  return lulcLegendPanel;
+};
+
 // -----------
 // Plot Panel
 // -----------
@@ -431,6 +519,7 @@ controlPanel.add(regionSelectPanel);
 controlPanel.add(speciesSelectPanel);
 controlPanel.add(submitButton);
 legendPanel(controlPanel);
+controlPanel.add(lulcLegend(lulc_colPal));
 ui.root.clear(); ui.root.add(controlPanel);
 ui.root.add(map); ui.root.add(plotPanelParent);
 
@@ -460,17 +549,22 @@ submitButton.onClick(function() {
   
   var emiByYrMean = ee.Image([projFolder + 'GFEIyrMean_sp/GFEIyrMean_' + spBandName])
     .clip(basisRegions).reproject({crs: 'EPSG:4326', crsTransform: [0.5,0,-180,0,-0.5,90]});
- 
   var emiByYrMeanAdj = emiByYrMean.multiply(bandMulti.select(species));
-    
+  
+  var mapYr = ee.Number((sYear + eYear)/2).round();
+  var lulcMapYr = getLULCmap(mapYr);
+  
   // Display Maps:
   map.clear(); map.centerObject(regionShp);
-  map.addLayer(RFCM1.multiply(1e3), {palette: colPal_RdBu, min: -1e3, max: 1e3}, 'Metric 1: Areal BA-AF Discrepancy', false);
-  map.addLayer(RFCM2.multiply(1e3), {palette: colPal_Blues, min: 0, max: 1e3}, 'Metric 2: Cloud/Haze Obscuration', false);
-  map.addLayer(RFCM3.multiply(1e3), {palette: colPal_Reds, min: 0, max: 2e3}, 'Metric 3: Burn Size/Fragmentation', false);
-  map.addLayer(RFCM4, {palette: colPal_Grays, min: 0, max: 1e3}, 'Metric 4: Topography Variance', false);
+  map.addLayer(lulcMapYr, {palette: lulc_colPal, min: 1, max: 7}, 'Land Use/ Land Cover ' + mapYr.getInfo(), false);
+  map.addLayer(peat.gt(0).selfMask(), {palette: ['#800080']}, 'Peatlands', false);
+  
   map.addLayer(RFCM5.multiply(1e3), {palette: colPal_Reds, min: 0, max: 1e3}, 'Metric 5: VIIRS FRP Outside MODIS Burn Extent', false);
-
+  map.addLayer(RFCM4, {palette: colPal_Grays, min: 0, max: 1e3}, 'Metric 4: Topography Variance', false);
+  map.addLayer(RFCM3.multiply(1e3), {palette: colPal_Reds, min: 0, max: 2e3}, 'Metric 3: Burn Size/Fragmentation', false);
+  map.addLayer(RFCM2.multiply(1e3), {palette: colPal_Blues, min: 0, max: 1e3}, 'Metric 2: Cloud/Haze Obscuration', false);
+  map.addLayer(RFCM1.multiply(1e3), {palette: colPal_RdBu, min: -1e3, max: 1e3}, 'Metric 1: Areal BA-AF Discrepancy', false);
+  
   map.addLayer(emiByYrMeanAdj.select('FEERv1p0_G1p2').selfMask(), vizParams, 'FEERv1.0-G1.2', false);
   map.addLayer(emiByYrMeanAdj.select('QFEDv2p5r1').selfMask(), vizParams, 'QFEDv2.5r1', false);
   map.addLayer(emiByYrMeanAdj.select('GFASv1p2').selfMask(), vizParams, 'GFASv1.2', false);
@@ -479,7 +573,7 @@ submitButton.onClick(function() {
   
   map.addLayer(ee.Image().byte().rename('Selected Basis Region')
     .paint(ee.FeatureCollection(regionShp), 0, 2), {palette: '#000000'}, 'Selected Region');
-    
+  
   map.add(emiLegend(speciesLabel, unitsLabel, maxVal, maxPos));
   
   // Display Charts:

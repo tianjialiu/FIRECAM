@@ -187,6 +187,43 @@ exports.emiLegend = function(speciesLabel, units, maxVal, maxValPos) {
   return emiLegendPanel;
 };
 
+exports.lulc_colPal = ['#000000','#05450A','#92AF1F','#6A2424','#D99125','#F7E174','#FF0000'];
+
+exports.lulcLegend = function(colPal) {
+  colPal[7] = '#800080';
+  var labels = ['Boreal Forest','Tropical Forest','Temperate Forest',
+    'Woody Savanna/Shrubland','Savanna/Grassland','Cropland','Urban/Built-Up','Peatland'];
+  
+  var lulcLegendPanel = ui.Panel({
+    style: {
+      padding: '2px 9px 8px 9px',
+      position: 'bottom-left'
+    }
+  });
+   
+  lulcLegendPanel.add(ui.Label('Land Use/Land Cover', {fontWeight: 'bold', fontSize: '18px', margin: '0px 0 7px 8px'}));
+  
+  var makeRow = function(colPal, labels) {
+    var colorBox = ui.Label({
+      style: {
+        padding: '10px',
+        margin: '0px 0 4px 8px',
+        fontSize: '15px',
+        backgroundColor: colPal
+      }
+    });
+
+    var description = ui.Label({value: labels, style: {margin: '2px 1px 4px 6px', fontSize: '14.7px'}});
+    return ui.Panel({widgets: [colorBox, description], layout: ui.Panel.Layout.Flow('horizontal')});
+  };
+  
+  for (var i = 0; i < labels.length; i++) {
+    lulcLegendPanel.add(makeRow(colPal[i], labels[i]));
+  }
+  
+  return lulcLegendPanel;
+};
+
 // -----------
 // Plot Panel
 // -----------

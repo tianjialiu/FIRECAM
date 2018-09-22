@@ -6,7 +6,7 @@
 /*
 // Documentation: https://github.com/tianjialiu/FIRECAM
 // Author: Tianjia Liu
-// Last updated: September 19, 2018
+// Last updated: September 22, 2018
 
 // Purpose: explore regional differences in fire emissions from five
 // global fire emissions inventories (GFED, FINN, GFAS, QFED, FEER)
@@ -21,7 +21,8 @@
 // Import Modules |
 // ----------------
 var plotParams = require('users/tl2581/FIRECAM:Modules/plotParams.js');
-var FIRECAM = require('users/tl2581/FIRECAM:Modules/FIRECAM.js');
+var FIRECAM = require('users/tl2581/FIRECAM:Modules/emissions.js');
+var lulc = require('users/tl2581/FIRECAM:Modules/lulc.js');
 
 // --------------
 // Input Params |
@@ -106,11 +107,16 @@ submitButton.onClick(function() {
   
   var emiByYrMean = ee.Image(['projects/GlobalFires/GFEIyrMean_sp/GFEIyrMean_' + spBandName])
     .clip(FIRECAM.basisRegions).reproject({crs: 'EPSG:4326', crsTransform: [0.5,0,-180,0,-0.5,90]});
-    
   var emiByYrMeanAdj = emiByYrMean.multiply(bandMulti.select(species));
+  
+  var mapYr = ee.Number((sYear + eYear)/2).round();
+  var lulcMapYr = lulc.getLULCmap(mapYr);
   
   // Display Maps:
   map.clear(); map.centerObject(regionShp);
+  map.addLayer(lulcMapYr, {palette: plotParams.lulc_colPal, min: 1, max: 7}, 'Land Use/ Land Cover ' + mapYr.getInfo(), false);
+  map.addLayer(lulc.peat.gt(0).selfMask(), {palette: ['#800080']}, 'Peatlands', false);
+  
   map.addLayer(FIRECAM.RFCM1.multiply(1e3), {palette: plotParams.colPal_RdBu, min: -1e3, max: 1e3}, 'Metric 1: Areal BA-AF Discrepancy', false);
   map.addLayer(FIRECAM.RFCM2.multiply(1e3), {palette: plotParams.colPal_Blues, min: 0, max: 1e3}, 'Metric 2: Cloud/Haze Obscuration', false);
   map.addLayer(FIRECAM.RFCM3.multiply(1e3), {palette: plotParams.colPal_Reds, min: 0, max: 2e3}, 'Metric 3: Burn Size/Fragmentation', false);
