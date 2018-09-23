@@ -52,7 +52,7 @@ var basisRegions = ee.FeatureCollection(projFolder + 'basisRegions_0p5deg');
 // Relative Fire Confidence Metrics
 // ----------------------------------
 // Metric 1: areal BA-AF discrepancy
-var RFCM1 = ee.Image([projFolder + 'RelFireConfidence/RFCM1_areal_BA_AF_discrepancy']);
+var RFCM1 = ee.Image([projFolder + 'RelFireConfidence/RFCM1_BA_AFA_discrepancy']);
 // Metric 2: FRP-weighted cloud/haze burden on satellite observing conditions
 var RFCM2 = ee.Image([projFolder + 'RelFireConfidence/RFCM2_cloud_haze_burden']);
 // Metric 3: burn size and fragmentation
@@ -398,7 +398,7 @@ var legendPanel = function(controlPanel) {
 
   controlPanel.add(ui.Label('', {margin: '0px 0px 4px 0px'}));
   
-  continuousLegend(controlPanel,'Areal BA-AF Discrepancy',
+  continuousLegend(controlPanel,'BA-AFA Discrepancy',
     colPal_RdBu, -1, 1, 'Metric 1: normalized difference', 303);
   continuousLegend(controlPanel,'Cloud/Haze Obscuration',
     colPal_Blues, 0, 1, 'Metric 2: fractional, FRP-weighted', 303);

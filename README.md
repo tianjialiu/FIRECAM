@@ -27,7 +27,17 @@ FIRECAM can be accessed through 1) Earth Engine Apps and 2) Google Earth Engine 
 *Select a species.* The six available species are CO<sub>2</sub>, CO, CH<sub>4</sub>, organic carbon (OC), black carbon (BC), and fine particulate matter (PM<sub>2.5</sub>)
 
 ### Regional Emissions
-After clicking the submit button, please wait a few seconds for the default map layers and three charts to display. Note that for large regions, such as BOAS, and long time ranges, calculations for the monthly and annual time series can take up to a few minutes. The three charts (annual average from 2003-2016 and two time series charts, yearly and monthly emissions by inventory), can be viewed in a new tab and exported as tables or images. Map layers consist of emissions at 0.5° x 0.5° spatial resolution for a given species for each of the five global fire emissions inventories and fire relative fire confidence metrics at 0.25° x 0.25° spatial resolution. The distribution of peatlands (0.25° x 0.25°), based on GFEDv4s emissions from 2003-2016, and MODIS land use/land cover map (500 m, MCD12Q1 C6), based on FINNv1.0 aggregated vegetation classes, are also available as map layers.
+After clicking the submit button, please wait a few seconds for the default map layers and three charts to display. Note that for large regions, such as BOAS, and long time ranges, calculations for the monthly and annual time series can take up to a few minutes. The three charts (annual average from 2003-2016 and two time series charts, yearly and monthly emissions by inventory), can be viewed in a new tab and exported as tables or images. Map layers consist of emissions at 0.5° x 0.5° spatial resolution for a given species for each of the five global fire emissions inventories and fire relative fire confidence metrics (described below) at 0.25° x 0.25° spatial resolution. The distribution of peatlands (0.25° x 0.25°), based on GFEDv4s emissions from 2003-2016, and MODIS land use/land cover map (500 m, MCD12Q1 C6), based on FINNv1.0 aggregated vegetation classes, are also available as map layers.
+
+### Relative Fire Confidence Metrics
+| # | Metric | Range | Units | Description |
+| :---: | :--- | :--- | :--- | :--- |
+| 1 | BA-AFA Discrepancy | -1 to 1 | unitless | discrepancy between burned area (BA; MCD64A1) and active fire area (AFA; MxD14A1), calculated as a normalized index using the area of BA outside AFA and AFA outside BA |
+| 2 | Cloud-Haze Obscuration | 0 to 1 | unitless | degree to which clouds and/or haze obscure the land surface from satellite observations of fires during fire-prone months |
+| 3 | Burn Size/ Fragmentation | ≥ 0 | km<sup>2</sup> / fragment | average size of burned area per burn scar fragment (large, continuguous versus small, fragmented fire landscapes) |
+| 4 | Topography Variance | ≥ 0 | m<sup>2</sup> | roughness in terrain, expressed as the variance in elevation across neighboring pixels (flat versus mountainous) |
+| 5 | VIIRS FRP Outside MODIS Burn Extent | 0 to 1 | unitless | additional small fires from VIIRS (375 m), a sensor with higher spatial resolution than MODIS (500 m, 1 km) |
+
 <br><br>
 
 ## Google Earth Engine Code Editor GUI

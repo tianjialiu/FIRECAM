@@ -117,7 +117,7 @@ submitButton.onClick(function() {
   map.addLayer(lulcMapYr, {palette: plotParams.lulc_colPal, min: 1, max: 7}, 'Land Use/ Land Cover ' + mapYr.getInfo(), false);
   map.addLayer(lulc.peat.gt(0).selfMask(), {palette: ['#800080']}, 'Peatlands', false);
   
-  map.addLayer(FIRECAM.RFCM1.multiply(1e3), {palette: plotParams.colPal_RdBu, min: -1e3, max: 1e3}, 'Metric 1: Areal BA-AF Discrepancy', false);
+  map.addLayer(FIRECAM.RFCM1.multiply(1e3), {palette: plotParams.colPal_RdBu, min: -1e3, max: 1e3}, 'Metric 1: BA-AFA Discrepancy', false);
   map.addLayer(FIRECAM.RFCM2.multiply(1e3), {palette: plotParams.colPal_Blues, min: 0, max: 1e3}, 'Metric 2: Cloud/Haze Obscuration', false);
   map.addLayer(FIRECAM.RFCM3.multiply(1e3), {palette: plotParams.colPal_Reds, min: 0, max: 2e3}, 'Metric 3: Burn Size/Fragmentation', false);
   map.addLayer(FIRECAM.RFCM4, {palette: plotParams.colPal_Grays, min: 0, max: 1e3}, 'Metric 4: Topography Variance', false);

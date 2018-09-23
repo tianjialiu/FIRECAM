@@ -139,7 +139,7 @@ exports.legendPanel = function(controlPanel) {
 
   controlPanel.add(ui.Label('', {margin: '0px 0px 4px 0px'}));
   
-  continuousLegend(controlPanel,'Areal BA-AF Discrepancy',
+  continuousLegend(controlPanel,'BA-AFA Discrepancy',
     colPal_RdBu, -1, 1, 'Metric 1: normalized difference', 303);
   continuousLegend(controlPanel,'Cloud/Haze Obscuration',
     colPal_Blues, 0, 1, 'Metric 2: fractional, FRP-weighted', 303);

@@ -1,5 +1,5 @@
 /**** Start of imports. If edited, may not auto-convert in the playground. ****/
-var metric1 = ee.Image("projects/GlobalFires/RelFireConfidence/RFCM1_areal_BA_AF_discrepancy"),
+var metric1 = ee.Image("users/tl2581/RelFireConfidence/RFCM1_BA_AFA_discrepancy"),
     metric2 = ee.Image("projects/GlobalFires/RelFireConfidence/RFCM2_cloud_haze_burden"),
     metric3 = ee.Image("projects/GlobalFires/RelFireConfidence/RFCM3_fireBAComponentSize"),
     metric4 = ee.Image("projects/GlobalFires/RelFireConfidence/RFCM4_topo_variance"),
@@ -12,11 +12,10 @@ var metric1 = ee.Image("projects/GlobalFires/RelFireConfidence/RFCM1_areal_BA_AF
     gfedv4_ancill = ee.Image("projects/GlobalFires/GFEDv4ancill"),
     basisRegions = ee.FeatureCollection("projects/GlobalFires/basisRegions_0p5deg");
 /***** End of imports. If edited, may not auto-convert in the playground. *****/
-
 // ----------------------------------
 // Relative Fire Confidence Metrics
 // ----------------------------------
-// Metric 1: areal BA-AF discrepancy
+// Metric 1: BA-AFA discrepancy
 exports.RFCM1 = metric1;
 // Metric 2: FRP-weighted cloud/haze burden on satellite observing conditions
 exports.RFCM2 = metric2;
