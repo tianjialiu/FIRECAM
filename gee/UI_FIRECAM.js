@@ -78,6 +78,7 @@ controlPanel.add(regionSelectPanel);
 controlPanel.add(speciesSelectPanel);
 controlPanel.add(submitButton);
 plotParams.legendPanel(controlPanel);
+plotParams.lulcLegend(controlPanel,plotParams.lulcPeat_colPal);
 ui.root.clear(); ui.root.add(controlPanel);
 ui.root.add(map); ui.root.add(plotPanelParent);
 

@@ -188,9 +188,9 @@ exports.emiLegend = function(speciesLabel, units, maxVal, maxValPos) {
 };
 
 exports.lulc_colPal = ['#000000','#05450A','#92AF1F','#6A2424','#D99125','#F7E174','#FF0000'];
+exports.lulcPeat_colPal = ['#000000','#05450A','#92AF1F','#6A2424','#D99125','#F7E174','#FF0000','#800080'];
 
-exports.lulcLegend = function(colPal) {
-  colPal[7] = '#800080';
+exports.lulcLegend = function(controlPanel, colPal) {
   var labels = ['Boreal Forest','Tropical Forest','Temperate Forest',
     'Woody Savanna/Shrubland','Savanna/Grassland','Cropland','Urban/Built-Up','Peatland'];
   
@@ -221,7 +221,7 @@ exports.lulcLegend = function(colPal) {
     lulcLegendPanel.add(makeRow(colPal[i], labels[i]));
   }
   
-  return lulcLegendPanel;
+  controlPanel.add(lulcLegendPanel);
 };
 
 // -----------

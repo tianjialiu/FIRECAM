@@ -447,9 +447,9 @@ var emiLegend = function(speciesLabel, units, maxVal, maxValPos) {
 };
 
 var lulc_colPal = ['#000000','#05450A','#92AF1F','#6A2424','#D99125','#F7E174','#FF0000'];
+var lulcPeat_colPal = ['#000000','#05450A','#92AF1F','#6A2424','#D99125','#F7E174','#FF0000','#800080'];
 
-var lulcLegend = function(colPal) {
-  colPal[7] = '#800080';
+var lulcLegend = function(controlPanel, colPal) {
   var labels = ['Boreal Forest','Tropical Forest','Temperate Forest',
     'Woody Savanna/Shrubland','Savanna/Grassland','Cropland','Urban/Built-Up','Peatland'];
   
@@ -480,7 +480,7 @@ var lulcLegend = function(colPal) {
     lulcLegendPanel.add(makeRow(colPal[i], labels[i]));
   }
   
-  return lulcLegendPanel;
+  controlPanel.add(lulcLegendPanel);
 };
 
 // -----------
@@ -519,7 +519,7 @@ controlPanel.add(regionSelectPanel);
 controlPanel.add(speciesSelectPanel);
 controlPanel.add(submitButton);
 legendPanel(controlPanel);
-controlPanel.add(lulcLegend(lulc_colPal));
+lulcLegend(controlPanel,lulcPeat_colPal);
 ui.root.clear(); ui.root.add(controlPanel);
 ui.root.add(map); ui.root.add(plotPanelParent);
 
