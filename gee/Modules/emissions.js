@@ -33,11 +33,6 @@ var sYear = 2003; var eYear = 2016;
 
 var invNames = ['GFEDv4s','FINNv1p5','GFASv1p2','QFEDv2p5r1','FEERv1p0_G1p2'];
 var bandNames = ['CO','CO2','CH4','OC','BC','PM2/5'];
-var bandLabel = ee.List(['CO','CO2','CH4','OC','BC','PM2.5']);
-
-var gfedBandNames = ['DM','CO','CO2','CH4','OC','BC','PM2/5'];
-var gfasBandNames = ['APT','FRP','CO','CO2','CH4','OC','BC','PM2/5'];
-var finnBandNames = ['BA','CO','CO2','CH4','OC','BC','PM2/5'];
 
 var aggProj = gfedv4s.first()
   .reproject({crs: 'EPSG:4326', crsTransform: [0.5,0,-180,0,-0.5,90]})
@@ -45,11 +40,11 @@ var aggProj = gfedv4s.first()
   
 exports.basisRegions = basisRegions;
 
-var getBand = function(imageList, iMonth, renameBands, species) {
+var getBand = function(imageList, iMonth, species) {
   var image = ee.Image(imageList.get(iMonth));
 
   return ee.Image(image.select('.*_0-5deg').divide(1e9)
-    .rename(renameBands).select(species)
+    .rename(bandNames).select(species)
     .reproject({crs: aggProj, scale: aggProj.nominalScale()})
     .copyProperties(image,['system:time_start']));
 };
@@ -66,11 +61,11 @@ exports.getEmiByMonth = function(species, sYear, eYear) {
   var feerList = feerv1p0_g1p2.filter(filterAllYrs).toList(500,0);
   
   var emiByMonth = ee.List.sequence(0,nMonth,1).map(function(iMonth) {
-    var gfed = getBand(gfedList,iMonth,gfedBandNames,species);
-    var finn = getBand(finnList,iMonth,finnBandNames,species);
-    var gfas = getBand(gfasList,iMonth,gfasBandNames,species);
-    var qfed = getBand(qfedList,iMonth,bandNames,species);
-    var feer = getBand(feerList,iMonth,bandNames,species);
+    var gfed = getBand(gfedList,iMonth,species);
+    var finn = getBand(finnList,iMonth,species);
+    var gfas = getBand(gfasList,iMonth,species);
+    var qfed = getBand(qfedList,iMonth,species);
+    var feer = getBand(feerList,iMonth,species);
   
     var emiAll = gfed.addBands(finn).addBands(gfas).addBands(qfed).addBands(feer)
       .rename(invNames).reproject({crs: aggProj, scale: aggProj.nominalScale()})

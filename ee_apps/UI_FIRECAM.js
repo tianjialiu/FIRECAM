@@ -6,7 +6,7 @@
 /*
 // Documentation: https://github.com/tianjialiu/FIRECAM
 // Author: Tianjia Liu
-// Last updated: September 22, 2018
+// Last updated: September 24, 2018
 
 // Purpose: explore regional differences in fire emissions from five
 // global fire emissions inventories (GFED, FINN, GFAS, QFED, FEER)
@@ -28,10 +28,6 @@ var bandMaxPos = ee.List([235,228,228,228,235,228]);
 var bandUnits = ee.List(['Gg','Gg','Mg','Mg','Mg','Mg']);
 var bandLabel = ee.List(['CO','CO2','CH4','OC','BC','PM2.5']);
 
-var gfedBandNames = ['DM','CO','CO2','CH4','OC','BC','PM2/5'];
-var gfasBandNames = ['APT','FRP','CO','CO2','CH4','OC','BC','PM2/5'];
-var finnBandNames = ['BA','CO','CO2','CH4','OC','BC','PM2/5'];
-  
 var regionNames = ['BONA - Boreal North America',
   'TENA - Temperate North America',
   'CEAM - Central America',
@@ -75,11 +71,11 @@ var aggProj = gfedv4s.first()
   .reproject({crs: 'EPSG:4326', crsTransform: [0.5,0,-180,0,-0.5,90]})
   .projection();
 
-var getBand = function(imageList, iMonth, renameBands, species) {
+var getBand = function(imageList, iMonth, species) {
   var image = ee.Image(imageList.get(iMonth));
 
   return ee.Image(image.select('.*_0-5deg').divide(1e9)
-    .rename(renameBands).select(species)
+    .rename(bandNames).select(species)
     .reproject({crs: aggProj, scale: aggProj.nominalScale()})
     .copyProperties(image,['system:time_start']));
 };
@@ -97,11 +93,11 @@ var getEmiByMonth = function(species, sYear, eYear) {
   var feerList = feerv1p0_g1p2.filter(filterAllYrs).toList(500,0);
   
   var emiByMonth = ee.List.sequence(0,nMonth,1).map(function(iMonth) {
-    var gfed = getBand(gfedList,iMonth,gfedBandNames,species);
-    var finn = getBand(finnList,iMonth,finnBandNames,species);
-    var gfas = getBand(gfasList,iMonth,gfasBandNames,species);
-    var qfed = getBand(qfedList,iMonth,bandNames,species);
-    var feer = getBand(feerList,iMonth,bandNames,species);
+    var gfed = getBand(gfedList,iMonth,species);
+    var finn = getBand(finnList,iMonth,species);
+    var gfas = getBand(gfasList,iMonth,species);
+    var qfed = getBand(qfedList,iMonth,species);
+    var feer = getBand(feerList,iMonth,species);
   
     var emiAll = gfed.addBands(finn).addBands(gfas).addBands(qfed).addBands(feer)
       .rename(invNames).reproject({crs: aggProj, scale: aggProj.nominalScale()})
