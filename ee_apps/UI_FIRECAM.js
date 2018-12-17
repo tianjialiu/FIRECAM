@@ -18,7 +18,7 @@
 // --------------
 // Input Params |
 // --------------
-var projFolder = 'users/tl2581/';
+var projFolder = 'projects/GlobalFires/';
 
 var invNames = ['GFEDv4s','FINNv1p5','GFASv1p2','QFEDv2p5r1','FEERv1p0_G1p2'];
 var bandNames = ['CO','CO2','CH4','OC','BC','PM2p5'];
