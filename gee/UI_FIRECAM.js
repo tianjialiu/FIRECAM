@@ -6,7 +6,7 @@
 /*
 // Documentation: https://github.com/tianjialiu/FIRECAM
 // Author: Tianjia Liu
-// Last updated: September 24, 2018
+// Last updated: January 28, 2019
 
 // Purpose: explore regional differences in fire emissions from five
 // global fire emissions inventories (GFED, FINN, GFAS, QFED, FEER)
@@ -52,7 +52,7 @@ var basisCodes = [2,13,3,9,12,6,7,8,11,1,4,10,5,0];
 // Control panel
 var controlPanel = ui.Panel({
   layout: ui.Panel.Layout.flow('vertical'),
-  style: {width: '335px'}
+  style: {width: '345px'}
 });
 
 // Plot panel

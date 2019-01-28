@@ -6,7 +6,7 @@
 /*
 // Documentation: https://github.com/tianjialiu/FIRECAM
 // Author: Tianjia Liu
-// Last updated: September 24, 2018
+// Last updated: January 28, 2019
 
 // Purpose: explore regional differences in fire emissions from five
 // global fire emissions inventories (GFED, FINN, GFAS, QFED, FEER)
@@ -389,7 +389,8 @@ var continuousLegend = function(controlPanel, title, colPal, minVal,
 
 
 var legendPanel = function(controlPanel) {
-  controlPanel.add(ui.Label('----------------------------------------------------------------------------------', {margin: '-5px 8px 12px 8px', stretch: 'horizontal'}));
+  controlPanel.add(ui.Label('----------------------------------------------------------------------------------',
+    {margin: '-5px 8px 12px 8px', stretch: 'horizontal', textAlign: 'center'}));
   controlPanel.add(ui.Label('Legends', {fontWeight: 'bold', fontSize: '20px', margin: '-3px 8px 8px 8px'}));
 
   controlPanel.add(ui.Label('', {margin: '0px 0px 4px 0px'}));
@@ -490,7 +491,7 @@ var plotPanelLabel = ui.Label('Regional Emissions', {fontWeight: 'bold', fontSiz
 // Control panel
 var controlPanel = ui.Panel({
   layout: ui.Panel.Layout.flow('vertical'),
-  style: {width: '335px'}
+  style: {width: '345px'}
 });
 
 // Plot panel
