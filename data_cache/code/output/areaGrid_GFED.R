@@ -67,6 +67,8 @@ GFEDv4s_area_nc <- function(outputType="tif") {
     writeRaster(area_m2,paste0(outname,".tif"),format="GTiff",overwrite=T)
   }
   
+  removeTmpFiles(h=0)
+  
   # -----------------
   # Save NetCDF
   # -----------------
