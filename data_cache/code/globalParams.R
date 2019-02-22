@@ -1,17 +1,12 @@
-# =============================================
-# Global parameters and functions for
-# processing global fire emissions inventories
-# =============================================
-# last updated: Feb 20, 2019
-# Tianjia Liu
-
 #open packages
 library("raster");library("rgeos");library("maptools");library("mapproj");
 library("maps");library("rgdal");library("spdep");library("sp");library("fields")
 library("plyr");library("ncdf4");library("rhdf5")
 
-outputDir <- "/Volumes/TLIU_DATA/FIRE_nc_daily/"
 inputDir <- "/Volumes/TLIU_DATA/FIRE_raw/"
+outputDir_nc <- "/Volumes/TLIU_DATA/FIRE_nc_daily/"
+outputDir_tif <- "/Volumes/TLIU_DATA/FIRE_tif_daily/"
+
 originDate <- "1985-01-01"
 varUnits <- "kg/m2/s"
 
