@@ -12,6 +12,7 @@ varUnits <- "kg/m2/s"
 
 latlong <- crs(raster())
 fillval <- NULL
+nTmpHrs <- 1
 
 setwd(inputDir)
 spNames <- read.csv("species_names.csv")

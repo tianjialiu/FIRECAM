@@ -113,7 +113,7 @@ GFASv1p2_pro <- function(varName, xYears, xMonths, outputType="tif") {
         writeRaster(stack(inv_sp),paste0(outname,".tif"),format="GTiff",overwrite=T)
       }
       
-      removeTmpFiles(h=0)
+      removeTmpFiles(h=nTmpHrs)
       
       # -----------------
       # Construct NetCDF

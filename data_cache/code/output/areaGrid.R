@@ -56,7 +56,7 @@ area_pro <- function(xres, yres, outputType="tif") {
     writeRaster(area_m2,paste0(outname,".tif"),format="GTiff",overwrite=T)
   }
   
-  removeTmpFiles(h=0)
+  removeTmpFiles(h=nTmpHrs)
   
   # -----------------
   # Save NetCDF

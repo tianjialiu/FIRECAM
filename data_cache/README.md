@@ -43,7 +43,7 @@ wget -m -nH --cut-dirs=5 ftp://iesa:@ftp.nccs.nasa.gov/aerosol/emissions/QFED/v2
 ```
 
 ### 5. FEERv1.0-G1.2
-Monthly NetCDF files can be downloaded [here](https://feer.gsfc.nasa.gov/data/emissions/).
+Monthly NetCDF files (with daily timesteps) can be downloaded [here](https://feer.gsfc.nasa.gov/data/emissions/).
 
 ## Processing
 R code under `code/output/`, along with the `globalParams.R` script, transforms the raw downloaded files into monthly NetCDF or GeoTiff files with daily timesteps for a given species (in units of kg/m<sup>2</sup>/s) and given time period. The `species_names.csv` table in `ancill/` lists all possible species you can download for each inventory and is a required input that standarizes the species names and provides long names for the output NetCDF files. The full directory structure, with an input directory (Fire_raw) and output directories (Fire_nc_daily, Fire_tif_daily), should look like the following:
@@ -86,7 +86,7 @@ Fire_tif_daily/
 First, install the necessary R dependencies, which are listed in the `globalParams.R` script. Then, modify the `globalParams.R` script with your input and output directory paths. Make sure to also modify the `source('~/Google Drive/scripts/R/fire_inv/globalParams.R')` line with the correct path of the  `globalParams.R` script in the in the inventory-specific R scripts in `code/output_nc`. Finally, modify the input parameters (`xYears`, `xMonths`, and `varNameL`) to specify the time range and species list you want to output and source the inventory-specific R script!
 
 ### Important Notes
-* GeoTiff outputs are in raster stacks, where each layer represents one timestep. GeoTiffs preserve the gridded format and are faster and more convenient to read and write in R. The R routine periodically removes temporary raster files saved to memory to prevent storage issues.
+* GeoTiff outputs are in raster stacks, where each layer represents one timestep. GeoTiffs preserve the gridded format and are faster and more convenient to read and write in R. On default, the R routine removes temporary raster files saved to memory > 1 hour old to prevent storage issues: `removeTmpFiles(h=1)`
 * NetCDF files are compressed to 2-3MB/file for GFED and 6-7MB/file for FINN, GFAS, QFED, and FEER using the [ncdf4](https://cran.r-project.org/web/packages/ncdf4/ncdf4.pdf) package. As the default, the R routine uses a compression factor of 3 (low = 1, high = 9). Note that this dramatically reduces the native file size of GFASv1.2 files downloaded from ECMWF.
 * To convert the emissions into units of per m<sup>2</sup>, I used the `raster::area` function. The `areaGrid.R` script outputs a NetCDF file with area in m<sup>2</sup> per grid cell. For GFEDv4s, the `areaGrid_GFED.R` script returns the original area included with all GFEDv4s HDF files as a NetCDF file. The GFEDv4s-calculated area has very minor differences with the `raster::area` function output.
 * Because the native FINN format is 1-km point locations (lat, long), FINN can essentially be gridded into any spatial resolution >1 km. The default is 0.1° x 0.1°, but you can specify another spatial resolution in the `FINNv1p5_sp_daily.R` script.
