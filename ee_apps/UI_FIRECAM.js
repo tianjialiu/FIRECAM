@@ -6,7 +6,7 @@
 /*
 // Documentation: https://github.com/tianjialiu/FIRECAM
 // Author: Tianjia Liu
-// Last updated: February 25, 2019
+// Last updated: February 26, 2019
 
 // Purpose: explore regional differences in fire emissions from five
 // global fire emissions inventories (GFED, FINN, GFAS, QFED, FEER)
@@ -553,6 +553,9 @@ submitButton.onClick(function() {
   
   // Display Maps:
   map.clear(); map.centerObject(regionShp);
+  map.addLayer(ee.Image(1).clip(basisRegions).rename('Basis Regions'),
+    {palette: '#000000', opacity: 0.8}, 'Basis Regions');
+    
   map.addLayer(lulcMapYr, {palette: lulc_colPal, min: 1, max: 7}, 'Land Use/ Land Cover ' + mapYr.getInfo(), false);
   map.addLayer(peat.gt(0).selfMask(), {palette: ['#800080']}, 'Peatlands', false);
   
@@ -569,7 +572,7 @@ submitButton.onClick(function() {
   map.addLayer(emiByYrMeanAdj.select('GFEDv4s').selfMask(), vizParams, 'GFEDv4s');
   
   map.addLayer(ee.Image().byte().rename('Selected Basis Region')
-    .paint(ee.FeatureCollection(regionShp), 0, 2), {palette: '#000000'}, 'Selected Region');
+    .paint(ee.FeatureCollection(regionShp), 0, 1), {palette: '#FF0000'}, 'Selected Region');
   
   map.add(emiLegend(speciesLabel, unitsLabel, maxVal, maxPos));
   
