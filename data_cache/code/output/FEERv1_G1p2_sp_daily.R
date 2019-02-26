@@ -90,8 +90,6 @@ FEERv1_pro <- function(varName, xYears, xMonths, outputType="tif") {
         }
       }
       
-      nc_close(ncin)
-      
       # --------
       # Output
       # --------
@@ -142,6 +140,7 @@ FEERv1_pro <- function(varName, xYears, xMonths, outputType="tif") {
         nc_close(ncout)
       }
     }
+    nc_close(ncin)
   }
   timestamp(prefix=paste("Finished! ","##------ "))
 }

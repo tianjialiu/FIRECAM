@@ -13,7 +13,7 @@ FIRECAM can be accessed through 1) Earth Engine Apps and 2) Google Earth Engine 
 ## Public Apps
 (*Earth Engine Apps, no Google Earth Engine account required*)
 <br><br>
-![banner image](https://github.com/tianjialiu/FIRECAM/blob/master/docs/imgs/FIRECAM.jpeg)
+![banner image](https://github.com/tianjialiu/FIRECAM/blob/master/docs/imgs/FIRECAM.png)
 
 ### Step 1: Time Range
 *Select a time range* Use the start year and end year sliders to select a time range for the annual and monthly regional emissions time series charts.
