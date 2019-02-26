@@ -10,7 +10,7 @@ var ADMShpDetailed = ee.FeatureCollection("USDOS/LSIB/2013"),
 /*
 // Documentation: https://github.com/tianjialiu/FIRECAM
 // Author: Tianjia Liu
-// Last updated: September 24, 2018
+// Last updated: February 22, 2019
 
 // Purpose: explore regional differences in fire emissions from five
 // global fire emissions inventories (GFED, FINN, GFAS, QFED, FEER)
@@ -28,8 +28,8 @@ var ADMShpDetailed = ee.FeatureCollection("USDOS/LSIB/2013"),
 // Simplified Large Scale Internation Boundary Polygons (LSIB)
 // in the GEE data catalog; the 'filterMetadata' function
 // can be used to select a country_na ('name') or world region ('wld_rgn')
-var regionShp = ADMShpSimplified.filterMetadata('country_na','equals','Indonesia'); 
 var regionName = 'Indonesia'; // Name of region
+var regionShp = ADMShpSimplified.filterMetadata('country_na','equals',regionName); 
 var species = 'CO2'; // Species
 
 // Inspect names of administrative boundaries shapefile
@@ -137,7 +137,7 @@ var getEmiTS = function(imageCol, timeFormat) {
 };
 
 var speciesIdx = bandNames.indexOf(species);
-var speciesLabel = bandLabel.get(speciesIdx).getInfo();
+var speciesLabel = ee.List(bandNames).get(speciesIdx).getInfo();
 
 var emiByMonth = getEmiByMonth(species);
 var emiByYr = getEmiByYr(emiByMonth);

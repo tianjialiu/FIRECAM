@@ -6,7 +6,7 @@
 /*
 // Documentation: https://github.com/tianjialiu/FIRECAM
 // Author: Tianjia Liu
-// Last updated: February 11, 2019
+// Last updated: February 25, 2019
 
 // Purpose: explore regional differences in fire emissions from five
 // global fire emissions inventories (GFED, FINN, GFAS, QFED, FEER)
@@ -139,7 +139,7 @@ var colPal = {
 var plotEmiTS = function(plotPanel, imageCol, regionShp,
   speciesLabel, timePeriod, dateFormat, 
   sYear, eYear, sMonth, eMonth, nLines) {
-    
+  
   return ui.Chart.image.series({
     imageCollection: imageCol.select(invNames,['b1','b2','b3','b4','b5']),
     region: regionShp,
@@ -150,7 +150,7 @@ var plotEmiTS = function(plotPanel, imageCol, regionShp,
     .setSeriesNames(['GFEDv4s','FINNv1.5','GFASv1.2','QFEDv2.5r1','FEERv1.0-G1.2'])
     .setOptions({
       title: timePeriod + ' Regional Fire Emissions',
-      vAxis: {title: ['Emissions (Tg ' + speciesLabel + ')']},
+      vAxis: {title: 'Emissions (Tg ' + speciesLabel + ')'},
       hAxis: {
         format: dateFormat, 
         viewWindowMode:'explicit',
@@ -170,7 +170,7 @@ var updateOpts = function(emiTS, speciesLabel, timePeriod, dateFormat,
   
   return emiTS.setOptions({
       title: timePeriod + ' Regional Fire Emissions',
-      vAxis: {title: ['Emissions (Tg ' + speciesLabel + ')']},
+      vAxis: {title: 'Emissions (Tg ' + speciesLabel + ')'},
       hAxis: {
         format: dateFormat, 
         viewWindowMode:'explicit',
@@ -200,7 +200,7 @@ var plotEmiBar = function(plotPanel, imageCol, regionShp,
   .setSeriesNames(['GFEDv4s','FINNv1.5','GFASv1.2','QFEDv2.5r1','FEERv1.0-G1.2'])
     .setOptions({
       title: 'Average ' + timePeriod + ' Regional Fire Emissions (2003-2016)',
-      vAxis: {title: ['Emissions (Tg ' + speciesLabel + ')']},
+      vAxis: {title: 'Emissions (Tg ' + speciesLabel + ')'},
       hAxis: {gridlines: {count: 0}},
       height: '230px',
       series: colPal

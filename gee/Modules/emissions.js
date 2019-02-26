@@ -1,5 +1,5 @@
 /**** Start of imports. If edited, may not auto-convert in the playground. ****/
-var metric1 = ee.Image("users/tl2581/RelFireConfidence/RFCM1_BA_AFA_discrepancy"),
+var metric1 = ee.Image("projects/GlobalFires/RelFireConfidence/RFCM1_BA_AFA_discrepancy"),
     metric2 = ee.Image("projects/GlobalFires/RelFireConfidence/RFCM2_cloud_haze_burden"),
     metric3 = ee.Image("projects/GlobalFires/RelFireConfidence/RFCM3_fireBAComponentSize"),
     metric4 = ee.Image("projects/GlobalFires/RelFireConfidence/RFCM4_topo_variance"),
@@ -118,7 +118,7 @@ exports.plotEmiTS = function(plotPanel, imageCol, regionShp,
     .setSeriesNames(['GFEDv4s','FINNv1.5','GFASv1.2','QFEDv2.5r1','FEERv1.0-G1.2'])
     .setOptions({
       title: timePeriod + ' Regional Fire Emissions',
-      vAxis: {title: ['Emissions (Tg ' + speciesLabel + ')']},
+      vAxis: {title: 'Emissions (Tg ' + speciesLabel + ')'},
       hAxis: {
         format: dateFormat, 
         viewWindowMode:'explicit',
@@ -138,7 +138,7 @@ exports.updateOpts = function(emiTS, speciesLabel, timePeriod, dateFormat,
   
   return emiTS.setOptions({
       title: timePeriod + ' Regional Fire Emissions',
-      vAxis: {title: ['Emissions (Tg ' + speciesLabel + ')']},
+      vAxis: {title: 'Emissions (Tg ' + speciesLabel + ')'},
       hAxis: {
         format: dateFormat, 
         viewWindowMode:'explicit',
@@ -168,7 +168,7 @@ exports.plotEmiBar = function(plotPanel, imageCol, regionShp,
   .setSeriesNames(['GFEDv4s','FINNv1.5','GFASv1.2','QFEDv2.5r1','FEERv1.0-G1.2'])
     .setOptions({
       title: 'Average ' + timePeriod + ' Regional Fire Emissions (2003-2016)',
-      vAxis: {title: ['Emissions (Tg ' + speciesLabel + ')']},
+      vAxis: {title: 'Emissions (Tg ' + speciesLabel + ')'},
       hAxis: {gridlines: {count: 0}},
       height: '230px',
       series: colPal
