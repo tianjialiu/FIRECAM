@@ -8,7 +8,7 @@ FIRECAM is an explorer for regional differences in fire emissions from five glob
 4. Quick Fire Emissions Dataset ([QFEDv2.5r1](https://gmao.gsfc.nasa.gov/research/science_snapshots/global_fire_emissions.php); Darmenov and da Silva, 2013)
 5. Fire Energetics and Emissions Research ([FEERv1.0-G1.2](https://feer.gsfc.nasa.gov/data/emissions/); Ichoku and Ellison, 2014)
 
-FIRECAM can be accessed through 1) Earth Engine Apps and 2) the Google Earth Engine playground.
+FIRECAM can be accessed through 1) Earth Engine Apps and 2) the Google Earth Engine (GEE) playground. While EE Apps faciliates access to FIRECAM for any user (does not require a GEE account), accessing the FIRECAM repository in the GEE playground allows custom exports of timeseries and additional data analysis.
 
 ### Ancillary Apps
 * [GFEDv4s Explorer](https://globalfires.earthengine.app/view/gfedv4s): Explore GFEDv4s emissions (1997-2016) for all available species, partitioned by land use/land cover
@@ -44,7 +44,7 @@ After clicking the submit button, please wait a few seconds for the default map 
 | 4 | Topography Variance | ≥ 0 | m<sup>2</sup> | roughness in terrain, expressed as the variance in elevation across neighboring pixels (flat versus mountainous) |
 | 5 | VIIRS FRP Outside MODIS Burn Extent | 0 to 1 | unitless | additional small fires from VIIRS (375 m), a sensor with higher spatial resolution than MODIS (500 m, 1 km) |
 
-<br><br>
+------
 
 (*Google Earth Engine account required*)
 ### Step 1: Sign up for a free Google Earth Engine account
@@ -58,7 +58,7 @@ https://code.earthengine.google.com/?accept_repo=users/tl2581/FIRECAM
 The repository should then appear in the top-left panel under 'Reader' as 'users/tl2581/FIRECAM'. The GEE Javascript playground is a code editor with a map and console to display or print results.
 
 ### Step 3: Diving into the GUI
-Click the 'Apps/UI_FIRECAM.js' script in the 'users/tl2581/FIRECAM' repository. The script should appear in the code editor. Click 'Run' in the top-right corner of the code editor to activate the UI. The repository also contains two export scripts, one for the GFEDv4s basis regions and one for custom regions (e.g. country, continent).
+Click the 'Apps/UI_FIRECAM.js' script in the 'users/tl2581/FIRECAM' repository. The script should appear in the code editor. Click 'Run' in the top-right corner of the code editor to activate the user interface. The repository also contains a script to export monthly and annual timeseries data ('Exports/UI_FIRECAM_Exports.js').
 
 ## Updates
 * Feburary 2019: add data download/processing code to this Github repo under "data_cache"; added "Country/Sub-Region" and "Pixel" options to FIRECAM app; created ancillary app for GFEDv4s (GFEDv4s Explorer)
