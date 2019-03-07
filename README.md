@@ -8,9 +8,12 @@ FIRECAM is an explorer for regional differences in fire emissions from five glob
 4. Quick Fire Emissions Dataset ([QFEDv2.5r1](https://gmao.gsfc.nasa.gov/research/science_snapshots/global_fire_emissions.php); Darmenov and da Silva, 2013)
 5. Fire Energetics and Emissions Research ([FEERv1.0-G1.2](https://feer.gsfc.nasa.gov/data/emissions/); Ichoku and Ellison, 2014)
 
-FIRECAM can be accessed through 1) Earth Engine Apps and 2) Google Earth Engine playground.
+FIRECAM can be accessed through 1) Earth Engine Apps and 2) the Google Earth Engine playground.
 
-## Public Apps
+### Ancillary Apps
+* [GFEDv4s Explorer](https://globalfires.earthengine.app/view/gfedv4s): Explore GFEDv4s emissions (1997-2016) for all available species, partitioned by land use/land cover
+
+## FIRECAM App
 (*Earth Engine Apps, no Google Earth Engine account required*)
 <br><br>
 ![banner image](https://github.com/tianjialiu/FIRECAM/blob/master/docs/imgs/FIRECAM.png)
@@ -18,8 +21,11 @@ FIRECAM can be accessed through 1) Earth Engine Apps and 2) Google Earth Engine 
 ### Step 1: Time Range
 *Select a time range* Use the start year and end year sliders to select a time range for the annual and monthly regional emissions time series charts.
 
-### Step 2: Region
-*Select a region.* Choose one of 14 "basis" regions, based on GFEDv4s (van der Werf et al., 2017).
+### Step 2: Select Bounds Type and Region/Pixel of Interest
+*Select a bounds type* Choose 1) "Basis Regions," 2) "Country/Sub-Region," or 3) "Pixel."
+1. **Basis Regions**: 14 broad geographic regions from GFEDv4s (van der Werf et al., 2017).
+2. **Country/Sub-Region**: countries and sub-regions from simplified Large Scale International Boundary (LSIB) Polygons; those with neglible fire emissions were excluded
+3. **Pixel**: individual grid cells, 0.5° x 0.5° spatial resolution
 <br><br>
 ![banner image](https://github.com/tianjialiu/FIRECAM/blob/master/docs/imgs/basisRegions.png)
 
@@ -40,7 +46,6 @@ After clicking the submit button, please wait a few seconds for the default map 
 
 <br><br>
 
-## Google Earth Engine Code Editor GUI
 (*Google Earth Engine account required*)
 ### Step 1: Sign up for a free Google Earth Engine account
 Google Earth Engine ([GEE](https://earthengine.google.com/)) is a powerful cloud-computing platform for geospatial analysis and capable of computations with petabyte-scale datasets. To sign up, simply fill out a [form](https://signup.earthengine.google.com/) and wait for an email. GEE works best with the [Google Chrome web browser](https://www.google.com/chrome/).
@@ -53,10 +58,14 @@ https://code.earthengine.google.com/?accept_repo=users/tl2581/FIRECAM
 The repository should then appear in the top-left panel under 'Reader' as 'users/tl2581/FIRECAM'. The GEE Javascript playground is a code editor with a map and console to display or print results.
 
 ### Step 3: Diving into the GUI
-Click the 'UI_FIRECAM.js' script in the 'users/tl2581/FIRECAM' repository. The script should appear in the code editor. Click 'Run' in the top-right corner of the code editor to activate the UI. The repository also contains two export scripts, one for the GFEDv4s basis regions and one for custom regions (e.g. country, continent).
+Click the 'Apps/UI_FIRECAM.js' script in the 'users/tl2581/FIRECAM' repository. The script should appear in the code editor. Click 'Run' in the top-right corner of the code editor to activate the UI. The repository also contains two export scripts, one for the GFEDv4s basis regions and one for custom regions (e.g. country, continent).
+
+## Updates
+* Feburary 2019: add data download/processing code to this Github repo under "data_cache"; added "Country/Sub-Region" and "Pixel" options to FIRECAM app; created ancillary app for GFEDv4s (GFEDv4s Explorer)
+* March 2019: added "Country/Sub-Region" and "Pixel" options to FIRECAM exports
 
 ## Publications
-1. Liu, T., L.J. Mickley, R.S. DeFries, M.E. Marlier, M.F. Khan, M.T. Latif, and A. Karambelas (in review). Diagnosing spatial uncertainties and relative biases in global fire emissions inventories: Indonesia as regional case study
+1. Liu, T., L.J. Mickley, R.S. DeFries, M.E. Marlier, M.F. Khan, M.T. Latif, and A. Karambelas (in review). Diagnosing spatial uncertainties and relative biases in global fire emissions inventories: Indonesia as regional case study. *EarthArXiv*: https://dx.doi.org/10.31223/osf.io/nh57j
 
 2. van der Werf, G.R., J.T. Randerson, L. Giglio, T.T. van Leeuwen, Y. Chen, B.M. Rogers, M. Mu, M.J.E. van Marle, D.C. Morton, G.J. Collatz, R.J. Yokelson, and P.S. Kasibhatla (2017). Global fire emissions estimates during 1997-2016. *Earth Syst. Sci. Data* 9, 697–720. https://doi.org/10.5194/essd-9-697-2017
 

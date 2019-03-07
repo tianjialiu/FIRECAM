@@ -1,12 +1,12 @@
 Name,GFEDv4s,FINNv1p5,GFASv1p2,QFEDv2p5r1,FEERv1_G1p2,Name_Long
-DM,DM,,,,,Dry Matter (DM)
+DM,DM,,CR,,,Dry Matter (DM)
 C,C,,C,,C,Total Carbon (C) 
 CO2,CO2,CO2,CO2,co2,CO2,Carbon Dioxide (CO2)
 CO,CO,CO,CO,co,CO,Carbon Monoxide (CO)
 CH4,CH4,CH4,CH4,ch4,CH4,Methane (CH4)
 NMHC,NMHC,,NMHC,,,Non-Methane Hydrocarbons (NMHC)
 H2,H2,,H2,,H2,Hydrogen (H2)
-NOx,NOx,NO,NOx,no,NOx,Nitric Oxides (NO)
+NOx,NOx,NO,NOx,no,NOx,"Nitrogen Oxides (NOx, NO)"
 NO2,,NO2,,,,Nitrogen Dioxide (NO2)
 N2O,N2O,,N2O,,N2O,Nitrous Oxide (N2O)
 PM25,PM2.5,PM25,PM2p5,pm25,PM2.5,Particulate Matter < 2.5 micrometers (PM2.5)
@@ -38,8 +38,8 @@ C6H14,,,C6H14,,,Hexane (C6H14)
 C7H16,,,C7H16,,,Heptane (C7H16)
 TOLU,Toluene_lump,,Toluene,,,Toluene Lump (C7H8 + C6H6 + C8H10)
 TERP,,,Terpenes,,,Terpenes (C5H8)n
-PRPE1,Higher_Alkenes,PRPE,HiAlkenes,,,"Higher Alkenes (CnH2n, C³4)"
-ALK4,Higher_Alkanes,ALK4,HiAlkanes,alk4,,"Higher Alkanes (CnH2n+2, C³4)"
+PRPE1,Higher_Alkenes,PRPE,HiAlkenes,,,"Higher Alkenes (CnH2n, C>=4)"
+ALK4,Higher_Alkanes,ALK4,HiAlkanes,alk4,,"Higher Alkanes (CnH2n+2, C>=4)"
 CH2O,CH2O,CH2O,CH2O,ch2o,CH2O,Formaldehyde (CH2O)
 ALD2,C2H4O,ALD2,C2H4O,ald2,C2H4O,Acetaldehyde (C2H4O)
 ACET,C3H6O,ACET,C3H6O,acet,Acet,Acetone (C3H6O)

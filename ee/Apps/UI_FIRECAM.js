@@ -6,7 +6,7 @@
 /*
 // Documentation: https://github.com/tianjialiu/FIRECAM
 // Author: Tianjia Liu
-// Last updated: February 26, 2019
+// Last updated: February 28, 2019
 
 // Purpose: explore regional differences in fire emissions from five
 // global fire emissions inventories (GFED, FINN, GFAS, QFED, FEER)
@@ -20,13 +20,59 @@
 // --------------
 var projFolder = 'projects/GlobalFires/';
 
+var sYear_abs = 2003; var eYear_abs = 2016;
+
 var invNames = ['GFEDv4s','FINNv1p5','GFASv1p2','QFEDv2p5r1','FEERv1p0_G1p2'];
 var bandNames = ['CO','CO2','CH4','OC','BC','PM2p5'];
-var bandMulti = ee.Image([1e3,1e3,1e6,1e6,1e6,1e6]).rename(bandNames);
-var bandMaxVal = ee.List([100,2000,2000,3000,500,5000]);
-var bandMaxPos = ee.List([235,228,228,228,235,228]);
-var bandUnits = ee.List(['Gg','Gg','Mg','Mg','Mg','Mg']);
-var bandLabel = ee.List(['CO','CO2','CH4','OC','BC','PM2.5']);
+
+var speciesNames = ['CO - Carbon Monoxide', 'CO2 - Carbon Dioxide',
+  'CH4 - Methane', 'OC - Organic Carbon', 'BC - Black Carbon',
+  'PM2.5 - Particulate Matter <2.5 um'];
+  
+var speciesList = {
+  'CO - Carbon Monoxide': 'CO',
+  'CO2 - Carbon Dioxide': 'CO2',
+  'CH4 - Methane': 'CH4',
+  'OC - Organic Carbon': 'OC',
+  'BC - Black Carbon': 'BC',
+  'PM2.5 - Particulate Matter <2.5 um': 'PM2.5'
+};
+
+var bandNamesList = {
+  'CO': 'CO',
+  'CO2': 'CO2',
+  'CH4': 'CH4',
+  'OC': 'OC',
+  'BC': 'BC',
+  'PM2.5': 'PM2p5'
+};
+
+var bandMaxValList = {
+  'CO': 100,
+  'CO2': 2000,
+  'CH4': 2000,
+  'OC': 3000,
+  'BC': 500,
+  'PM2.5': 5000
+};
+
+var bandUnitsList = {
+  'CO': 'Gg',
+  'CO2': 'Gg',
+  'CH4': 'Mg',
+  'OC': 'Mg',
+  'BC': 'Mg',
+  'PM2.5': 'Mg'
+};
+
+var bandMulti = {
+  'CO': 1e3,
+  'CO2': 1e3,
+  'CH4': 1e6,
+  'OC': 1e6,
+  'BC': 1e6,
+  'PM2.5': 1e6
+};
 
 var regionNames = ['BONA - Boreal North America',
   'TENA - Temperate North America',
@@ -41,9 +87,64 @@ var regionNames = ['BONA - Boreal North America',
 var basisCodes = [2,13,3,9,12,6,7,8,11,1,4,10,5,0];
 var basisRegions = ee.FeatureCollection(projFolder + 'basisRegions_0p5deg');
 
-// ------------------------------------
-// - - - - - - FIRECAM.js - - - - - - |
-// ------------------------------------
+// Countries/ Sub-regions (those with neglible emissions were excluded)
+var countryNames = ['Afghanistan', 'Albania', 'Algeria',
+  'Andorra', 'Angola', 'Argentina', 'Armenia', 'Australia', 
+  'Austria', 'Azerbaijan', 'Bangladesh', 'Bahamas',
+  'Belarus', 'Belgium', 'Belize', 'Benin', 'Bhutan',
+  'Bolivia', 'Bosnia & Herzegovina', 'Botswana', 'Brazil', 
+  'Brunei', 'Bulgaria', 'Burkina Faso', 'Myanmar (Burma)', 'Burundi',
+  'Cambodia', 'Cameroon', 'Canada', 'Central African Republic',
+  'Chad', 'Chile', 'China', 'Colombia', 'Comoros',
+  'Costa Rica', 'Cote d\'Ivoire', 'Croatia', 'Cuba', 'Cyprus',
+  'Czechia', 'Democratic Republic of the Congo', 'Denmark',
+  'Djibouti', 'Dominican Republic', 'Egypt', 'El Salvador',
+  'Equatorial Guinea', 'Eritrea', 'Estonia', 'Ethiopia',
+  'Falkland Islands', 'Finland', 'France', 'French Guiana',
+  'Gabon', 'Gambia', 'Gaza Strip', 'Georgia', 'Germany', 'Ghana',
+  'Gibraltar', 'Greece', 'Grenada', 'Guadeloupe', 'Guatemala',
+  'Guinea', 'Guinea-Bissau', 'Guyana', 'Haiti', 'Honduras',
+  'Hong Kong', 'Hungary', 'Iceland', 'India', 'Indonesia', 'Iran',
+  'Iraq', 'Ireland', 'Israel', 'Italy', 'Jamaica', 'Japan', 'Jordan',
+  'Kazakhstan', 'Kenya', 'North Korea', 'South Korea', 'Kosovo',
+  'Kuwait', 'Laos', 'Latvia', 'Lebanon', 'Lesotho', 'Liberia',
+  'Libya', 'Lithuania', 'Macedonia', 'Madagasgar', 'Malawi',
+  'Malaysia', 'Mali', 'Martinique', 'Mauritania', 'Mexico',
+  'Moldova', 'Mongolia', 'Montenegro', 'Montserrat', 'Morocco',
+  'Mozambique', 'Namibia', 'Nepal', 'Netherlands', 'New Caledonia',
+  'New Zealand', 'Nicaragua', 'Niger', 'Nigeria', 'Norway',
+  'Oman', 'Pakistan', 'Panama', 'Papua New Guinea', 'Paraguay',
+  'Peru', 'Philippines', 'Poland', 'Portugual', 'Puerto Rico',
+  'Qatar', 'Republic of the Congo', 'Romania', 'Russia', 'Rwanda',
+  'Saint Lucia', 'Sao Tome & Principe', 'Saudi Arabia', 'Senegal',
+  'Sierra Leone', 'Serbia', 'Slovakia', 'Slovenia', 'Solomon Islands',
+  'South Africa', 'South Sudan', 'Spain', 'Sri Lanka', 'Sudan',
+  'Suriname', 'Swaziland', 'Sweden', 'Switzerland', 'Syria',
+  'Taiwan', 'Tanzania', 'Thailand', 'Timor-Leste', 'Togo',
+  'Trinidad & Tobago', 'Tunisia', 'Turkey', 'Turkmenistan',
+  'Uganda', 'Ukraine', 'United Arab Emirates', 'United Kingdom',
+  'United States', 'United States (Alaska)',
+  'Uruguay', 'Uzbekistan', 'Venezuela', 'Vietnam', 'Vanuatu',
+  'West Bank', 'Western Sahara', 'Yemen', 'Zambia', 'Zimbabwe'
+];
+
+// dictionary to rename countries
+var countryList = {
+  'Bahamas': 'Bahamas, The',
+  'Myanmar (Burma)': 'Burma',
+  'Central African Republic': 'Central African Rep',
+  'Democratic Republic of the Congo': 'Dem Rep of the Congo',
+  'Denmark': 'Denmark',
+  'Gambia': 'Gambia, The', 
+  'North Korea': 'Korea, North',
+  'South Korea': 'Korea, South',
+  'Rep of the Congo': 'Rep of the Congo',
+  'Solomon Islands': 'Solomon Is',
+};
+
+// ---------------------------------
+// - - - - - - FIRECAM - - - - - - |
+// ---------------------------------
 // ----------------------------------
 // Relative Fire Confidence Metrics
 // ----------------------------------
@@ -67,8 +168,11 @@ var gfasv1p2 = ee.ImageCollection(projFolder + 'GFASv1p2_sp');
 var qfedv2p5 = ee.ImageCollection(projFolder + 'QFEDv2p5r1_sp');
 var feerv1p0_g1p2 = ee.ImageCollection(projFolder + 'FEERv1p0_G1p2_sp');
 
+var crs = 'EPSG:4326';
+var crsTrans = [0.5,0,-180,0,-0.5,90];
+
 var aggProj = gfedv4s.first()
-  .reproject({crs: 'EPSG:4326', crsTransform: [0.5,0,-180,0,-0.5,90]})
+  .reproject({crs: crs, crsTransform: crsTrans})
   .projection();
 
 var getBand = function(imageList, iMonth, species) {
@@ -79,7 +183,6 @@ var getBand = function(imageList, iMonth, species) {
     .reproject({crs: aggProj, scale: aggProj.nominalScale()})
     .copyProperties(image,['system:time_start']));
 };
-
 
 var getEmiByMonth = function(species, sYear, eYear) {
   
@@ -128,13 +231,20 @@ var getRegionShp = function(basisID) {
   return basisRegions.filterMetadata('basis','equals',basisID);
 };
 
+var getCountryShp = function(region) {
+  return ee.Image(1).clip(ee.FeatureCollection('USDOS/LSIB_SIMPLE/2017')
+    .filter(ee.Filter.eq('country_na',region)))
+    .reproject({crs: crs, crsTransform: crsTrans}).gt(0)
+    .reduceToVectors({geometry: basisRegions.union()});
+};
+
 var colPal = {
-        0: {color: '777777'},
-        1: {color: '87CEEB'},
-        2: {color: 'FF0000'},
-        3: {color: 'FDB751'},
-        4: {color: '800080'},
-      };
+  0: {color: '777777'},
+  1: {color: '87CEEB'},
+  2: {color: 'FF0000'},
+  3: {color: 'FDB751'},
+  4: {color: '800080'},
+};
       
 var plotEmiTS = function(plotPanel, imageCol, regionShp,
   speciesLabel, timePeriod, dateFormat, 
@@ -149,7 +259,7 @@ var plotEmiTS = function(plotPanel, imageCol, regionShp,
   }).setChartType('LineChart')
     .setSeriesNames(['GFEDv4s','FINNv1.5','GFASv1.2','QFEDv2.5r1','FEERv1.0-G1.2'])
     .setOptions({
-      title: timePeriod + ' Regional Fire Emissions',
+      title: timePeriod + ' Fire Emissions',
       vAxis: {title: 'Emissions (Tg ' + speciesLabel + ')'},
       hAxis: {
         format: dateFormat, 
@@ -169,7 +279,7 @@ var updateOpts = function(emiTS, speciesLabel, timePeriod, dateFormat,
   sYear, eYear, sMonth, eMonth, nLines) {
   
   return emiTS.setOptions({
-      title: timePeriod + ' Regional Fire Emissions',
+      title: timePeriod + ' Fire Emissions',
       vAxis: {title: 'Emissions (Tg ' + speciesLabel + ')'},
       hAxis: {
         format: dateFormat, 
@@ -191,7 +301,7 @@ var plotEmiBar = function(plotPanel, imageCol, regionShp,
   var ts_chart = ui.Chart.image.series({
     imageCollection: imageCol
       .select(invNames,['b1','b2','b3','b4','b5'])
-      .set('xName','Avg., 2003-2016'),
+      .set('xName','Average, ' + sYear_abs + '-' + eYear_abs),
     region: regionShp,
     reducer: ee.Reducer.sum().unweighted(),
     scale: aggProj.nominalScale(),
@@ -199,7 +309,7 @@ var plotEmiBar = function(plotPanel, imageCol, regionShp,
   }).setChartType('ColumnChart')
   .setSeriesNames(['GFEDv4s','FINNv1.5','GFASv1.2','QFEDv2.5r1','FEERv1.0-G1.2'])
     .setOptions({
-      title: 'Average ' + timePeriod + ' Regional Fire Emissions (2003-2016)',
+      title: 'Average ' + timePeriod + ' Fire Emissions (' + sYear_abs + '-' + eYear_abs + ')',
       vAxis: {title: 'Emissions (Tg ' + speciesLabel + ')'},
       hAxis: {gridlines: {count: 0}},
       height: '230px',
@@ -209,9 +319,9 @@ var plotEmiBar = function(plotPanel, imageCol, regionShp,
   return ts_chart;
 };
 
-// ---------------------------------
-// - - - - - - LULC.js - - - - - - |
-// ---------------------------------
+// ------------------------------
+// - - - - - - LULC - - - - - - |
+// ------------------------------
 // ------------------------------
 // MODIS MCD12Q1 aggregated LULC
 // based on FINNv1.0 delineation
@@ -245,9 +355,9 @@ var getLULCmap = function(mapYr) {
   var TROP = mcd12q1Yr.eq(2).multiply(2);
   var TEMP = mcd12q1Yr.eq(4).add(mcd12q1Yr.eq(5)).gt(0).multiply(3);
   var WS = mcd12q1Yr.eq(6).add(mcd12q1Yr.eq(7)).add(mcd12q1Yr.eq(8))
-  .gt(0).multiply(4);
+    .gt(0).multiply(4);
   var SG = mcd12q1Yr.eq(9).add(mcd12q1Yr.eq(10)).add(mcd12q1Yr.eq(11))
-  .add(mcd12q1Yr.eq(14)).add(mcd12q1Yr.eq(16)).gt(0).multiply(5);
+    .add(mcd12q1Yr.eq(14)).add(mcd12q1Yr.eq(16)).gt(0).multiply(5);
   var CROP = mcd12q1Yr.eq(12).multiply(6);
   var URBAN = mcd12q1Yr.eq(13).multiply(7);
   
@@ -260,20 +370,21 @@ var getLULCmap = function(mapYr) {
 // -----------------------------------
 var peat = ee.Image(projFolder + 'GFEDv4s_peatCfrac');
 
-// ---------------------------------------
-// - - - - - - plotParams.js - - - - - - |
-// ---------------------------------------
+// -------------------------------------
+// - - - - - - Plot Params - - - - - - |
+// -------------------------------------
 // ------------
 // Info Panel
 // ------------
 var infoPanel = function() {
   var FIRECAMLabelShort = ui.Label('FIRECAM Online Tool', {margin: '12px 0px 0px 8px', fontWeight: 'bold', fontSize: '24px', border: '1px solid black', padding: '3px 3px 3px 3px'});
   var FIRECAMLabelLong = ui.Label('Fire Inventories: Regional Evaluation, Comparison, and Metrics', {margin: '8px 30px 0px 8px', fontSize: '16px'});
-  var githubRepoLabel = ui.Label('Documentation: github.com/tianjialiu/FIRECAM', {margin: '8px 8px 5px 8px', fontSize: '13px'}, 'https://github.com/tianjialiu/FIRECAM');
+  var githubRepoLabel = ui.Label('Documentation: github.com/tianjialiu/FIRECAM', {margin: '8px 8px 3px 8px', fontSize: '13px'}, 'https://github.com/tianjialiu/FIRECAM');
+  var citationLabel = ui.Label('Citation: Liu et al. (in review) | [EarthArXiv]', {margin: '0px 8px 5px 8px', fontSize: '13px'}, 'https://eartharxiv.org/nh57j/');
   var inputParamsLabel = ui.Label('Input Parameters', {margin: '8px 8px 5px 8px', fontWeight: 'bold', fontSize: '20px'});
   
   return ui.Panel([
-      FIRECAMLabelShort, FIRECAMLabelLong, githubRepoLabel, inputParamsLabel,
+      FIRECAMLabelShort, FIRECAMLabelLong, githubRepoLabel, citationLabel, inputParamsLabel,
     ]);
 };
 
@@ -281,13 +392,13 @@ var infoPanel = function() {
 // Year Panel
 // -----------
 var yearSelectPanel = function() {
-  var timeRangeLabel = ui.Label('1) Select Time Range:', {margin: '8px 8px 8px 8px', fontSize: '14.5px'});
-  var startYearLabel = ui.Label('Start Year:', {margin: '8px 20px 8px 20px', fontSize: '14.5px'});
-  var startYearSlider = ui.Slider({min: 2003, max: 2016, value: 2005, step: 1});
+  var timeRangeLabel = ui.Label('1) Select Time Range:', {margin: '8px 8px 8px 12px', fontSize: '14.5px'});
+  var startYearLabel = ui.Label('Start Year:', {margin: '3px 20px 8px 24px', fontSize: '14.5px'});
+  var startYearSlider = ui.Slider({min: sYear_abs, max: eYear_abs, value: 2005, step: 1, style: {margin: '3px 8px 8px 14px'}});
   startYearSlider.style().set('stretch', 'horizontal');
   
-  var endYearLabel = ui.Label('End Year:', {margin: '8px 20px 8px 20px', fontSize: '14.5px'});
-  var endYearSlider = ui.Slider({min: 2003, max: 2016, value: 2015, step: 1, style: {margin: '8px 8px 8px 14px'}});
+  var endYearLabel = ui.Label('End Year:', {margin: '3px 20px 8px 24px', fontSize: '14.5px'});
+  var endYearSlider = ui.Slider({min: sYear_abs, max: eYear_abs, value: 2015, step: 1, style: {margin: '3px 8px 8px 14px'}});
   endYearSlider.style().set('stretch', 'horizontal');
   
   var changeSliderYr = function() {
@@ -316,23 +427,80 @@ var getYears = function(yearSelectPanel) {
 // -----------------
 // Region Panel
 // -----------------
-var regionSelectPanel = function(regionNames) {
-  var regionLabel = ui.Label('2) Select Region:', {padding: '5px 0px 0px 0px', fontSize: '14.5px'});
-  var regionSelect = ui.Select({items: regionNames.sort(), value: 'EQAS - Equatorial Asia', style: {stretch: 'horizontal'}});
-  return ui.Panel([regionLabel, regionSelect], ui.Panel.Layout.Flow('horizontal'), {stretch: 'horizontal'});
+var regionTypeSelectPanel = function(map) {
+  var regionLabel = ui.Label('2) Select Bounds Type:', {padding: '5px 0px 0px 4px', fontSize: '14.5px'});
+  var regionTypeSelect = ui.Select({items: ['Basis Region','Country/ Sub-Region', 'Pixel'],
+    value: 'Basis Region', style: {stretch: 'horizontal'},
+    onChange: function(selected) {
+      if (selected == 'Basis Region') {setRegionList(regionNames, 'EQAS - Equatorial Asia')}
+      if (selected == 'Country/ Sub-Region') {setRegionList(countryNames, 'Indonesia')}
+      if (selected == 'Pixel') {setCoords(map)}
+    }
+  });
+  
+  return ui.Panel([regionLabel, regionTypeSelect], ui.Panel.Layout.Flow('horizontal'), {stretch: 'horizontal'});
+};
+
+var getRegionType = function(regionTypeSelectPanel) {
+  return regionTypeSelectPanel.widgets().get(1).getValue();
 };
 
 var getRegions = function(regionSelectPanel) {
-  return regionSelectPanel.widgets().get(1).getValue();
+  return regionSelectPanel.widgets().get(0).widgets().get(1).getValue();
+};
+
+var setRegionList = function(shpNames, defaultName) {
+  regionSelectPanel.clear();
+  
+  var regionLabel = ui.Label('Select Region:', {padding: '5px 0px 0px 20px', fontSize: '14.5px'});
+  var regionSelect = ui.Select({items: shpNames.sort(), value: defaultName, style: {stretch: 'horizontal'}});
+  
+  return regionSelectPanel.add(
+    ui.Panel([regionLabel, regionSelect], ui.Panel.Layout.Flow('horizontal'),
+      {stretch: 'horizontal', margin: '-8px 0px 0px 0px'}));
+};
+
+var setCoords = function(map) {
+  regionSelectPanel.clear();
+  
+  var coordsLabel = ui.Label('Enter lat/lon below or click on map to update coordinates',
+    {margin: '3px 8px 6px 23px', fontSize: '11.5px'});
+
+  var lonLabel = ui.Label('Lon (x):', {padding: '3px 0px 0px 15px', fontSize: '14.5px'});
+  var latLabel = ui.Label('Lat (y):', {padding: '3px 0px 0px 0px', fontSize: '14.5px'});
+  
+  var lonBox = ui.Textbox({value: 111.25});
+  lonBox.style().set('stretch', 'horizontal');
+  var latBox = ui.Textbox({value: -2.75});
+  latBox.style().set('stretch', 'horizontal');
+  
+  var coordsPanel = ui.Panel([
+    coordsLabel, ui.Panel([lonLabel, lonBox, latLabel, latBox], ui.Panel.Layout.Flow('horizontal'),
+      {stretch: 'horizontal', margin: '-5px 0px 0px 0px'})
+    ]);
+
+  map.onClick(function(coords) {
+    regionSelectPanel.widgets().get(0).widgets().get(1).widgets().get(1).setValue(coords.lon);
+    regionSelectPanel.widgets().get(0).widgets().get(1).widgets().get(3).setValue(coords.lat);
+  });
+    
+  return regionSelectPanel.add(coordsPanel);
+};
+
+var getCoords = function(regionSelectPanel) {
+
+  var lon = parseFloat(regionSelectPanel.widgets().get(0).widgets().get(1).widgets().get(1).getValue());
+  var lat = parseFloat(regionSelectPanel.widgets().get(0).widgets().get(1).widgets().get(3).getValue());
+ 
+  return ee.Geometry.Point(lon,lat);
 };
 
 // -----------------
 // Species Panel
 // -----------------
 var speciesSelectPanel = function() {
-  var speciesLabel = ui.Label('3) Select Species:', {padding: '5px 0px 0px 0px', fontSize: '14.5px'});
-  var speciesList = ['CO','CO2','CH4','OC','BC','PM2.5'];
-  var speciesSelect = ui.Select({items: speciesList, value: 'CO2', style: {stretch: 'horizontal'}});
+  var speciesLabel = ui.Label('3) Select Species:', {padding: '5px 0px 0px 4px', fontSize: '14.5px'});
+  var speciesSelect = ui.Select({items: speciesNames, value: 'CO2 - Carbon Dioxide', style: {stretch: 'horizontal'}});
   return ui.Panel([speciesLabel, speciesSelect], ui.Panel.Layout.Flow('horizontal'), {stretch: 'horizontal'});
 };
 
@@ -354,91 +522,113 @@ var colPal_Reds = ['#FEE5D9','#FCBBA1','#FC9272','#FB6A4A','#EF3B2C','#CB181D','
 var colPal_Grays = ['#F7F7F7','#D9D9D9','#BDBDBD','#969696','#737373','#525252','#252525'];
 var colPal_Spectral = ['#3288BD','#99D594','#E6F598','#FFFFBF','#FEE08B','#FC8D59','#D53E4F'];
 
-var continuousLegend = function(controlPanel, title, colPal, minVal,
-  maxVal, units, maxValPos) {
+var continuousLegend = function(controlPanel, title, colPal, minVal, maxVal, units) {
   var continuousLegendPanel = ui.Panel({
     style: {
-      padding: '0px 0px 5px 8px'
+      padding: '0px 8px 5px 8px'
     }
   });
-  controlPanel.add(continuousLegendPanel);
   
   var legendTitle = ui.Label(title, {fontWeight: 'bold', fontSize: '16px', margin: '0 0 6px 8px'});
-  continuousLegendPanel.add(legendTitle);
-  continuousLegendPanel.add(ui.Label(units, {margin: '-6px 0 6px 8px'}));
+  var unitsLabel = ui.Label(units, {margin: '-6px 0 6px 8px'});
 
-  var makeRow = function(colPal) {
-    var colorBox = ui.Label('', {
-        backgroundColor: colPal,
-        padding: '8px 21.5px',
-        margin: '0 0 4px 0px',
-    });
-    return ui.Panel({widgets: [colorBox], layout: ui.Panel.Layout.Flow('vertical')});
+  var vis = {min: minVal, max: maxVal, palette: colPal};
+
+  var makeColorBarParams = function(palette) {
+    return {
+      bbox: [0, 0, 1, 0.1],
+      dimensions: '100x10',
+      format: 'png',
+      min: 0,
+      max: 1,
+      palette: palette,
+    };
   };
+
+  // Create the color bar for the legend.
+  var colorBar = ui.Thumbnail({
+    image: ee.Image.pixelLonLat().select(0),
+    params: makeColorBarParams(vis.palette),
+    style: {stretch: 'horizontal', margin: '0px 8px', maxHeight: '24px'},
+  });
+
+  // Create a panel with three numbers for the legend.
+  var legendLabels = ui.Panel({
+    widgets: [
+      ui.Label(vis.min, {margin: '4px 8px'}),
+      ui.Label('', {margin: '4px 8px', textAlign: 'center', stretch: 'horizontal'}),
+      ui.Label(vis.max, {margin: '4px 8px'})
+      ],
+    layout: ui.Panel.Layout.flow('horizontal')
+  });
   
-  var colPalWidget = []; var labelWidget = [];
-  for (var i = 0; i < colPal.length; i++) {
-    colPalWidget[i] = makeRow(colPal[i]);
-  }
-  
-  continuousLegendPanel.add(ui.Panel({widgets: colPalWidget, layout: ui.Panel.Layout.Flow('horizontal'),
-    style: {margin: '0 0 6px 8px'}}));
-  continuousLegendPanel.add(ui.Label(minVal, {margin: '-6px 0px 0px 8px'}));
-  continuousLegendPanel.add(ui.Label(maxVal, {margin: '-17px 5px 5px ' + maxValPos + 'px', textAlign: 'right'}));
+  controlPanel.add(continuousLegendPanel);
+  continuousLegendPanel.add(legendTitle).add(unitsLabel).add(colorBar).add(legendLabels);
 };
 
 
 var legendPanel = function(controlPanel) {
-  controlPanel.add(ui.Label('----------------------------------------------------------------------------------',
-    {margin: '-5px 8px 12px 8px', stretch: 'horizontal', textAlign: 'center'}));
-  controlPanel.add(ui.Label('Legends', {fontWeight: 'bold', fontSize: '20px', margin: '-3px 8px 8px 8px'}));
-
+  controlPanel.add(ui.Label('Legends', {fontWeight: 'bold', fontSize: '20px', margin: '10px 8px 8px 16px'}));
   controlPanel.add(ui.Label('', {margin: '0px 0px 4px 0px'}));
   
   continuousLegend(controlPanel,'BA-AFA Discrepancy',
-    colPal_RdBu, -1, 1, 'Metric 1: normalized difference', 303);
+    colPal_RdBu, -1, 1, 'Metric 1: normalized difference');
   continuousLegend(controlPanel,'Cloud/Haze Obscuration',
-    colPal_Blues, 0, 1, 'Metric 2: fractional, FRP-weighted', 303);
+    colPal_Blues, 0, 1, 'Metric 2: fractional, FRP-weighted');
   continuousLegend(controlPanel,'Burn Size/Fragmentation',
-    colPal_Reds, 0, 2, 'Metric 3: km2 / fragment', 303);
+    colPal_Reds, 0, 2, 'Metric 3: km2 / fragment');
   continuousLegend(controlPanel,'Topography Variance',
-    colPal_Grays, 0, 1000, 'Metric 4: m2', 278);
+    colPal_Grays, 0, 1000, 'Metric 4: m2');
   continuousLegend(controlPanel,'VIIRS FRP Outside MODIS Burn Extent',
-    colPal_Reds, 0, 1, 'Metric 5: fractional', 303);
+    colPal_Reds, 0, 1, 'Metric 5: fractional');
 };
 
-var emiLegend = function(speciesLabel, units, maxVal, maxValPos) {
+var emiLegend = function(speciesLabel, units, maxVal) {
+  
   var emiLegendPanel = ui.Panel({
     style: {
-      padding: '6px 3px 5px 0px',
+      padding: '3px 10.5px 3px 3px',
       position: 'bottom-right'
     }
   });
   
-  var legendTitle = ui.Label('Average Annual Fire Emissions', {fontWeight: 'bold', fontSize: '16px', margin: '0 0 6px 8px'});
-  emiLegendPanel.add(legendTitle);
-  emiLegendPanel.add(ui.Label(units + ' ' + speciesLabel + '/yr, 2003-2016', {margin: '-6px 0 6px 8px'}));
-  
-  var colPal = colPal_Spectral;
-  
-  var makeRow = function(colPal) {
-    var colorBox = ui.Label('', {
-        backgroundColor: colPal,
-        padding: '8px 18px',
-        margin: '0 0 4px 0px',
-    });
-    return ui.Panel({widgets: [colorBox], layout: ui.Panel.Layout.Flow('vertical')});
+  var legendTitle = ui.Label('Average Annual Fire Emissions',
+    {fontWeight: 'bold', fontSize: '16px', margin: '5px 0 6px 8px'});
+
+  var legendSubtitle = ui.Label(units + ' ' + speciesLabel + '/yr (' + sYear_abs + '-' + eYear_abs + ')',
+    {margin: '-6px 0 6px 8px'});
+
+  var vis = {min: 0, max: maxVal, palette: colPal_Spectral};
+
+  var makeColorBarParams = function(palette) {
+    return {
+      bbox: [0, 0, 1, 0.1],
+      dimensions: '100x10',
+      format: 'png',
+      min: 0,
+      max: 1,
+      palette: palette,
+    };
   };
+
+  // Create the color bar for the legend.
+  var colorBar = ui.Thumbnail({
+    image: ee.Image.pixelLonLat().select(0),
+    params: makeColorBarParams(vis.palette),
+    style: {stretch: 'horizontal', margin: '0px 8px', maxHeight: '24px'},
+  });
+
+  // Create a panel with three numbers for the legend.
+  var legendLabels = ui.Panel({
+    widgets: [
+      ui.Label(vis.min, {margin: '4px 8px'}),
+      ui.Label('', {margin: '4px 8px', textAlign: 'center', stretch: 'horizontal'}),
+      ui.Label(vis.max, {margin: '4px 8px'})
+      ],
+    layout: ui.Panel.Layout.flow('horizontal')
+  });
   
-  var colPalWidget = []; var labelWidget = [];
-  for (var i = 0; i < colPal.length; i++) {
-    colPalWidget[i] = makeRow(colPal[i]);
-  }
-  
-  emiLegendPanel.add(ui.Panel({widgets: colPalWidget, layout: ui.Panel.Layout.Flow('horizontal'),
-    style: {margin: '0 0 6px 8px'}}));
-  emiLegendPanel.add(ui.Label(0, {margin: '-6px 0px 0px 8px'}));
-  emiLegendPanel.add(ui.Label(maxVal, {margin: '-17px 5px 0px ' + maxValPos + 'px', textAlign: 'right'}));
+  emiLegendPanel.add(legendTitle).add(legendSubtitle).add(colorBar).add(legendLabels);
   
   return emiLegendPanel;
 };
@@ -506,15 +696,15 @@ map.setControlVisibility({fullscreenControl: false});
 
 var infoPanel = infoPanel();
 var yearSelectPanel = yearSelectPanel();
-var regionSelectPanel = regionSelectPanel(regionNames);
+var regionTypeSelectPanel = regionTypeSelectPanel(map);
+var regionSelectPanel = ui.Panel();
+setRegionList(regionNames, 'EQAS - Equatorial Asia');
 var speciesSelectPanel = speciesSelectPanel();
 
 // Display Panels
-controlPanel.add(infoPanel);
-controlPanel.add(yearSelectPanel);
-controlPanel.add(regionSelectPanel);
-controlPanel.add(speciesSelectPanel);
-controlPanel.add(submitButton);
+controlPanel.add(infoPanel).add(yearSelectPanel)
+  .add(regionTypeSelectPanel).add(regionSelectPanel)
+  .add(speciesSelectPanel).add(submitButton);
 legendPanel(controlPanel);
 lulcLegend(controlPanel,lulcPeat_colPal);
 ui.root.clear(); ui.root.add(controlPanel);
@@ -527,32 +717,33 @@ submitButton.onClick(function() {
   var sYear = getYears(yearSelectPanel).startYear;
   var eYear = getYears(yearSelectPanel).endYear;
   
-  var region = getRegions(regionSelectPanel);
-  var species = getRegions(speciesSelectPanel);
+  var regionType = getRegionType(regionTypeSelectPanel);
+  var regionShp = [];
   
-  var basisID = basisCodes.indexOf(regionNames.indexOf(region)) + 1;
-  var regionShp = getRegionShp(basisID);
-
-  var speciesIdx = bandNames.indexOf(species);
-  var maxVal = bandMaxVal.get(speciesIdx).getInfo();
-  var maxPos = bandMaxPos.get(speciesIdx).getInfo();
-  var speciesLabel = bandLabel.get(speciesIdx).getInfo();
-  var unitsLabel = bandUnits.get(speciesIdx).getInfo();
-  var spBandName = ee.List(bandNames).get(speciesIdx).getInfo();
+  var speciesLong = getSpecies(speciesSelectPanel);
+  var species = speciesList[speciesLong];
+  
+  var spBandName = bandNamesList[species];
+  var maxVal = bandMaxValList[species];
+  var speciesLabel = species;
+  var unitsLabel = bandUnitsList[species];
+  
   var vizParams = {palette: colPal_Spectral, min: 0, max: maxVal};
   
   var emiByMonth = getEmiByMonth(species, sYear, eYear);
   var emiByYr = getEmiByYr(emiByMonth, sYear, eYear);
   
   var emiByYrMean = ee.Image([projFolder + 'GFEIyrMean_sp/GFEIyrMean_' + spBandName])
-    .clip(basisRegions).reproject({crs: 'EPSG:4326', crsTransform: [0.5,0,-180,0,-0.5,90]});
-  var emiByYrMeanAdj = emiByYrMean.multiply(bandMulti.select(species));
+    .clip(basisRegions).reproject({crs: crs, crsTransform: crsTrans});
+  var emiByYrMeanAdj = emiByYrMean.multiply(bandMulti[species]);
   
   var mapYr = ee.Number((sYear + eYear)/2).round();
   var lulcMapYr = getLULCmap(mapYr);
   
   // Display Maps:
-  map.clear(); map.centerObject(regionShp);
+  map.clear();
+  map.add(emiLegend(speciesLabel, unitsLabel, maxVal));
+  
   map.addLayer(ee.Image(1).clip(basisRegions).rename('Basis Regions'),
     {palette: '#000000', opacity: 0.8}, 'Basis Regions');
     
@@ -571,10 +762,37 @@ submitButton.onClick(function() {
   map.addLayer(emiByYrMeanAdj.select('FINNv1p5').selfMask(), vizParams, 'FINNv1.5', false);
   map.addLayer(emiByYrMeanAdj.select('GFEDv4s').selfMask(), vizParams, 'GFEDv4s');
   
-  map.addLayer(ee.Image().byte().rename('Selected Basis Region')
-    .paint(ee.FeatureCollection(regionShp), 0, 1), {palette: '#FF0000'}, 'Selected Region');
+  if (regionType == 'Basis Region' | regionType == 'Country/ Sub-Region') {
+    var region = getRegions(regionSelectPanel);
+    
+    if (regionType == 'Basis Region') {
+      var basisID = basisCodes.indexOf(regionNames.indexOf(region)) + 1;
+      regionShp = getRegionShp(basisID);
+    }
   
-  map.add(emiLegend(speciesLabel, unitsLabel, maxVal, maxPos));
+    if (regionType == 'Country/ Sub-Region') {
+      if (ee.Dictionary(countryList).keys().contains(region).getInfo() === true) {
+        region = countryList[region];
+      }
+      regionShp = getCountryShp(region);
+    }
+    map.centerObject(regionShp);
+    
+    map.addLayer(ee.Image().byte().rename('Selected Region')
+    .paint(ee.FeatureCollection(regionShp), 0, 1), {palette: '#FF0000'}, 'Selected Region');
+  }
+  
+  if (regionType == 'Pixel') {
+    map.onClick(function(coords) {
+      regionSelectPanel.widgets().get(0).widgets().get(1).widgets().get(1).setValue(coords.lon);
+      regionSelectPanel.widgets().get(0).widgets().get(1).widgets().get(3).setValue(coords.lat);
+    });
+
+    regionShp = getCoords(regionSelectPanel);
+    map.centerObject(regionShp, 6);
+    
+    map.addLayer(regionShp, {}, 'Selected Pixel');
+  }
   
   // Display Charts:
   plotPanel = plotPanel.clear();
