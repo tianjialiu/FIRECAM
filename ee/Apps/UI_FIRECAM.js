@@ -6,7 +6,7 @@
 /*
 // Documentation: https://github.com/tianjialiu/FIRECAM
 // Author: Tianjia Liu
-// Last updated: February 28, 2019
+// Last updated: March 10, 2019
 
 // Purpose: explore regional differences in fire emissions from five
 // global fire emissions inventories (GFED, FINN, GFAS, QFED, FEER)
@@ -397,8 +397,8 @@ var yearSelectPanel = function() {
   var startYearSlider = ui.Slider({min: sYear_abs, max: eYear_abs, value: 2005, step: 1, style: {margin: '3px 8px 8px 14px'}});
   startYearSlider.style().set('stretch', 'horizontal');
   
-  var endYearLabel = ui.Label('End Year:', {margin: '3px 20px 8px 24px', fontSize: '14.5px'});
-  var endYearSlider = ui.Slider({min: sYear_abs, max: eYear_abs, value: 2015, step: 1, style: {margin: '3px 8px 8px 14px'}});
+  var endYearLabel = ui.Label('End Year:', {margin: '5px 20px 8px 24px', fontSize: '14.5px'});
+  var endYearSlider = ui.Slider({min: sYear_abs, max: eYear_abs, value: 2015, step: 1, style: {margin: '5px 8px 8px 14px'}});
   endYearSlider.style().set('stretch', 'horizontal');
   
   var changeSliderYr = function() {

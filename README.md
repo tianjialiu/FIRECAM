@@ -11,7 +11,8 @@ FIRECAM is an explorer for regional differences in fire emissions from five glob
 FIRECAM can be accessed through 1) Earth Engine Apps and 2) the Google Earth Engine (GEE) playground. While EE Apps faciliates access to FIRECAM for any user (does not require a GEE account), accessing the FIRECAM repository in the GEE playground allows custom exports of timeseries and additional data analysis.
 
 ### Ancillary Apps
-* [GFEDv4s Explorer](https://globalfires.earthengine.app/view/gfedv4s): Explore GFEDv4s emissions (1997-2016) for all available species, partitioned by land use/land cover
+* [GFEDv4s Explorer](https://globalfires.earthengine.app/view/gfedv4s): Explore GFEDv4s emissions (1997-2016) for burned area and all available chemical species, partitioned by land use/land cover
+    - *Note*: Burned area from small fires is approximate based on the small fire fraction for emissions
 
 ## FIRECAM App
 (*Earth Engine Apps, no Google Earth Engine account required*)

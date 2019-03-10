@@ -9,7 +9,7 @@
 // https://doi.org/10.5194/essd-9-697-2017
 
 // Author: Tianjia Liu
-// Last Updated: Feburary 28, 2019
+// Last Updated: March 8, 2019
 
 // ---------------
 // Global Params |
@@ -147,7 +147,7 @@ var EFlist = {
   'HOCH2CHO': [[0.25, 0.86, 0.86, 0.74, 0.74, 0.71]]
 };
 
-var speciesNames = ['DM - Dry Matter', 'C - Carbon',
+var speciesNames = ['BA - Burned Area','DM - Dry Matter', 'C - Carbon',
   'CO2 - Carbon Dioxide', 'CO - Carbon Monoxide', 'CH4 - Methane',
   'NHMC - Non-Methane Hydrocarbons', 'H2 - Hydrogen',
   'NOx - Nitric Oxides', 'N2O - Nitrous Oxide',
@@ -167,6 +167,7 @@ var speciesNames = ['DM - Dry Matter', 'C - Carbon',
 ];
   
 var speciesList = {
+  'BA - Burned Area': 'BA',
   'DM - Dry Matter': 'DM',
   'C - Carbon': 'C',
   'CO2 - Carbon Dioxide': 'CO2',
@@ -218,24 +219,37 @@ var LULC = ['SAVA','BORF','TEMF','DEFO','PEAT','AGRI'];
 var LULCtot = ['Total','SAVA','BORF','TEMF','DEFO','PEAT','AGRI'];
 
 // Calculate emissions of input species by month in kg/ grid cell
-var getEmiByMonth = function(EFs, sYear, eYear) {
+var getEmiByMonth = function(EFs, varType, sYear, eYear) {
   
   var filterYr = ee.Filter.calendarRange(sYear, eYear, 'year');
   var invCol_Yrs = invCol.filter(filterYr);
   
   var emiByMonth = invCol_Yrs.map(function(gfedMon) {
    
-    var DM = gfedMon.select('DM'); // kg per m2
-    var DMfrac = gfedMon.select('DM_.*'); // fraction
-    var sp = DM.multiply(DMfrac).multiply(EFs).multiply(gridArea)
-      .multiply(1e-12); // Tg per grid cell
+    if (varType == 'BA') {
+      var BAfrac = gfedMon.select('burned_fraction');
+      var BAsf = gfedMon.select('small_fire_fraction');
       
-    var spTotal = sp.reduce(ee.Reducer.sum());
-    var emiAll = spTotal.addBands(sp).rename(LULCtot)
-      .reproject({crs: crs, crsTransform: crsTrans})
-      .copyProperties(gfedMon,['system:time_start']);
+      var BA = BAfrac.addBands(BAfrac.multiply(BAsf))
+        .multiply(gridArea).divide(1e6).rename(['BA','BAsf'])
+        .reproject({crs: crs, crsTransform: crsTrans})
+        .copyProperties(gfedMon,['system:time_start']);
+      
+      return BA;
+    } else {
+      var DM = gfedMon.select('DM'); // kg per m2
+      var DMfrac = gfedMon.select('DM_.*'); // fraction
+      var sp = DM.multiply(DMfrac).multiply(EFs).multiply(gridArea)
+        .multiply(1e-12); // Tg per grid cell
+      
+      var spTotal = sp.reduce(ee.Reducer.sum());
+      var emiAll = spTotal.addBands(sp).rename(LULCtot)
+        .reproject({crs: crs, crsTransform: crsTrans})
+        .copyProperties(gfedMon,['system:time_start']);
     
-    return emiAll;
+      return emiAll;
+    }
+
   });
   
   return ee.ImageCollection(emiByMonth);
@@ -278,21 +292,73 @@ var colPalseries = {
   6: {color: 'DB7093'},
 };
 
+var colPalseries_BA = {
+  0: {color: '000000'},
+  1: {color: 'FF0000'},
+};
+
 var plotEmiTS = function(plotPanel, imageCol, regionShp,
   speciesLabel, timePeriod, dateFormat, 
   sYear, eYear, sMonth, eMonth, nLines) {
   
-  return ui.Chart.image.series({
-    imageCollection: imageCol.select(LULCtot,['b1','b2','b3','b4','b5','b6','b7']),
-    region: regionShp,
-    reducer: ee.Reducer.sum().unweighted(),
-    scale: scale,
-    xProperty: 'system:time_start',
-  }).setChartType('LineChart')
-    .setSeriesNames(LULCtot)
-    .setOptions({
-      title: timePeriod + ' Fire Emissions',
-      vAxis: {title: 'Emissions (Tg ' + speciesLabel + ')'},
+  if (speciesLabel == 'BA') {
+    return ui.Chart.image.series({
+      imageCollection: imageCol.select(['BA','BAsf'],['b1','b2']),
+      region: regionShp,
+      reducer: ee.Reducer.sum().unweighted(),
+      scale: scale,
+      xProperty: 'system:time_start',
+    }).setChartType('LineChart')
+      .setSeriesNames(['BA','BA from small fires'])
+      .setOptions({
+        title: timePeriod + ' Burned Area',
+        vAxis: {title: 'Burned Area (sq. km)'},
+        hAxis: {
+          format: dateFormat, 
+          viewWindowMode:'explicit',
+          viewWindow: {
+            min: ee.Date.fromYMD(sYear,sMonth,1).millis().getInfo(),
+            max: ee.Date.fromYMD(eYear,eMonth,1).millis().getInfo()
+          },
+          gridlines: {count: nLines}
+        },
+        height: '230px',
+        series: colPalseries_BA,
+      });
+  } else {
+    return ui.Chart.image.series({
+      imageCollection: imageCol.select(LULCtot,['b1','b2','b3','b4','b5','b6','b7']),
+      region: regionShp,
+      reducer: ee.Reducer.sum().unweighted(),
+      scale: scale,
+      xProperty: 'system:time_start',
+    }).setChartType('LineChart')
+      .setSeriesNames(LULCtot)
+      .setOptions({
+        title: timePeriod + ' Fire Emissions',
+        vAxis: {title: 'Emissions (Tg ' + speciesLabel + ')'},
+        hAxis: {
+          format: dateFormat, 
+          viewWindowMode:'explicit',
+          viewWindow: {
+            min: ee.Date.fromYMD(sYear,sMonth,1).millis().getInfo(),
+            max: ee.Date.fromYMD(eYear,eMonth,1).millis().getInfo()
+          },
+          gridlines: {count: nLines}
+        },
+        height: '230px',
+        series: colPalseries,
+      });
+    }
+};
+
+var updateOpts = function(emiTS, speciesLabel, timePeriod, dateFormat, 
+  sYear, eYear, sMonth, eMonth, nLines) {
+  
+  if (speciesLabel == 'BA') {
+    return emiTS.setOptions({
+      title: timePeriod + ' Burned Area',
+      vAxis: {title: 'Burned Area (sq. km)'},
       hAxis: {
         format: dateFormat, 
         viewWindowMode:'explicit',
@@ -303,14 +369,10 @@ var plotEmiTS = function(plotPanel, imageCol, regionShp,
         gridlines: {count: nLines}
       },
       height: '230px',
-      series: colPalseries,
+      series: colPalseries_BA
     });
-};
-
-var updateOpts = function(emiTS, speciesLabel, timePeriod, dateFormat, 
-  sYear, eYear, sMonth, eMonth, nLines) {
-  
-  return emiTS.setOptions({
+  } else {
+    return emiTS.setOptions({
       title: timePeriod + ' Fire Emissions',
       vAxis: {title: 'Emissions (Tg ' + speciesLabel + ')'},
       hAxis: {
@@ -325,6 +387,8 @@ var updateOpts = function(emiTS, speciesLabel, timePeriod, dateFormat,
       height: '230px',
       series: colPalseries
     });
+  }
+
 };
 
 // ------------
@@ -476,10 +540,6 @@ var submitButton = ui.Button({label: 'Submit',  style: {stretch: 'horizontal'}})
 // --------
 // Legend
 // --------
-var colPal_RdBu = ['#2166AC','#67A9CF','#D1E5F0','#F7F7F7','#FDDBC7','#EF8A62','#B2182B'];
-var colPal_Blues = ['#EFF3FF','#C6DBEF','#9ECAE1','#6BAED6','#4292C6','#2171B5','#084594'];
-var colPal_Reds = ['#FEE5D9','#FCBBA1','#FC9272','#FB6A4A','#EF3B2C','#CB181D','#99000D'];
-var colPal_Grays = ['#F7F7F7','#D9D9D9','#BDBDBD','#969696','#737373','#525252','#252525'];
 var colPal_Spectral = ['#3288BD','#99D594','#E6F598','#FFFFBF','#FEE08B','#FC8D59','#D53E4F'];
 
 var emiLegend = function(speciesLabel, units, maxVal, sYear, eYear) {
@@ -586,16 +646,16 @@ submitButton.onClick(function() {
   var speciesLabel = speciesList[speciesLong];
   
   // Default Map
-  var default_sp = 'DM'; var unitsLabel = 'Mg'; var maxVal = 500;
-
-  var EFs_default = ee.Image(EFlist[default_sp]).rename(LULC)
+  var display_sp = 'DM'; var unitsLabel = 'Mg'; var maxVal = 500;
+  
+  var EFs_display = ee.Image(EFlist[display_sp]).rename(LULC)
     .reproject({crs: crs, crsTransform: crsTrans});
-  var emiByMonth_default = getEmiByMonth(EFs_default, sYear, eYear);
-  var emiByYr_default = getEmiByYr(emiByMonth_default, sYear, eYear);
-  var emiByYrMean_default = emiByYr_default.reduce(ee.Reducer.mean()).divide(1e6);
+  var emiByMonth_display = getEmiByMonth(EFs_display, display_sp, sYear, eYear);
+  var emiByYr_display = getEmiByYr(emiByMonth_display, sYear, eYear);
+  var emiByYrMean_display = emiByYr_display.reduce(ee.Reducer.mean()).divide(1e6);
 
   // Display Maps:
-  var legendPanel = emiLegend(default_sp, unitsLabel, maxVal, sYear, eYear);
+  var legendPanel = emiLegend(display_sp, unitsLabel, maxVal, sYear, eYear);
   
   if (counter > 1) {controlPanel.remove(controlPanel.widgets().get(6))}
   map.add(controlPanel); controlPanel.add(legendPanel);
@@ -603,7 +663,7 @@ submitButton.onClick(function() {
   map.addLayer(ee.Image(1).clip(basisRegions).rename('Basis Regions'),
     {palette: '#000000', opacity: 0.8}, 'Basis Regions');
     
-  map.addLayer(emiByYrMean_default.select('Total.*').multiply(1e9).selfMask(),
+  map.addLayer(emiByYrMean_display.select('Total.*').multiply(1e9).selfMask(),
     {palette: colPal_Spectral, min: 0, max: maxVal}, 'GFEDv4s');
 
   if (regionType == 'Basis Region' | regionType == 'Country/ Sub-Region') {
@@ -642,10 +702,16 @@ submitButton.onClick(function() {
   var EFs = ee.Image(EFlist[speciesLabel]).rename(LULC)
     .reproject({crs: crs, crsTransform: crsTrans});
   
-  var emiByMonth = getEmiByMonth(EFs, sYear, eYear);
+  var emiByMonth = getEmiByMonth(EFs, speciesLabel, sYear, eYear);
   var emiByYr = getEmiByYr(emiByMonth, sYear, eYear);
   
   // Display Charts:
+  if (speciesLabel == 'BA') {
+    plotPanelParent.widgets().get(0).setValue('Burned Area');
+  } else {
+    plotPanelParent.widgets().get(0).setValue('Emissions by Land Use/Land Cover');
+  }
+  
   map.add(plotPanelParent);
   plotPanel = plotPanel.clear();
   
@@ -663,7 +729,7 @@ submitButton.onClick(function() {
   var monthlyChart = plotEmiTS(plotPanel, emiByMonth, regionShp,
     speciesLabel, 'Monthly', 'MMM Y', sYear, eYear, 1, 12, null);
   plotPanel.add(monthlyChart);
-  
+
 });
 
 
