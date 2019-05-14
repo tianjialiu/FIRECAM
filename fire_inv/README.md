@@ -1,4 +1,5 @@
-# Downloading & Processing Files
+# Global Fire Emissions Inventories
+## Downloading & Processing Files
 
 For me, the most time-consuming steps in working with global fire emissions inventories is finding, download, and processing the data. Below, I summarize the essentials of downloading and processing the data. This directory includes code and ancillary files to download and process raw files for the following inventories:
 1. Global Fire Emissions Database ([GFEDv4s](https://www.globalfiredata.org/); van der Werf et al., 2017)
