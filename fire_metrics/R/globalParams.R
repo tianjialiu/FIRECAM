@@ -19,11 +19,9 @@ setwd(homeDir)
 outTabHome <- file.path(homeDir,"outputTables/")
 geeHome <- file.path(homeDir,"gee/")
 geeBasisHome <- file.path(homeDir,"gee_basis/")
-shapeHome <- file.path(homeDir,"shapefiles/")
 plotHome <- file.path(homeDir,"plots/")
 rasMapsHome <- file.path(homeDir,"RasterMaps/")
 rasHome <- file.path(homeDir,"rasters/")
-qgisHome <- file.path(homeDir,"qgis/")
 
 # ----- Parameters -----
 sYear <- 2003; eYear <- 2017
@@ -32,6 +30,3 @@ nYear <- length(xYears)
 
 nLandPix <- 254969
 nBasis <- 14
-
-basis <- raster(file.path(shapeHome,"basisRegions.tif"))
-LCtypes <- c("AGRI","BORF","DEFO","PEAT","SAVA","TEMF")
