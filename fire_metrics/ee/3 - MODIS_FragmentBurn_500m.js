@@ -7,14 +7,8 @@ var modisBA = ee.ImageCollection("MODIS/006/MCD64A1"),
 // statistics, gridded at 0.25deg x 0.25deg
 
 // Author: Tianjia Liu (tianjialiu@g.harvard.edu)
-// Last Updated: May 13, 2019 
+// Last Updated: May 15, 2019 
 // ---------------------------------------------------
-
-// Set basis region using its id (1-14)
-var iBasis = 1;
-
-// Return the basis id as a string with a leading zero
-var iBasisStr = ee.Number(iBasis).format('%02d').getInfo();
 
 // Return feature collection of selected basis region
 var Shp = gfedPoly.filterMetadata('lc','greater_than',0);
@@ -24,7 +18,6 @@ var sYear = 2003; var eYear = 2017;
 
 // Define spatial scale: 500 m
 var modisScale = ee.Image(modisBA.first()).select('BurnDate');
-
 
 // Return burned area as burn dates
 var getBA = function(image) {
