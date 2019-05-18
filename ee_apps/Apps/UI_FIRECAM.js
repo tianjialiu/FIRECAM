@@ -6,7 +6,7 @@
 /*
 // Documentation: https://github.com/tianjialiu/FIRECAM
 // Author: Tianjia Liu
-// Last updated: March 10, 2019
+// Last updated: May 18, 2019
 
 // Purpose: explore regional differences in fire emissions from five
 // global fire emissions inventories (GFED, FINN, GFAS, QFED, FEER)
@@ -231,6 +231,8 @@ var getRegionShp = function(basisID) {
   return basisRegions.filterMetadata('basis','equals',basisID);
 };
 
+var globalShp = basisRegions.geometry().bounds();
+
 var getCountryShp = function(region) {
   return ee.Image(1).clip(ee.FeatureCollection('USDOS/LSIB_SIMPLE/2017')
     .filter(ee.Filter.eq('country_na',region)))
@@ -429,12 +431,15 @@ var getYears = function(yearSelectPanel) {
 // -----------------
 var regionTypeSelectPanel = function(map) {
   var regionLabel = ui.Label('2) Select Bounds Type:', {padding: '5px 0px 0px 4px', fontSize: '14.5px'});
-  var regionTypeSelect = ui.Select({items: ['Basis Region','Country/ Sub-Region', 'Pixel'],
+  var regionTypeSelect = ui.Select({items: ['Global', 'Basis Region', 'Country/ Sub-Region', 'Pixel', 'Custom'],
     value: 'Basis Region', style: {stretch: 'horizontal'},
     onChange: function(selected) {
+      regionSelectPanel.clear();
+      if (selected == 'Global') {}
       if (selected == 'Basis Region') {setRegionList(regionNames, 'EQAS - Equatorial Asia')}
       if (selected == 'Country/ Sub-Region') {setRegionList(countryNames, 'Indonesia')}
       if (selected == 'Pixel') {setCoords(map)}
+      if (selected == 'Custom') {setBounds(map)}
     }
   });
   
@@ -450,8 +455,6 @@ var getRegions = function(regionSelectPanel) {
 };
 
 var setRegionList = function(shpNames, defaultName) {
-  regionSelectPanel.clear();
-  
   var regionLabel = ui.Label('Select Region:', {padding: '5px 0px 0px 20px', fontSize: '14.5px'});
   var regionSelect = ui.Select({items: shpNames.sort(), value: defaultName, style: {stretch: 'horizontal'}});
   
@@ -461,9 +464,7 @@ var setRegionList = function(shpNames, defaultName) {
 };
 
 var setCoords = function(map) {
-  regionSelectPanel.clear();
-  
-  var coordsLabel = ui.Label('Enter lat/lon below or click on map to update coordinates',
+  var coordsLabel = ui.Label('Enter lon/lat below or click on map to update coordinates',
     {margin: '3px 8px 6px 23px', fontSize: '11.5px'});
 
   var lonLabel = ui.Label('Lon (x):', {padding: '3px 0px 0px 15px', fontSize: '14.5px'});
@@ -480,19 +481,52 @@ var setCoords = function(map) {
     ]);
 
   map.onClick(function(coords) {
+    regionSelectPanel.clear(); regionSelectPanel.add(coordsPanel);
     regionSelectPanel.widgets().get(0).widgets().get(1).widgets().get(1).setValue(coords.lon);
     regionSelectPanel.widgets().get(0).widgets().get(1).widgets().get(3).setValue(coords.lat);
   });
-    
+  
   return regionSelectPanel.add(coordsPanel);
 };
 
 var getCoords = function(regionSelectPanel) {
-
   var lon = parseFloat(regionSelectPanel.widgets().get(0).widgets().get(1).widgets().get(1).getValue());
   var lat = parseFloat(regionSelectPanel.widgets().get(0).widgets().get(1).widgets().get(3).getValue());
  
   return ee.Geometry.Point(lon,lat);
+};
+
+var setBounds = function(map) {
+  var boundsLabel = ui.Label('Enter custom bounds as an array of lon/lat coordinates',
+    {margin: '3px 8px 6px 23px', fontSize: '11.5px'});
+
+  var coordsBox = ui.Textbox({value: '[[94,-10],[94,7.5],[120,7.5],[120,-10]]'});
+  coordsBox.style().set('stretch', 'horizontal');
+  
+  var cursorBounds = ui.Label('Print lon/lat coordinates of cursor: (click on map)',
+    {margin: '3px 8px 6px 23px', fontSize: '11.5px'});
+  
+  var boundsPanel = ui.Panel([
+    boundsLabel, ui.Panel([coordsBox], ui.Panel.Layout.Flow('horizontal'),
+      {stretch: 'horizontal', margin: '-5px 0px 0px 15px'}),
+      cursorBounds
+    ]);
+    
+  map.onClick(function(coords) {
+    regionSelectPanel.clear(); regionSelectPanel.add(boundsPanel);
+    var cursorBounds = ee.String('Print lon/lat coordinates of cursor: [' +
+      ee.Number(coords.lon).format('%.2f').getInfo() +
+      ', ' + ee.Number(coords.lat).format('%.2f').getInfo() + ']').getInfo();
+    regionSelectPanel.widgets().get(0).widgets().get(2).setValue(cursorBounds);
+  });
+  
+  return regionSelectPanel.add(boundsPanel);
+};
+
+var getBounds = function(regionSelectPanel) {
+  var bounds = regionSelectPanel.widgets().get(0).widgets().get(1).widgets().get(0).getValue();
+  
+  return ee.Geometry.Polygon(ee.String(bounds).decodeJSON(),'EPSG:4326',false);
 };
 
 // -----------------
@@ -516,11 +550,14 @@ var submitButton = ui.Button({label: 'Submit',  style: {stretch: 'horizontal'}})
 // --------
 // Legends
 // --------
+// RColorBrewer and RCartoColor color palettes
 var colPal_RdBu = ['#2166AC','#67A9CF','#D1E5F0','#F7F7F7','#FDDBC7','#EF8A62','#B2182B'];
-var colPal_Blues = ['#EFF3FF','#C6DBEF','#9ECAE1','#6BAED6','#4292C6','#2171B5','#084594'];
+var colPal_Blues = ['#FFFFFF','#EFF3FF','#C6DBEF','#9ECAE1','#6BAED6','#4292C6','#2171B5','#084594'];
 var colPal_Reds = ['#FEE5D9','#FCBBA1','#FC9272','#FB6A4A','#EF3B2C','#CB181D','#99000D'];
+var colPal_OrRed = ['#FFFFFF','#FEF0D9','#FDD49E','#FDBB84','#FC8D59','#EF6548','#D7301F','#990000'];
 var colPal_Grays = ['#F7F7F7','#D9D9D9','#BDBDBD','#969696','#737373','#525252','#252525'];
 var colPal_Spectral = ['#3288BD','#99D594','#E6F598','#FFFFBF','#FEE08B','#FC8D59','#D53E4F'];
+var colPal_Sunset = ['#F3E79B','#FAC484','#F8A07E','#EB7f86','#CE6693','#A059A0','#5C53A5'];
 
 var continuousLegend = function(controlPanel, title, colPal, minVal, maxVal, units) {
   var continuousLegendPanel = ui.Panel({
@@ -576,11 +613,11 @@ var legendPanel = function(controlPanel) {
   continuousLegend(controlPanel,'Cloud/Haze Obscuration',
     colPal_Blues, 0, 1, 'Metric 2: fractional, FRP-weighted');
   continuousLegend(controlPanel,'Burn Size/Fragmentation',
-    colPal_Reds, 0, 2, 'Metric 3: km2 / fragment');
+    colPal_OrRed, 0, 2, 'Metric 3: sq. km / fragment');
   continuousLegend(controlPanel,'Topography Variance',
-    colPal_Grays, 0, 1000, 'Metric 4: m2');
+    colPal_Grays, 0, 1000, 'Metric 4: sq. m');
   continuousLegend(controlPanel,'VIIRS FRP Outside MODIS Burn Extent',
-    colPal_Reds, 0, 1, 'Metric 5: fractional');
+    colPal_Sunset, 0, 1, 'Metric 5: fractional');
 };
 
 var emiLegend = function(speciesLabel, units, maxVal) {
@@ -750,9 +787,9 @@ submitButton.onClick(function() {
   map.addLayer(lulcMapYr, {palette: lulc_colPal, min: 1, max: 7}, 'Land Use/ Land Cover ' + mapYr.getInfo(), false);
   map.addLayer(peat.gt(0).selfMask(), {palette: ['#800080']}, 'Peatlands', false);
   
-  map.addLayer(RFCM5.multiply(1e3), {palette: colPal_Reds, min: 0, max: 1e3}, 'Metric 5: VIIRS FRP Outside MODIS Burn Extent', false);
+  map.addLayer(RFCM5.multiply(1e3), {palette: colPal_Sunset, min: 0, max: 1e3}, 'Metric 5: VIIRS FRP Outside MODIS Burn Extent', false);
   map.addLayer(RFCM4, {palette: colPal_Grays, min: 0, max: 1e3}, 'Metric 4: Topography Variance', false);
-  map.addLayer(RFCM3.multiply(1e3), {palette: colPal_Reds, min: 0, max: 2e3}, 'Metric 3: Burn Size/Fragmentation', false);
+  map.addLayer(RFCM3.multiply(1e3), {palette: colPal_OrRed, min: 0, max: 2e3}, 'Metric 3: Burn Size/Fragmentation', false);
   map.addLayer(RFCM2.multiply(1e3), {palette: colPal_Blues, min: 0, max: 1e3}, 'Metric 2: Cloud/Haze Obscuration', false);
   map.addLayer(RFCM1.multiply(1e3), {palette: colPal_RdBu, min: -1e3, max: 1e3}, 'Metric 1: Areal BA-AF Discrepancy', false);
   
@@ -783,15 +820,37 @@ submitButton.onClick(function() {
   }
   
   if (regionType == 'Pixel') {
-    map.onClick(function(coords) {
+    var coordsPanel = regionSelectPanel.widgets().get(0);
+      map.onClick(function(coords) {
+      regionSelectPanel.clear(); regionSelectPanel.add(coordsPanel);
       regionSelectPanel.widgets().get(0).widgets().get(1).widgets().get(1).setValue(coords.lon);
       regionSelectPanel.widgets().get(0).widgets().get(1).widgets().get(3).setValue(coords.lat);
     });
-
     regionShp = getCoords(regionSelectPanel);
-    map.centerObject(regionShp, 6);
     
+    map.centerObject(regionShp, 6);
     map.addLayer(regionShp, {}, 'Selected Pixel');
+  }
+  
+  if (regionType == 'Custom') {
+    var boundsPanel = regionSelectPanel.widgets().get(0);
+    map.onClick(function(coords) {
+      regionSelectPanel.clear(); regionSelectPanel.add(boundsPanel);
+      var cursorBounds = ee.String('Print lon/lat coordinates of cursor: [' +
+        ee.Number(coords.lon).format('%.2f').getInfo() +
+        ', ' + ee.Number(coords.lat).format('%.2f').getInfo() + ']').getInfo();
+      regionSelectPanel.widgets().get(0).widgets().get(2).setValue(cursorBounds);
+    });
+    regionShp = getBounds(regionSelectPanel);
+    
+    map.centerObject(regionShp);
+    map.addLayer(ee.Image().byte().rename('Selected Region')
+      .paint(ee.FeatureCollection(regionShp), 0, 1), {palette: '#FF0000'}, 'Selected Region');
+  }
+
+  if (regionType == 'Global') {
+    regionShp = globalShp;
+    map.setCenter(0,0,1);
   }
   
   // Display Charts:
@@ -813,6 +872,7 @@ submitButton.onClick(function() {
   
   var monthlyChart = plotEmiTS(plotPanel, emiByMonth, regionShp,
     species, 'Monthly', 'MMM Y', sYear, eYear, 1, 12, null);
-  plotPanel.add(monthlyChart);
-  
+  if (regionType != 'Global') {
+    plotPanel.add(monthlyChart);
+  }
 });

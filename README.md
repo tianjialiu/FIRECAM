@@ -8,7 +8,7 @@ FIRECAM is an explorer for regional differences in fire emissions from five glob
 4. Quick Fire Emissions Dataset ([QFEDv2.5r1](https://gmao.gsfc.nasa.gov/research/science_snapshots/global_fire_emissions.php); Darmenov and da Silva, 2013)
 5. Fire Energetics and Emissions Research ([FEERv1.0-G1.2](https://feer.gsfc.nasa.gov/data/emissions/); Ichoku and Ellison, 2014)
 
-FIRECAM can be accessed through 1) Earth Engine Apps and 2) the Google Earth Engine (GEE) playground. While EE Apps faciliates access to FIRECAM for any user (does not require a GEE account), accessing the FIRECAM repository in the GEE playground allows custom exports of timeseries and additional data analysis.
+FIRECAM can be accessed through 1) Earth Engine Apps and 2) the Google Earth Engine (GEE) playground. While EE Apps faciliates access to FIRECAM for any user (does not require a GEE account), accessing the FIRECAM repository in the GEE playground allows custom exports of timeseries and additional data analysis. The latter is also a fallback option if EE Apps is running too slowly.
 
 ### Ancillary Apps
 * [GFEDv4s Explorer](https://globalfires.earthengine.app/view/gfedv4s): Explore GFEDv4s emissions (1997-2016) for burned area and all available chemical species, partitioned by land use/land cover
@@ -23,10 +23,12 @@ FIRECAM can be accessed through 1) Earth Engine Apps and 2) the Google Earth Eng
 *Select a time range* Use the start year and end year sliders to select a time range for the annual and monthly regional emissions time series charts.
 
 ### Step 2: Select Bounds Type and Region/Pixel of Interest
-*Select a bounds type* Choose 1) "Basis Regions," 2) "Country/Sub-Region," or 3) "Pixel."
-1. **Basis Regions**: 14 broad geographic regions from GFEDv4s (van der Werf et al., 2017).
-2. **Country/Sub-Region**: countries and sub-regions from simplified Large Scale International Boundary (LSIB) Polygons; those with neglible fire emissions were excluded
-3. **Pixel**: individual grid cells, 0.5° x 0.5° spatial resolution
+*Select a bounds type* Choose 1) "Global," 2) "Basis Region," 3) "Country/Sub-Region," 4) "Pixel," or 5) "Custom."
+1. **Global**: all grid cells (*Note*: monthly time series plot not shown for this option)
+2. **Basis Region**: 14 broad geographic regions from GFEDv4s (van der Werf et al., 2017).
+3. **Country/Sub-Region**: countries and sub-regions from simplified Large Scale International Boundary (LSIB) Polygons; those with neglible fire emissions were excluded
+4. **Pixel**: individual grid cells, 0.5° x 0.5° spatial resolution
+5. **Custom**: user-defined polygon using an array of longitude, latitude coordinates
 <br><br>
 ![banner image](https://github.com/tianjialiu/FIRECAM/blob/master/docs/imgs/basisRegions.png)
 
@@ -64,6 +66,7 @@ Click the 'Apps/UI_FIRECAM.js' script in the 'users/tl2581/FIRECAM' repository. 
 ## Updates
 * Feburary 2019: add data download/processing code to this Github repo under "data_cache"; added "Country/Sub-Region" and "Pixel" options to FIRECAM app; created ancillary app for GFEDv4s (GFEDv4s Explorer)
 * March 2019: added "Country/Sub-Region" and "Pixel" options to FIRECAM exports
+* May 2019: added "Global" and "Custom" options to FIRECAM, GFEDv4s apps
 
 ## Publications
 1. Liu, T., L.J. Mickley, R.S. DeFries, M.E. Marlier, M.F. Khan, M.T. Latif, and A. Karambelas (in review). Diagnosing spatial uncertainties and relative biases in global fire emissions inventories: Indonesia as regional case study. *EarthArXiv*: https://dx.doi.org/10.31223/osf.io/nh57j
