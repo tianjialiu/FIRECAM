@@ -64,7 +64,7 @@ The repository should then appear in the top-left panel under 'Reader' as 'users
 Click the 'Apps/UI_FIRECAM.js' script in the 'users/tl2581/FIRECAM' repository. The script should appear in the code editor. Click 'Run' in the top-right corner of the code editor to activate the user interface. The repository also contains a script to export monthly and annual timeseries data ('Exports/UI_FIRECAM_Exports.js').
 
 ## Updates
-* Feburary 2019: add data download/processing code to this Github repo under "data_cache"; added "Country/Sub-Region" and "Pixel" options to FIRECAM app; created ancillary app for GFEDv4s (GFEDv4s Explorer)
+* Feburary 2019: add data download/processing code to this Github repo under "fire_inv"; added "Country/Sub-Region" and "Pixel" options to FIRECAM app; created ancillary app for GFEDv4s (GFEDv4s Explorer)
 * March 2019: added "Country/Sub-Region" and "Pixel" options to FIRECAM exports
 * May 2019: added "Global" and "Custom" options to FIRECAM, GFEDv4s apps
 

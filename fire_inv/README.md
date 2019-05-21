@@ -21,7 +21,7 @@ For me, the most time-consuming steps in working with global fire emissions inve
 ### 1. GFEDv4s
 Annual HDF5 (with monthly timesteps and daily fraction) can be downloaded [here](https://www.geo.vu.nl/~gwerf/GFED/GFED4/). [Ancillary files](https://www.geo.vu.nl/~gwerf/GFED/GFED4/ancill), in particular, the TXT file containing the emissions factors to convert from Dry Matter (DM), are also needed. You can download the entire directory using the `wget` command:
 ```
-wget -m -nH --cut-dirs=2 -A hdf5,csv,txt,xlsx https://www.geo.vu.nl/~gwerf/GFED/GFED4/
+wget -m -np -nH --cut-dirs=2 -A hdf5,csv,txt,xlsx https://www.geo.vu.nl/~gwerf/GFED/GFED4/
 ```
 
 ### 2. FINNv1.5
@@ -39,11 +39,8 @@ I modified the example Python script from ECMWF to automate download requests to
 ### 4. QFEDv2.5r1
 Daily NetCDF files can be downloaded at the NASA NCCS data portal. You can download the entire directory using the `wget` command:
 ```
-wget -m -nH --cut-dirs=7 -A nc4 https://portal.nccs.nasa.gov/datashare/iesa/aerosol/emissions/QFED/v2.5r1/0.1/QFED/
-```
-However, you can also download each year (and month) separately. For example, the following command downloads all files for 2001.
-```
-wget -m -nH --cut-dirs=7 -A nc4 https://portal.nccs.nasa.gov/datashare/iesa/aerosol/emissions/QFED/v2.5r1/0.1/QFED/Y2001
+wget -m -np -nH --cut-dirs=7 -e robots=off -A nc4 \
+https://portal.nccs.nasa.gov/datashare/iesa/aerosol/emissions/QFED/v2.5r1/0.1/QFED/
 ```
 
 ### 5. FEERv1.0-G1.2
