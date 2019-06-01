@@ -8,7 +8,7 @@ FIRECAM is an explorer for regional differences in fire emissions from five glob
 4. Quick Fire Emissions Dataset ([QFEDv2.5r1](https://gmao.gsfc.nasa.gov/research/science_snapshots/global_fire_emissions.php); Darmenov and da Silva, 2013)
 5. Fire Energetics and Emissions Research ([FEERv1.0-G1.2](https://feer.gsfc.nasa.gov/data/emissions/); Ichoku and Ellison, 2014)
 
-FIRECAM can be accessed through 1) Earth Engine Apps and 2) the Google Earth Engine (GEE) playground. While EE Apps faciliates access to FIRECAM for any user (does not require a GEE account), accessing the FIRECAM repository in the GEE playground allows custom exports of timeseries and additional data analysis. The latter is also a fallback option if EE Apps is running too slowly.
+FIRECAM can be accessed through 1) Earth Engine Apps and 2) the Google Earth Engine (GEE) playground. While EE Apps faciliates access to FIRECAM for any user (does not require a GEE account), accessing the FIRECAM repository in the GEE playground allows rapid exports of timeseries and additional data analysis. The latter is also a fallback option if EE Apps is running too slowly.
 
 ### Ancillary Apps
 * [GFEDv4s Explorer](https://globalfires.earthengine.app/view/gfedv4s): Explore GFEDv4s emissions (1997-2016) for burned area and all available chemical species, partitioned by land use/land cover
@@ -24,11 +24,11 @@ FIRECAM can be accessed through 1) Earth Engine Apps and 2) the Google Earth Eng
 
 ### Step 2: Select Bounds Type and Region/Pixel of Interest
 *Select a bounds type* Choose 1) "Global," 2) "Basis Region," 3) "Country/Sub-Region," 4) "Pixel," or 5) "Custom."
-1. **Global**: all grid cells (*Note*: monthly time series plot not shown for this option)
+1. **Global**: all grid cells within GFEDv4s bounds (*Note*: monthly time series plot only shown for individual years)
 2. **Basis Region**: 14 broad geographic regions from GFEDv4s (van der Werf et al., 2017).
 3. **Country/Sub-Region**: countries and sub-regions from simplified Large Scale International Boundary (LSIB) Polygons; those with neglible fire emissions were excluded
-4. **Pixel**: individual grid cells, 0.5° x 0.5° spatial resolution
-5. **Custom**: user-defined polygon using an array of longitude, latitude coordinates
+4. **Pixel**: individual grid cells, 0.5° x 0.5° spatial resolution; the centroid of the selected grid cell is displayed on the map
+5. **Custom**: user-defined polygon using an array of longitude, latitude coordinates; the tool re-defines the polygon to match the 0.5° x 0.5° grid of the basis regions
 <br><br>
 ![banner image](https://github.com/tianjialiu/FIRECAM/blob/master/docs/imgs/basisRegions.png)
 
@@ -36,7 +36,7 @@ FIRECAM can be accessed through 1) Earth Engine Apps and 2) the Google Earth Eng
 *Select a species.* The six available species are CO<sub>2</sub>, CO, CH<sub>4</sub>, organic carbon (OC), black carbon (BC), and fine particulate matter (PM<sub>2.5</sub>)
 
 ### Regional Emissions
-After clicking the submit button, please wait a few seconds for the default map layers and three charts to display. Note that for large regions, such as BOAS, and long time ranges, calculations for the monthly and annual time series can take up to a few minutes. The three charts (annual average from 2003-2016 and two time series charts, yearly and monthly emissions by inventory), can be viewed in a new tab and exported as tables or images. Map layers consist of emissions at 0.5° x 0.5° spatial resolution for a given species for each of the five global fire emissions inventories and fire relative fire confidence metrics (described below) at 0.25° x 0.25° spatial resolution. The distribution of peatlands (0.25° x 0.25°), based on GFEDv4s emissions from 2003-2016, and MODIS land use/land cover map (500 m, MCD12Q1 C6), based on FINNv1.0 aggregated vegetation classes, are also available as map layers.
+After clicking the submit button, please wait a few seconds for the default map layers and three charts to display. Note that for large regions, such as BOAS, and long time ranges, calculations for the monthly and annual time series can take up to a few minutes. The three charts (annual average from 2003-2016 and two time series charts, yearly and monthly emissions by inventory), can be viewed in a new tab and exported as tables or images. Map layers consist of emissions at 0.5° x 0.5° spatial resolution for a given species for each of the five global fire emissions inventories and fire relative fire confidence metrics (described below) at 0.25° x 0.25° spatial resolution. The distribution of peatlands (0.25° x 0.25°), based on GFEDv4s emissions from 2003-2016, and MODIS land use/land cover map (500 m, MCD12Q1 C6), based on FINNv1.0 aggregated vegetation classes, are also available as map layers. (*Tip*: Zoom in or zoom out in the web browser to adjust the displayed text.)
 
 ### Relative Fire Confidence Metrics
 | # | Metric | Range | Units | Description |
