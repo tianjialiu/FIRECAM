@@ -4,7 +4,7 @@
 # monthly files, daily timesteps, 0.1deg (default)
 # (any spatial resolution possible >1km)
 # =================================================
-# last updated: Feb 22, 2019
+# last updated: June 1, 2019
 # Tianjia Liu
 
 rm(list=ls())
@@ -104,8 +104,6 @@ FINNv1p5_pro <- function(varName, xYears, xMonths, outputType="tif",
         writeRaster(stack(inv_sp),paste0(outname,".tif"),format="GTiff",overwrite=T)
       }
       
-      removeTmpFiles(h=nTmpHrs)
-      
       # -----------------
       # Save NetCDF
       # -----------------
@@ -137,6 +135,8 @@ FINNv1p5_pro <- function(varName, xYears, xMonths, outputType="tif",
         
         nc_close(ncout)
       }
+      
+      removeTmpFiles(h=nTmpHrs)
     }
   }
   timestamp(prefix=paste("Finished! ","##------ "))

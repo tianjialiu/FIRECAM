@@ -9,7 +9,7 @@
 // https://doi.org/10.5194/essd-9-697-2017
 
 // Author: Tianjia Liu
-// Last Updated: May 18, 2019
+// Last updated: June 1, 2019
 
 // ---------------
 // Global Params |
@@ -280,6 +280,12 @@ var globalShp = basisRegions.geometry().bounds();
 var getCountryShp = function(region) {
   return ee.Image(1).clip(ee.FeatureCollection('USDOS/LSIB_SIMPLE/2017')
     .filter(ee.Filter.eq('country_na',region)))
+    .reproject({crs: crs, crsTransform: crsTrans}).gt(0)
+    .reduceToVectors({geometry: basisRegions.union()});
+};
+
+var getGridShp = function(region) {
+  return ee.Image(1).clip(region)
     .reproject({crs: crs, crsTransform: crsTrans}).gt(0)
     .reduceToVectors({geometry: basisRegions.union()});
 };
@@ -729,10 +735,11 @@ submitButton.onClick(function() {
       regionSelectPanel.widgets().get(0).widgets().get(1).widgets().get(1).setValue(coords.lon);
       regionSelectPanel.widgets().get(0).widgets().get(1).widgets().get(3).setValue(coords.lat);
     });
-    regionShp = getCoords(regionSelectPanel);
+    regionShp = getGridShp(getCoords(regionSelectPanel));
     
     map.centerObject(regionShp, 6);
-    map.addLayer(regionShp, {}, 'Selected Pixel');
+    map.addLayer(ee.Feature(ee.FeatureCollection(regionShp).first()).centroid(0.1),
+      {}, 'Selected Pixel');
   }
   
   if (regionType == 'Custom') {
@@ -744,7 +751,7 @@ submitButton.onClick(function() {
         ', ' + ee.Number(coords.lat).format('%.2f').getInfo() + ']').getInfo();
       regionSelectPanel.widgets().get(0).widgets().get(2).setValue(cursorBounds);
     });
-    regionShp = getBounds(regionSelectPanel);
+    regionShp = getGridShp(getBounds(regionSelectPanel));
     
     map.centerObject(regionShp);
     map.addLayer(ee.Image().byte().rename('Selected Region')
@@ -786,7 +793,7 @@ submitButton.onClick(function() {
   
   var monthlyChart = plotEmiTS(plotPanel, emiByMonth, regionShp,
     speciesLabel, 'Monthly', 'MMM Y', sYear, eYear, 1, 12, null);
-  if (regionType != 'Global') {
+  if (regionType != 'Global' | eYear-sYear === 0) {
     plotPanel.add(monthlyChart);
   }
 });

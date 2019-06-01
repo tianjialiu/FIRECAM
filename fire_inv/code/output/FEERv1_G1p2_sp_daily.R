@@ -3,7 +3,7 @@
 # by species [kg m-2 s-1]
 # monthly files, daily timesteps, 0.1deg
 # ====================================================
-# last updated: Feb 22, 2019
+# last updated: June 1, 2019
 # Tianjia Liu
 
 rm(list=ls())
@@ -106,8 +106,6 @@ FEERv1_pro <- function(varName, xYears, xMonths, outputType="tif") {
         writeRaster(stack(inv_sp),paste0(outname,".tif"),format="GTiff",overwrite=T)
       }
       
-      removeTmpFiles(h=nTmpHrs)
-      
       # -----------------
       # Save NetCDF
       # -----------------
@@ -139,6 +137,8 @@ FEERv1_pro <- function(varName, xYears, xMonths, outputType="tif") {
         
         nc_close(ncout)
       }
+      
+      removeTmpFiles(h=nTmpHrs)
     }
     nc_close(ncin)
   }
