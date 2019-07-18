@@ -3,7 +3,7 @@
 # expressed as a normalized difference
 
 # Author: Tianjia Liu
-# Last Updated: May 13, 2019
+# Last Updated: July 18, 2019
 # -----------------------------------------
 source('~/Google Drive/GlobalFires/R/globalParams.R')
 
@@ -12,7 +12,7 @@ tableName <- "MxD14A1_FRP_1km_2003_2017.csv"
 rasterName <- "Metric1_BA_AFA_discrepancy"
 
 writeTable <- F
-write2Raster <- F
+write2Raster <- T
 plotMap <- T
 
 # ----- Write Table -----
@@ -54,7 +54,7 @@ if (write2Raster == T) {
   
   # Use ids of grid cells as index to save metric as a vector
   ids <- inTable$id
-  metricVec <- rep(NA,nBasis)
+  metricVec <- rep(NA,nTotalPix)
   metricVec[ids] <- (inTable$BAnoAF-inTable$AFnoBA)/(inTable$BAnoAF+inTable$AFnoBA)
   
   # Convert vector to raster and mask values that are 0

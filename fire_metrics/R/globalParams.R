@@ -28,5 +28,8 @@ sYear <- 2003; eYear <- 2017
 xYears <- sYear:eYear
 nYear <- length(xYears)
 
+basis <- raster(file.path(rasHome,"basisRegions.tif"))
+
 nLandPix <- 254969
+nTotalPix <- length(basis)
 nBasis <- 14

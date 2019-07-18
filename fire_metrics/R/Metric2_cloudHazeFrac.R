@@ -4,7 +4,7 @@
 # weighted by MODIS FRP
 
 # Author: Tianjia Liu
-# Last Updated: May 14, 2019
+# Last Updated: July 18, 2019
 # -----------------------------------------------
 source('~/Google Drive/GlobalFires/R/globalParams.R')
 
@@ -109,7 +109,7 @@ if (write2Raster == T) {
   
   # Use ids of grid cells as index to save metric as a vector
   ids <- inTable$id
-  metricVec <- rep(NA,nBasis)
+  metricVec <- rep(NA,nTotalPix)
   metricVec[ids] <- inTable$cloudModis
   
   # Convert vector to raster and mask values that are 0
