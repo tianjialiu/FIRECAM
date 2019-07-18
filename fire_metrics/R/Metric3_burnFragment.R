@@ -31,7 +31,7 @@ if (writeTable == T) {
     connCount <- connCount[order(connCount$id),]
     connCount$connCount <- connCount$connCount-1
     
-    # Account for residual ba
+    # Account for residual burned area
     connCount$connCount[which(mcd64a1$BA>0 & connCount$connCount == 0)] <- 1 
     fragmentBA <- fragmentBA + cbind(mcd64a1$BA,connCount$connCount)
   }

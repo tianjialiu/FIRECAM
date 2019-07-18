@@ -23,7 +23,7 @@ if (writeTable == T) {
   # Folder where MxD14A1_FRP_1km tables from EE are stored
   setwd(file.path(geeHome,"MxD14A1_FRP_1km/"))
   
-  # Loop over all tables, per year and per year
+  # Loop over all tables, per year and per month
   for (iYear in seq_along(xYears)) {
     # File names of tables of given year
     fileNames <- dir(".",paste0("MxD14A1_FRP_",xYears[iYear]))
