@@ -9,7 +9,7 @@
 // https://doi.org/10.5194/essd-9-697-2017
 
 // Author: Tianjia Liu
-// Last updated: June 1, 2019
+// Last updated: July 21, 2019
 
 // ---------------
 // Global Params |
@@ -63,7 +63,7 @@ var countryNames = ['Afghanistan', 'Albania', 'Algeria',
   'Iraq', 'Ireland', 'Israel', 'Italy', 'Jamaica', 'Japan', 'Jordan',
   'Kazakhstan', 'Kenya', 'North Korea', 'South Korea', 'Kosovo',
   'Kuwait', 'Laos', 'Latvia', 'Lebanon', 'Lesotho', 'Liberia',
-  'Libya', 'Lithuania', 'Macedonia', 'Madagasgar', 'Malawi',
+  'Libya', 'Lithuania', 'Macedonia', 'Madagascar', 'Malawi',
   'Malaysia', 'Mali', 'Martinique', 'Mauritania', 'Mexico',
   'Moldova', 'Mongolia', 'Montenegro', 'Montserrat', 'Morocco',
   'Mozambique', 'Namibia', 'Nepal', 'Netherlands', 'New Caledonia',
