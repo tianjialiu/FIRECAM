@@ -2,7 +2,7 @@
 # Functions to plot rasters using ggplot
 
 # Author: Tianjia Liu
-# Last Updated: May 14, 2019
+# Last Updated: July 24, 2019
 # -------------------------------------------
 
 # ----- Open Packages -----
@@ -91,7 +91,7 @@ ggplot_raster <- function(inName, titleName=F, legendName=F, subplotName=F, unit
   # Plot Map
   gg <- ggplot() + geom_polygon(data=world, aes(x=long, y=lat, group=group), fill=backgroundCol) +
     geom_raster(data=df, aes(x=long, y=lat, fill=value)) +
-    scale_fill_gradientn(colors=colPal, breaks=break.pts, na.value=colPal[1]) +
+    scale_fill_gradientn(colors=colPal, breaks=break.pts, na.value=colPal[1], limits=range(break.pts)) +
     geom_label(data=legend.label, aes(x=x, y=y, label=label), fontface="bold", size=3.6, label.size=NA, fill="white") +
     geom_text(data=x.ticks, aes(x=x, y=y, label=label), angle=90, size=2.75) +
     geom_text(data=y.ticks, aes(x=x, y=y, label=label), size=2.75) +
