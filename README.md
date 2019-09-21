@@ -1,18 +1,20 @@
 # FIRECAM
 [FIRECAM](https://globalfires.earthengine.app/view/firecam): Fire Inventories - Regional Evaluation, Comparison, and Metrics
 
-FIRECAM is an explorer for regional differences in fire emissions from five global fire emissions inventories:
+FIRECAM is an online app for end-users to diagnose and explore regional differences in fire emissions from five global fire emissions inventories:
 1. Global Fire Emissions Database ([GFEDv4s](https://www.globalfiredata.org/); van der Werf et al., 2017)
 2. Fire Inventory from NCAR ([FINNv1.5](http://bai.acom.ucar.edu/Data/fire); Wiedinmyer et al., 2011)
 3. Global Fire Assimilation System ([GFASv1.2](http://gmes-atmosphere.eu/about/project_structure/input_data/d_fire/); Kaiser et al., 2012)
 4. Quick Fire Emissions Dataset ([QFEDv2.5r1](https://gmao.gsfc.nasa.gov/research/science_snapshots/global_fire_emissions.php); Darmenov and da Silva, 2013)
 5. Fire Energetics and Emissions Research ([FEERv1.0-G1.2](https://feer.gsfc.nasa.gov/data/emissions/); Ichoku and Ellison, 2014)
 
-FIRECAM can be accessed through 1) Earth Engine Apps and 2) the Google Earth Engine (GEE) playground. While EE Apps faciliates access to FIRECAM for any user (does not require a GEE account), accessing the FIRECAM repository in the GEE playground allows rapid exports of timeseries and additional data analysis. The latter is also a fallback option if EE Apps is running too slowly.
+Please see our [website](https://sites.google.com/view/firecam/home) for more information.
+
+FIRECAM can be accessed through (1) Earth Engine Apps and (2) the Google Earth Engine (GEE) Javascript playground. While EE Apps facilitates access to FIRECAM for any user (GEE account not required), accessing the FIRECAM repository in the GEE playground allows rapid exports of timeseries and additional data analysis. The latter is also a fallback option if EE Apps is running too slowly.
 
 ### Ancillary Apps
 * [GFEDv4s Explorer](https://globalfires.earthengine.app/view/gfedv4s): Explore GFEDv4s emissions (1997-2016) for burned area and all available chemical species, partitioned by land use/land cover
-    - *Note*: Burned area from small fires is approximate based on the small fire fraction for emissions
+- *Note*: Burned area from small fires is approximate based on the small fire fraction for emissions
 
 ## FIRECAM App
 (*Earth Engine Apps, no Google Earth Engine account required*)
@@ -23,12 +25,13 @@ FIRECAM can be accessed through 1) Earth Engine Apps and 2) the Google Earth Eng
 *Select a time range* Use the start year and end year sliders to select a time range for the annual and monthly regional emissions time series charts.
 
 ### Step 2: Select Bounds Type and Region/Pixel of Interest
-*Select a bounds type* Choose 1) "Global," 2) "Basis Region," 3) "Country/Sub-Region," 4) "Pixel," or 5) "Custom."
+*Select a bounds type* Choose 1) "Global," 2) "Basis Region," 3) "Country/Sub-Region," 4) "Pixel," 5) "Custom" or 6) "Draw."
 1. **Global**: all grid cells within GFEDv4s bounds (*Note*: monthly time series plot only shown for individual years)
 2. **Basis Region**: 14 broad geographic regions from GFEDv4s (van der Werf et al., 2017).
 3. **Country/Sub-Region**: countries and sub-regions from simplified Large Scale International Boundary (LSIB) Polygons; those with neglible fire emissions were excluded
 4. **Pixel**: individual grid cells, 0.5° x 0.5° spatial resolution; the centroid of the selected grid cell is displayed on the map
 5. **Custom**: user-defined polygon using an array of longitude, latitude coordinates; the tool re-defines the polygon to match the 0.5° x 0.5° grid of the basis regions
+5. **Draw**: user-defined polygon, drawn interactively on the base map; the tool re-defines the polygon to match the 0.5° x 0.5° grid of the basis regions
 <br><br>
 ![banner image](https://github.com/tianjialiu/FIRECAM/blob/master/docs/imgs/basisRegions.png)
 
@@ -64,6 +67,7 @@ The repository should then appear in the top-left panel under 'Reader' as 'users
 Click the 'Apps/UI_FIRECAM.js' script in the 'users/tl2581/FIRECAM' repository. The script should appear in the code editor. Click 'Run' in the top-right corner of the code editor to activate the user interface. The repository also contains a script to export monthly and annual timeseries data ('Exports/UI_FIRECAM_Exports.js').
 
 ## Updates
+* September 2019: added "Draw" option to FIRECAM and GFEDv4s apps
 * Feburary 2019: added data download/processing code under the "fire_inv" subfolder; added "Country/Sub-Region" and "Pixel" options to FIRECAM app; created ancillary app for GFEDv4s (GFEDv4s Explorer)
 * March 2019: added "Country/Sub-Region" and "Pixel" options to FIRECAM exports
 * May 2019: added R/EE code for calculating the relative fire confidence metrics under the "fire_metrics" subfolder; added "Global" and "Custom" options to FIRECAM, GFEDv4s apps
