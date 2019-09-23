@@ -15,6 +15,8 @@ FIRECAM can be accessed through (1) Earth Engine Apps and (2) the Google Earth E
 ### Ancillary Apps
 * [GFEDv4s Explorer](https://globalfires.earthengine.app/view/gfedv4s): Explore GFEDv4s emissions (1997-2016) for burned area and all available chemical species, partitioned by land use/land cover
 - *Note*: Burned area from small fires is approximate based on the small fire fraction for emissions
+* [GFEDv4s Animated Burned Area](https://globalfires.earthengine.app/view/gfedv4s): Visualize the seasonality of GFEDv4s burned area. 
+- *Note*: GFEDv4s BA is averaged into monthly means. Please wait until all the images load (check the layer list in the upper-right hand corner of the map) before clicking 'Play.'
 
 ## FIRECAM App
 (*Earth Engine Apps, no Google Earth Engine account required*)
@@ -67,13 +69,13 @@ The repository should then appear in the top-left panel under 'Reader' as 'users
 Click the 'Apps/UI_FIRECAM.js' script in the 'users/tl2581/FIRECAM' repository. The script should appear in the code editor. Click 'Run' in the top-right corner of the code editor to activate the user interface. The repository also contains a script to export monthly and annual timeseries data ('Exports/UI_FIRECAM_Exports.js').
 
 ## Updates
-* September 2019: added "Draw" option to FIRECAM and GFEDv4s apps
+* September 2019: added "Draw" option to FIRECAM and GFEDv4s apps; added GFEDv4s monthly averaged burned area animation app
 * Feburary 2019: added data download/processing code under the "fire_inv" subfolder; added "Country/Sub-Region" and "Pixel" options to FIRECAM app; created ancillary app for GFEDv4s (GFEDv4s Explorer)
 * March 2019: added "Country/Sub-Region" and "Pixel" options to FIRECAM exports
 * May 2019: added R/EE code for calculating the relative fire confidence metrics under the "fire_metrics" subfolder; added "Global" and "Custom" options to FIRECAM, GFEDv4s apps
 
 ## Publications
-1. Liu, T., L.J. Mickley, R.S. DeFries, M.E. Marlier, M.F. Khan, M.T. Latif, and A. Karambelas (in review). Diagnosing spatial uncertainties and relative biases in global fire emissions inventories: Indonesia as regional case study. *EarthArXiv*: https://dx.doi.org/10.31223/osf.io/nh57j
+1. Liu, T., L.J. Mickley, R.S. DeFries, M.E. Marlier, M.F. Khan, M.T. Latif, and A. Karambelas (in review). Diagnosing spatial uncertainties and relative biases in global fire emissions inventories: Indonesia as regional case study. *EarthArXiv*: https://doi.org/10.31223/osf.io/nh57j
 
 2. van der Werf, G.R., J.T. Randerson, L. Giglio, T.T. van Leeuwen, Y. Chen, B.M. Rogers, M. Mu, M.J.E. van Marle, D.C. Morton, G.J. Collatz, R.J. Yokelson, and P.S. Kasibhatla (2017). Global fire emissions estimates during 1997-2016. *Earth Syst. Sci. Data* 9, 697–720. https://doi.org/10.5194/essd-9-697-2017
 

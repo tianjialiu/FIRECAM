@@ -9,7 +9,7 @@
 // https://doi.org/10.5194/essd-9-697-2017
 
 // Author: Tianjia Liu (tianjialiu@g.harvard.edu)
-// Last updated: September 20, 2019
+// Last updated: September 22, 2019
 
 // =================================================================
 // **********************   --    Code    --   *********************
@@ -53,7 +53,7 @@ var monthDict = {
 // Info Panel |
 // ------------
 var infoPanel = function() {
-  var GFEDLabelShort = ui.Label('GFEDv4s Explorer', {margin: '6px 0px 0px 8px', fontWeight: 'bold', fontSize: '24px', border: '1px solid black', padding: '3px 3px 3px 3px', backgroundColor: '#FFFFFF00'});
+  var GFEDLabelShort = ui.Label('GFEDv4s Burned Area', {margin: '6px 0px 0px 8px', fontWeight: 'bold', fontSize: '24px', border: '1px solid black', padding: '3px 3px 3px 3px', backgroundColor: '#FFFFFF00'});
   var GFEDLabelLong = ui.Label('Global Fire Emissions Database, version 4s', {margin: '8px 8px 0px 8px', fontSize: '16px'});
   var paperLabel = ui.Label('Citation: van der Werf et al. (2017, ESSD)', {margin: '5px 0px 5px 8px', fontSize: '12.5px'}, 'https://doi.org/10.5194/essd-9-697-2017');
   var websiteLabel = ui.Label('[Data]', {margin: '5px 0px 5px 8px', fontSize: '12.5px'}, 'https://www.globalfiredata.org/');
@@ -99,7 +99,7 @@ var hideShowButton = ui.Button({
 var yearSelectPanel = function() {
   var timeRangeLabel = ui.Label('1) Select Time Range:', {margin: '8px 8px 8px 8px', fontSize: '14.5px'});
   var startYearLabel = ui.Label('Start Year:', {margin: '3px 20px 8px 24px', fontSize: '14.5px'});
-  var startYearSlider = ui.Slider({min: 1997, max: 2016, value: 2015, step: 1, style: {margin: '3px 8px 8px 14px'}});
+  var startYearSlider = ui.Slider({min: 1997, max: 2016, value: 2005, step: 1, style: {margin: '3px 8px 8px 14px'}});
   startYearSlider.style().set('stretch', 'horizontal');
   
   var endYearLabel = ui.Label('End Year:', {margin: '3px 20px 8px 24px', fontSize: '14.5px'});
@@ -135,6 +135,9 @@ var getYears = function(yearSelectPanel) {
 var playButton = ui.Button({label: 'Play',  style: {stretch: 'horizontal'}});
 var stopButton = ui.Button({label: 'Stop',  style: {stretch: 'horizontal'}});
 var loadButton = ui.Button({label: 'Load Images',  style: {stretch: 'horizontal'}});
+
+var waitMessage = ui.Label('Please wait until all images are fully loaded before initializing animation.',
+  {fontSize:'10pt', textAlign: 'center', margin: '8px 8px 0 8px'});
 
 // --------
 // Legend
@@ -226,7 +229,6 @@ var animButtons = ui.Panel({
 var map = ui.Map();
 map.style().set({cursor:'crosshair'});
 map.setCenter(0,10,2);
-map.setControlVisibility({fullscreenControl: false});
 map.setOptions('Dark', {'Dark': baseMap.darkTheme});
 map.add(panelWrapper);
 
@@ -248,7 +250,6 @@ loadButton.onClick(function() {
   map.clear();
   map.style().set({cursor:'crosshair'});
   map.setCenter(0,10,2);
-  map.setControlVisibility({fullscreenControl: false});
   map.setOptions('Dark', {'Dark': baseMap.darkTheme});
   map.add(panelWrapper);
   
@@ -265,7 +266,7 @@ loadButton.onClick(function() {
   map.add(monthLabel);
   
   if (counter === 0) {
-    animWrapper.add(legendPanel).add(animButtons);
+    animWrapper.add(waitMessage).add(animButtons).add(legendPanel);
   }
   
   counter = counter + 1;
@@ -283,7 +284,7 @@ loadButton.onClick(function() {
   var fun_anim = function(layer) {
     var prev_layer = layer-1;
     if (layer === 0) {prev_layer = max_layer - 1}
-      setOpacityLayer(layer, prev_layer);
+    setOpacityLayer(layer, prev_layer);
     monthLabel.setValue(months[layer]);
   };
   
@@ -306,10 +307,21 @@ loadButton.onClick(function() {
     
     if (iMonth > 0) {map.layers().get(iMonth).set({opacity: 0.01})}
   }
-
+  
   playButton.onClick(function() {
+    map.setControlVisibility({layerList: false});
+    
+    for (var iMonth = 0; iMonth < max_layer; iMonth++) {
+      if (iMonth > 0) {
+        map.layers().get(iMonth).set({opacity: 0.01, shown: true});
+      } else {
+        map.layers().get(iMonth).set({opacity: 1, shown: true});
+        monthLabel.setValue(months[0]);
+      }
+    }
+
     ui.util.clear();
-    var delay = 1e3; var delay_gap = 1e3;
+    var delay = 1e3*0.75; var delay_gap = 1e3*0.75;
     
     ui.util.setInterval(function() {
       for (iMonth = 0; iMonth < max_layer; iMonth++) {

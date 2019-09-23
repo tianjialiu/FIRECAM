@@ -6,16 +6,26 @@
 /*
 // Documentation: https://github.com/tianjialiu/FIRECAM
 // Author: Tianjia Liu
-// Last updated: September 21, 2019
+// Last updated: September 22, 2019
 
 // Purpose: explore regional differences in fire emissions from five
 // global fire emissions inventories (GFED, FINN, GFAS, QFED, FEER)
 // for six species (CO, CO2, CH4, OC, BC, PM2.5); export monthly
 // and annual timeseries
 
-// 1. Click 'Run' to initialize the User Interface in the EE Console
+// 1. Click 'Run' to initialize the User Interface on the map below
 // 2. Select a region and species; exports can be started from 'Tasks'
+
+// If you have your own polygon, you can replace 'regionShp' with an EE
+// feature under the 'Global' option. You can also specify the name of
+// your region by replacing 'regionName.'
+
+// By default, the map will not show the bounds of the regions unless
+// you set showRegionOnMap to true
 */
+
+var showRegionOnMap = false;
+
 // =================================================================
 // *****************   --    User Interface    --   ****************
 // =================================================================
@@ -47,9 +57,6 @@ var speciesNames = firecam.speciesNames;
 var speciesList = firecam.speciesList;
 
 var bandNamesList = firecam.bandNamesList;
-var bandMaxValList = firecam.bandMaxValList;
-var bandUnitsList = firecam.bandUnitsList;
-var bandMulti = firecam.bandMulti;
 
 // 14 Basis Regions from GFEDv4s
 var regionNames = gfed4_params.regionNames;
@@ -65,20 +72,6 @@ var countryList = baseRegions.countryList;
 // ---------------------------------
 // - - - - - - FIRECAM - - - - - - |
 // ---------------------------------
-// ----------------------------------
-// Relative Fire Confidence Metrics
-// ----------------------------------
-// Metric 1: areal BA-AF discrepancy
-var RFCM1 = firecam.RFCM1;
-// Metric 2: FRP-weighted cloud/haze burden on satellite observing conditions
-var RFCM2 = firecam.RFCM2;
-// Metric 3: burn size and fragmentation
-var RFCM3 = firecam.RFCM3;
-// Metric 4: topography variance
-var RFCM4 = firecam.RFCM4;
-// Metric 5: additional small fires from VIIRS
-var RFCM5 = firecam.RFCM5;
-
 // ---------------------
 // Reducers and Charts |
 // ---------------------
@@ -89,17 +82,6 @@ var getGridShp = firecam.getGridShp;
 
 var getEmiByMonth = firecam.getEmiByMonth;
 var getEmiByYr = firecam.getEmiByYr;
-      
-var plotEmiTS = firecam.plotEmiTS;
-var updateOpts = firecam.updateOpts;
-var plotEmiBar = firecam.plotEmiBar;
-
-// MODIS MCD12Q1 aggregated LULC
-// based on FINNv1.0 delineation
-var getLULCmap = firecam.getLULCmap;
-
-// Peatland distribution from GFEDv4s
-var peat = firecam.peat; 
 
 // Generate output tables
 var getEmiTS = function(imageCol, regionShp, timeFormat) {
@@ -263,7 +245,7 @@ controlPanel.add(infoPanel).add(yearSelectPanel)
   .add(speciesSelectPanel)
   .add(ui.Panel([submitButton],null,{padding: '0 0 0 5px'}));
 
-print(controlPanel);
+ui.root.add(controlPanel);
 ui.root.add(map);
 
 var counter = 0;
@@ -291,9 +273,11 @@ submitButton.onClick(function() {
   // Display Maps:
   map.clear();
 
-  map.addLayer(ee.Image(1).clip(basisRegions).rename('Basis Regions'),
-    {palette: '#000000', opacity: 0.8}, 'Basis Regions');
-    
+  if (showRegionOnMap) {
+    map.addLayer(ee.Image(1).clip(basisRegions).rename('Basis Regions'),
+      {palette: '#000000', opacity: 0.8}, 'Basis Regions');
+  }
+  
   if (regionType == 'Basis Region' | regionType == 'Country/ Sub-Region') {
     var region = getRegions(regionSelectPanel);
     
@@ -305,22 +289,32 @@ submitButton.onClick(function() {
   
     if (regionType == 'Country/ Sub-Region') {
       if (ee.Dictionary(countryList).keys().contains(region).getInfo() === true) {
-        region = countryList[region];
+          region = countryList[region];
+        }
+        regionShp = getCountryShp(region);
+        regionName =  ee.String(region).split(' ').join('_').replace('\'','')
+          .replace('&','_').replace('-','_').getInfo();
       }
-      regionShp = getCountryShp(region);
-      regionName =  ee.String(region).split(' ').join('_').replace('\'','')
-        .replace('&','_').replace('-','_').getInfo();
-    }
-    map.centerObject(regionShp);
     
-    map.addLayer(ee.Image().byte().rename('Selected Region')
-    .paint(ee.FeatureCollection(regionShp), 0, 1), {palette: '#FF0000'}, 'Selected Region');
+    if (showRegionOnMap) {
+      map.centerObject(regionShp);
+      map.addLayer(ee.Image().byte().rename('Selected Region')
+        .paint(ee.FeatureCollection(regionShp), 0, 1), {palette: '#FF0000'}, 'Selected Region');
+    }
   }
   
   if (regionType == 'Global') {
     regionShp = globalShp;
     regionName = 'Global';
-    map.setCenter(50,0,1);
+    
+    if (showRegionOnMap) {
+      map.setCenter(50,0,1);
+      map.addLayer(ee.Image().byte().rename('Selected Region')
+        .paint(ee.FeatureCollection(regionShp), 0, 1), {palette: '#FF0000'}, 'Selected Region');
+    }
+    // If you have your own polygon, you can replace 'regionShp' with it above
+    // under the 'Global' option. You can also specify the name of your region
+    // by replacing 'regionName.'
   }
   
   Export.table.toDrive({
