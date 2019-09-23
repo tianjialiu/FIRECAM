@@ -41,9 +41,9 @@ gee_basis/
 | :---: | :--- | :--- | :--- | :--- |
 | 1 | BA-AFA Discrepancy | -1 to 1 | unitless | discrepancy between burned area (BA; MCD64A1) and active fire area (AFA; MxD14A1), calculated as a normalized index using the area of BA outside AFA and AFA outside BA |
 | 2 | Cloud-Haze Obscuration | 0 to 1 | unitless | degree to which clouds and/or haze obscure the land surface from satellite observations of fires during fire-prone months |
-| 3 | Burn Size/ Fragmentation | ≥ 0 | km<sup>2</sup> / fragment | average size of burned area per burn scar fragment (large, continuguous versus small, fragmented fire landscapes) |
+| 3 | Burn Size/ Fragmentation | ≥ 0 | km<sup>2</sup> / fragment | average size of burned area per burn scar fragment (large, contiguous versus small, fragmented fire landscapes) |
 | 4 | Topography Variance | ≥ 0 | m<sup>2</sup> | roughness in terrain, expressed as the variance in elevation across neighboring pixels (flat versus mountainous) |
 | 5 | VIIRS FRP Outside MODIS Burn Extent | 0 to 1 | unitless | additional small fires from VIIRS (375 m), a sensor with higher spatial resolution than MODIS (500 m, 1 km) |
 
 ## Publications
-1. Liu, T., L.J. Mickley, R.S. DeFries, M.E. Marlier, M.F. Khan, M.T. Latif, and A. Karambelas (in review). Diagnosing spatial uncertainties and relative biases in global fire emissions inventories: Indonesia as regional case study. *EarthArXiv*: https://dx.doi.org/10.31223/osf.io/nh57j
+1. Liu, T., L.J. Mickley, R.S. DeFries, M.E. Marlier, M.F. Khan, M.T. Latif, and A. Karambelas (in review). Diagnosing spatial uncertainties and relative biases in global fire emissions inventories: Indonesia as regional case study. *EarthArXiv*: https://doi.org/10.31223/osf.io/nh57j

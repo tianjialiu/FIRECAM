@@ -15,7 +15,7 @@ FIRECAM can be accessed through (1) Earth Engine Apps and (2) the Google Earth E
 ### Ancillary Apps
 * [GFEDv4s Explorer](https://globalfires.earthengine.app/view/gfedv4s): Explore GFEDv4s emissions (1997-2016) for burned area and all available chemical species, partitioned by land use/land cover
     - *Note*: Burned area from small fires is approximate based on the small fire fraction for emissions
-* [GFEDv4s Animated Burned Area](https://globalfires.earthengine.app/view/gfedv4s): Visualize the seasonality of GFEDv4s burned area. 
+* [GFEDv4s Animated Burned Area](https://globalfires.earthengine.app/view/gfedv4s-monthly-ba-animated): Visualize the seasonality of GFEDv4s burned area. 
     - *Note*: GFEDv4s BA is averaged into monthly means. Please wait until all the images load (check the layer list in the upper-right hand corner of the map) before clicking 'Play.'
 
 ## FIRECAM App
@@ -24,13 +24,13 @@ FIRECAM can be accessed through (1) Earth Engine Apps and (2) the Google Earth E
 ![banner image](https://github.com/tianjialiu/FIRECAM/blob/master/docs/imgs/FIRECAM.png)
 
 ### Step 1: Time Range
-*Select a time range* Use the start year and end year sliders to select a time range for the annual and monthly regional emissions time series charts.
+*Select a time range.* Use the start year and end year sliders to select a time range for the annual and monthly regional emissions time series charts.
 
 ### Step 2: Select Bounds Type and Region/Pixel of Interest
-*Select a bounds type* Choose 1) "Global," 2) "Basis Region," 3) "Country/Sub-Region," 4) "Pixel," 5) "Custom" or 6) "Draw."
+*Select a bounds type.* Choose 1) "Global," 2) "Basis Region," 3) "Country/Sub-Region," 4) "Pixel," 5) "Custom," or 6) "Draw."
 1. **Global**: all grid cells within GFEDv4s bounds (*Note*: monthly time series plot only shown for individual years)
 2. **Basis Region**: 14 broad geographic regions from GFEDv4s (van der Werf et al., 2017).
-3. **Country/Sub-Region**: countries and sub-regions from simplified Large Scale International Boundary (LSIB) Polygons; those with neglible fire emissions were excluded
+3. **Country/Sub-Region**: countries and sub-regions from simplified Large Scale International Boundary (LSIB) Polygons; those with negligible fire emissions were excluded
 4. **Pixel**: individual grid cells, 0.5° x 0.5° spatial resolution; the centroid of the selected grid cell is displayed on the map
 5. **Custom**: user-defined polygon using an array of longitude, latitude coordinates; the tool re-defines the polygon to match the 0.5° x 0.5° grid of the basis regions
 5. **Draw**: user-defined polygon, drawn interactively on the base map; the tool re-defines the polygon to match the 0.5° x 0.5° grid of the basis regions
@@ -48,7 +48,7 @@ After clicking the submit button, please wait a few seconds for the default map 
 | :---: | :--- | :--- | :--- | :--- |
 | 1 | BA-AFA Discrepancy | -1 to 1 | unitless | discrepancy between burned area (BA; MCD64A1) and active fire area (AFA; MxD14A1), calculated as a normalized index using the area of BA outside AFA and AFA outside BA |
 | 2 | Cloud-Haze Obscuration | 0 to 1 | unitless | degree to which clouds and/or haze obscure the land surface from satellite observations of fires during fire-prone months |
-| 3 | Burn Size/ Fragmentation | ≥ 0 | km<sup>2</sup> / fragment | average size of burned area per burn scar fragment (large, continuguous versus small, fragmented fire landscapes) |
+| 3 | Burn Size/ Fragmentation | ≥ 0 | km<sup>2</sup> / fragment | average size of burned area per burn scar fragment (large, contiguous versus small, fragmented fire landscapes) |
 | 4 | Topography Variance | ≥ 0 | m<sup>2</sup> | roughness in terrain, expressed as the variance in elevation across neighboring pixels (flat versus mountainous) |
 | 5 | VIIRS FRP Outside MODIS Burn Extent | 0 to 1 | unitless | additional small fires from VIIRS (375 m), a sensor with higher spatial resolution than MODIS (500 m, 1 km) |
 
