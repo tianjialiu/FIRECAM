@@ -14,9 +14,9 @@ FIRECAM can be accessed through (1) Earth Engine Apps and (2) the Google Earth E
 
 ### Ancillary Apps
 * [GFEDv4s Explorer](https://globalfires.earthengine.app/view/gfedv4s): Explore GFEDv4s emissions (1997-2016) for burned area and all available chemical species, partitioned by land use/land cover
-- *Note*: Burned area from small fires is approximate based on the small fire fraction for emissions
+    - *Note*: Burned area from small fires is approximate based on the small fire fraction for emissions
 * [GFEDv4s Animated Burned Area](https://globalfires.earthengine.app/view/gfedv4s): Visualize the seasonality of GFEDv4s burned area. 
-- *Note*: GFEDv4s BA is averaged into monthly means. Please wait until all the images load (check the layer list in the upper-right hand corner of the map) before clicking 'Play.'
+    - *Note*: GFEDv4s BA is averaged into monthly means. Please wait until all the images load (check the layer list in the upper-right hand corner of the map) before clicking 'Play.'
 
 ## FIRECAM App
 (*Earth Engine Apps, no Google Earth Engine account required*)
