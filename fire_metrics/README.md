@@ -13,7 +13,7 @@ This folder contains the EE and R code to construct the five relative fire confi
 | MCD12Q1 | MODIS Land Cover | 500 m, yearly, 2001-2016 | MODIS/006/MCD12Q1 |
 | MCD14ML | MODIS Active Fires (geolocation) | 1 km, daily, from 2000  | projects/GlobalFires/MCD14ML* |
 | VNP14IMGML | VIIRS Active Fires (geolocation) | 375 m, daily, from 2012 | projects/GlobalFires/VNP14IMGML* |
-| GMTED | Terrain Elevation | 375 m, 2010 | USGS/GMTED2010 |
+| GMTED | Terrain Elevation | 7.5 arc sec, 2010 | USGS/GMTED2010 |
 
 *Note*: MCD14ML and VNP14IMGML are currently not available in the EE data catalog, but can be downloaded from the University of Maryland ftp server (https://www.globalfiredata.org/data.html).
 
