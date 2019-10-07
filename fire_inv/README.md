@@ -66,7 +66,7 @@ Fire_raw/
         Y2003/
         Y2004/
         ...
-    FEERv1_G1p2/
+    FEERv1p0_G1p2/
     species_names.csv
     
 Fire_nc_daily/
@@ -74,14 +74,14 @@ Fire_nc_daily/
     FINNv1p5/
     GFASv1p2/
     QFEDv2p5r1/
-    FEERv1_G1p2/
+    FEERv1p0_G1p2/
     
 Fire_tif_daily/
     GFEDv4s/
     FINNv1p5/
     GFASv1p2/
     QFEDv2p5r1/
-    FEERv1_G1p2/
+    FEERv1p0_G1p2/
 ```
 
 First, install the necessary R dependencies, which are listed in the `globalParams.R` script. Then, modify the `globalParams.R` script with your input and output directory paths. Make sure to also modify the `source('~/Google Drive/scripts/R/fire_inv/globalParams.R')` line with the correct path of the  `globalParams.R` script in the in the inventory-specific R scripts in `code/output_nc`. Finally, modify the input parameters (`xYears`, `xMonths`, and `varNameL`) to specify the time range and species list you want to output and source the inventory-specific R script!

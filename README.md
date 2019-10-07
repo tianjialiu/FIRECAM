@@ -70,6 +70,7 @@ The repository should then appear in the top-left panel under 'Reader' as 'users
 Click the 'Apps/UI_FIRECAM.js' script in the 'users/tl2581/FIRECAM' repository. The script should appear in the code editor. Click 'Run' in the top-right corner of the code editor to activate the user interface. The repository also contains a script to export monthly and annual timeseries data ('Exports/UI_FIRECAM_Exports.js').
 
 ## Updates
+* October 2019: fixed FIRECAM emissions layers with 0.5° x 0.5° reprojection, updated FINNv1.5 emissions for 2016 with revised files from NCAR, added 2017-2018 emissions for all inventories; updated FIRECAM exports to allow user-defined polygons
 * September 2019: added "Draw" option to FIRECAM and GFEDv4s apps; added GFEDv4s monthly averaged burned area animation and GFEDv4s with Andreae (2019) EFs ancillary apps
 * Feburary 2019: added data download/processing code under the "fire_inv" subfolder; added "Country/Sub-Region" and "Pixel" options to FIRECAM app; created ancillary app for GFEDv4s (GFEDv4s Explorer)
 * March 2019: added "Country/Sub-Region" and "Pixel" options to FIRECAM exports

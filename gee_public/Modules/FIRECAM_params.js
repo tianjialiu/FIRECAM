@@ -8,21 +8,15 @@
 var projFolder = 'projects/GlobalFires/';
 exports.projFolder = projFolder;
 
-var sYear_abs = 2003; var eYear_abs = 2016;
-exports.sYear_abs = sYear_abs;
-exports.eYear_abs = eYear_abs;
-
 var basisRegions = ee.FeatureCollection(projFolder + 'basisRegions_0p5deg');
 exports.basisRegions = basisRegions;
 
 var invNames = ['GFEDv4s','FINNv1p5','GFASv1p2','QFEDv2p5r1','FEERv1p0_G1p2'];
-var bandNames = ['CO','CO2','CH4','OC','BC','PM2p5'];
 exports.invNames = invNames;
-exports.bandNames = bandNames;
 
 exports.speciesNames = ['CO - Carbon Monoxide', 'CO2 - Carbon Dioxide',
   'CH4 - Methane', 'OC - Organic Carbon', 'BC - Black Carbon',
-  'PM2.5 - Particulate Matter <2.5 um'];
+  'PM2.5 - Particulate Matter <2.5 μm'];
   
 exports.speciesList = {
   'CO - Carbon Monoxide': 'CO',
@@ -30,17 +24,19 @@ exports.speciesList = {
   'CH4 - Methane': 'CH4',
   'OC - Organic Carbon': 'OC',
   'BC - Black Carbon': 'BC',
-  'PM2.5 - Particulate Matter <2.5 um': 'PM2.5'
+  'PM2.5 - Particulate Matter <2.5 μm': 'PM2.5'
 };
 
-exports.bandNamesList = {
+var bandNamesList = {
   'CO': 'CO',
   'CO2': 'CO2',
   'CH4': 'CH4',
   'OC': 'OC',
   'BC': 'BC',
-  'PM2.5': 'PM2p5'
+  'PM2.5': 'PM25'
 };
+
+exports.bandNamesList = bandNamesList;
 
 exports.bandMaxValList = {
   'CO': 100,
@@ -86,17 +82,12 @@ exports.RFCM5 = ee.Image([projFolder + 'RelFireConfidence/RFCM5_additionalFRP_VI
 // ----------------------------------
 // Global Fire Emissions Inventories
 // ----------------------------------
-var gfedv4s = ee.ImageCollection(projFolder + 'GFEDv4s_sp');
-var finnv1p5 = ee.ImageCollection(projFolder + 'FINNv1p5_sp');
-var gfasv1p2 = ee.ImageCollection(projFolder + 'GFASv1p2_sp');
-var qfedv2p5 = ee.ImageCollection(projFolder + 'QFEDv2p5r1_sp');
-var feerv1p0_g1p2 = ee.ImageCollection(projFolder + 'FEERv1p0_G1p2_sp');
+var FIRECAM_sp = ee.ImageCollection(projFolder + 'FIRECAM');
 
 // Projection: Geographic, 0.5deg
 var crs = 'EPSG:4326';
 var crsTrans = [0.5,0,-180,0,-0.5,90];
-var aggProj = gfedv4s.first()
-  .reproject({crs: crs, crsTransform: crsTrans})
+var aggProj = FIRECAM_sp.first()
   .projection();
 
 exports.crs = crs;
@@ -125,39 +116,16 @@ exports.getGridShp = function(region) {
     .reduceToVectors({geometry: basisRegions.union()});
 };
 
-var getBand = function(imageList, iMonth, species) {
-  var image = ee.Image(imageList.get(iMonth));
-
-  return ee.Image(image.select('.*_0-5deg').divide(1e9)
-    .rename(bandNames).select(species)
-    .reproject({crs: aggProj, scale: aggProj.nominalScale()})
-    .copyProperties(image,['system:time_start']));
-};
-
 exports.getEmiByMonth = function(species, sYear, eYear) {
-  
-  var nMonth = (eYear-sYear+1)*12-1;
-  var filterAllYrs = ee.Filter.calendarRange(sYear,eYear,'year');
-  
-  var gfedList = gfedv4s.filter(filterAllYrs).toList(500,0);
-  var finnList = finnv1p5.filter(filterAllYrs).toList(500,0);
-  var gfasList = gfasv1p2.filter(filterAllYrs).toList(500,0);
-  var qfedList = qfedv2p5.filter(filterAllYrs).toList(500,0);
-  var feerList = feerv1p0_g1p2.filter(filterAllYrs).toList(500,0);
-  
-  var emiByMonth = ee.List.sequence(0,nMonth,1).map(function(iMonth) {
-    var gfed = getBand(gfedList,iMonth,species);
-    var finn = getBand(finnList,iMonth,species);
-    var gfas = getBand(gfasList,iMonth,species);
-    var qfed = getBand(qfedList,iMonth,species);
-    var feer = getBand(feerList,iMonth,species);
-  
-    var emiAll = gfed.addBands(finn).addBands(gfas).addBands(qfed).addBands(feer)
-      .rename(invNames).reproject({crs: aggProj, scale: aggProj.nominalScale()})
-      .copyProperties(gfed,['system:time_start']);
-    
-    return emiAll;
-  });
+
+  var filterYr = ee.Filter.calendarRange(sYear,eYear,'year');
+  var emiByMonth = FIRECAM_sp.filter(filterYr)
+    .map(function(image) {
+      return image.select('.*_' + bandNamesList[species])
+        .rename(invNames).divide(1e9)
+        .reproject({crs: crs, crsTransform: crsTrans})
+        .copyProperties(image,['system:time_start']);
+      });
   
   return ee.ImageCollection(emiByMonth);
 };
@@ -168,7 +136,7 @@ exports.getEmiByYr = function(emiByMonth, sYear, eYear) {
     var filterYr = ee.Filter.calendarRange(iYear,iYear,'year');
 
     var emiAll = ee.Image(emiByMonth.filter(filterYr).sum())
-      .reproject({crs: aggProj, scale: aggProj.nominalScale()})
+      .reproject({crs: crs, crsTransform: crsTrans})
       .set('system:time_start',ee.Date.fromYMD(iYear,1,1).millis());
     
       return emiAll;
@@ -186,7 +154,7 @@ var colPal = {
   4: {color: '800080'},
 };
       
-exports.plotEmiTS = function(plotPanel, imageCol, regionShp,
+exports.plotEmiTS = function(imageCol, regionShp,
   speciesLabel, timePeriod, dateFormat, 
   sYear, eYear, sMonth, eMonth, nLines) {
   
@@ -200,7 +168,12 @@ exports.plotEmiTS = function(plotPanel, imageCol, regionShp,
     .setSeriesNames(['GFEDv4s','FINNv1.5','GFASv1.2','QFEDv2.5r1','FEERv1.0-G1.2'])
     .setOptions({
       title: timePeriod + ' Fire Emissions',
-      vAxis: {title: 'Emissions (Tg ' + speciesLabel + ')'},
+      titleTextStyle: {fontSize: '13.5'},
+      vAxis: {
+        title: 'Emissions (Tg ' + speciesLabel + ')',
+        titleTextStyle: {fontSize: '12'},
+        format: '####.#'
+      },
       hAxis: {
         format: dateFormat, 
         viewWindowMode:'explicit',
@@ -216,11 +189,19 @@ exports.plotEmiTS = function(plotPanel, imageCol, regionShp,
 };
 
 exports.updateOpts = function(emiTS, speciesLabel, timePeriod, dateFormat, 
-  sYear, eYear, sMonth, eMonth, nLines) {
+  sYear, eYear, sMonth, eMonth) {
   
+  var nLines = eYear-sYear;
+  if (nLines == 2) {sMonth = 7; eMonth = 7}
+
   return emiTS.setOptions({
       title: timePeriod + ' Fire Emissions',
-      vAxis: {title: 'Emissions (Tg ' + speciesLabel + ')'},
+      titleTextStyle: {fontSize: '13.5'},
+      vAxis: {
+        title: 'Emissions (Tg ' + speciesLabel + ')',
+        titleTextStyle: {fontSize: '12'},
+        format: '####.#'
+      },
       hAxis: {
         format: dateFormat, 
         viewWindowMode:'explicit',
@@ -228,20 +209,21 @@ exports.updateOpts = function(emiTS, speciesLabel, timePeriod, dateFormat,
           min: ee.Date.fromYMD(sYear,sMonth,1).millis().getInfo(),
           max: ee.Date.fromYMD(eYear,eMonth,1).millis().getInfo()
         },
-        gridlines: {count: nLines}
+        gridlines: {count: nLines},
+        minorGridlines: {count: 0}
       },
       height: '230px',
       series: colPal
     });
 };
-
-exports.plotEmiBar = function(plotPanel, imageCol, regionShp,
-  speciesLabel, timePeriod) {
   
-  var ts_chart = ui.Chart.image.series({
+exports.plotEmiBar = function(imageCol, regionShp,
+  speciesLabel, timePeriod, sYear, eYear) {
+  
+  return ui.Chart.image.series({
     imageCollection: imageCol
       .select(invNames,['b1','b2','b3','b4','b5'])
-      .set('xName','Average, ' + sYear_abs + '-' + eYear_abs),
+      .set('xName',''),
     region: regionShp,
     reducer: ee.Reducer.sum().unweighted(),
     scale: aggProj.nominalScale(),
@@ -249,17 +231,114 @@ exports.plotEmiBar = function(plotPanel, imageCol, regionShp,
   }).setChartType('ColumnChart')
   .setSeriesNames(['GFEDv4s','FINNv1.5','GFASv1.2','QFEDv2.5r1','FEERv1.0-G1.2'])
     .setOptions({
-      title: 'Average ' + timePeriod + ' Fire Emissions (' + sYear_abs + '-' + eYear_abs + ')',
-      vAxis: {title: 'Emissions (Tg ' + speciesLabel + ')',
+      title: 'Average ' + timePeriod + ' Fire Emissions (' + sYear + '-' + eYear + ')',
+      titleTextStyle: {fontSize: '13.5'},
+      vAxis: {
+        title: 'Emissions (Tg ' + speciesLabel + ')',
+        titleTextStyle: {fontSize: '12'},
         viewWindowMode:'explicit',
-        viewWindow: {min: 0}
+        viewWindow: {min: 0},
+        format: '####.#'
       },
-      hAxis: {gridlines: {count: 0}},
       height: '230px',
       series: colPal
     });
-    
-  return ts_chart;
+};
+
+exports.plotEmiBarSD = function(imageCol, regionShp,
+  speciesLabel, timePeriod, sYear, eYear) {
+  
+  var invOrder = {
+    0:'GFEDv4s',
+    1:'FINNv1p5',
+    2:'GFASv1p2',
+    3:'QFEDv2p5r1',
+    4:'FEERv1p0_G1p2'
+  };
+  
+  var emiByYearRegion = ee.FeatureCollection(imageCol.toList(500,0)
+    .map(function(x) {
+      var sumRegion = ee.Image(x).reduceRegions({
+        collection: regionShp,
+        reducer: ee.Reducer.sum().unweighted(),
+        scale: aggProj.nominalScale(),
+      }).first();
+      return sumRegion;
+    }));
+  
+  var getStats = function(invName) {
+    var tot_mean = ee.Number(emiByYearRegion.aggregate_mean(invName));
+    var tot_min = ee.Number(emiByYearRegion.aggregate_min(invName));
+    var tot_max = ee.Number(emiByYearRegion.aggregate_max(invName));
+
+    return [tot_mean, tot_min, tot_max];
+  };
+ 
+  var inDate = 'Date(' + sYear + ',0)';
+  var dataTable = {
+    cols: [{id: 'Date', label: 'Date', type: 'date'}],
+    rows: []
+  };
+
+  var i = 1;
+  invNames.forEach(function(invName) {
+    dataTable.cols[i++] = {
+      type: 'number',
+      id: invName,
+      label: invName,
+    };
+    dataTable.cols[i++] = {
+      type: 'number',
+      id: invName + '_range',
+      label: invName + '_range',
+      role: 'interval'
+    };
+    dataTable.cols[i++] = {
+      type: 'number',
+      id: invName + '_range',
+      label: invName + '_range',
+      role: 'interval'
+    };
+  });
+
+  var invNum = [0,1,2,3,4];
+  invNum.forEach(function(inv) {
+    var summInv = getStats(invNames[inv]);
+    dataTable.rows[inv] = {c:{0:{v:inDate}}};
+    dataTable.rows[inv].c[inv*3+1] = {v:summInv[0].getInfo()};
+    dataTable.rows[inv].c[inv*3+2] = {v:summInv[1].getInfo()};
+    dataTable.rows[inv].c[inv*3+3] = {v:summInv[2].getInfo()};
+  });
+  
+  var avg_chart = ui.Chart(dataTable)
+    .setChartType('ColumnChart')
+    .setSeriesNames('GFEDv4s',0)
+    .setSeriesNames('FINNv1.5',3)
+    .setSeriesNames('GFASv1.2',6)
+    .setSeriesNames('QFEDv2.5r1',9)
+    .setSeriesNames('FEERv1.0-G1.2',12)
+    .setOptions({
+      title: 'Average ' + timePeriod + ' Fire Emissions (' + sYear + '-' + eYear + ')',
+      titleTextStyle: {fontSize: '13.5'},
+      vAxis: {
+        title: 'Emissions (Tg ' + speciesLabel + ')',
+        titleTextStyle: {fontSize: '12'},
+        format: '####.#'
+      },
+      hAxis: {
+        format:' ',
+        viewWindowMode:'explicit',
+        viewWindow: {
+          min: ee.Date.fromYMD(sYear,1,1).advance(-1,'month').millis().getInfo(),
+          max: ee.Date.fromYMD(sYear,1,1).advance(1,'month').millis().getInfo()
+        }
+      },
+      series: colPal,
+      height: '230px'
+  });
+  
+  return avg_chart;
+  
 };
 
 // ------------------------------

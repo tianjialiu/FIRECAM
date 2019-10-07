@@ -1,4 +1,4 @@
-#open packages
+# Open packages
 library("raster");library("rgeos");library("maptools");library("mapproj");
 library("maps");library("rgdal");library("spdep");library("sp");library("fields")
 library("plyr");library("ncdf4");library("rhdf5")

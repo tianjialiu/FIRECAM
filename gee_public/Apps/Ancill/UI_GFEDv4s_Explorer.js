@@ -9,7 +9,7 @@
 // https://doi.org/10.5194/essd-9-697-2017
 
 // Author: Tianjia Liu (tianjialiu@g.harvard.edu)
-// Last updated: September 20, 2019
+// Last updated: October 4, 2019
 
 // =================================================================
 // **********************   --    Code    --   *********************
@@ -17,9 +17,9 @@
 // --------------
 // Load Modules |
 // --------------
-var baseMap = require('users/tl2581/GlobalModules:baseMap.js');
-var baseRegions = require('users/tl2581/GlobalModules:baseRegions.js');
-var colPals = require('users/tl2581/GlobalModules:colorPalette.js');
+var baseMap = require('users/tl2581/packages:baseMap.js');
+var baseRegions = require('users/tl2581/packages:baseRegions.js');
+var colPals = require('users/tl2581/packages:colorPalette.js');
 var gfed4_params = require('users/tl2581/FIRECAM:Modules/GFEDv4s_params.js');
 
 // --------------
@@ -437,19 +437,19 @@ var addCharts = function(sYear, eYear, speciesLabel, regionShp, regionType) {
   map.add(plotPanelParent);
   plotPanel = plotPanel.clear();
   
-  var annualChart = plotEmiTS(plotPanel, emiByYr, regionShp,
-    speciesLabel, 'Annual', 'Y', sYear, eYear, 1, 1, null);
+  var annualChart = plotEmiTS(emiByYr, regionShp,
+    speciesLabel, 'Annual', 'Y', sYear, eYear, 1, 1);
   
   if (eYear-sYear <= 5) {
     var nYear = eYear-sYear+1;
-    annualChart = updateOpts(annualChart, speciesLabel, 'Annual', 'Y', (sYear-1), eYear, 12, 2, nYear);
+    annualChart = updateOpts(annualChart, speciesLabel, 'Annual', 'Y', (sYear-1), eYear, 12, 2);
     annualChart.setChartType('ScatterChart');
   }
   
   plotPanel.add(annualChart); plotPanel.add(ui.Label('', {margin: '-25px 8px 8px'}));
   
-  var monthlyChart = plotEmiTS(plotPanel, emiByMonth, regionShp,
-    speciesLabel, 'Monthly', 'MMM Y', sYear, eYear, 1, 12, null);
+  var monthlyChart = plotEmiTS(emiByMonth, regionShp,
+    speciesLabel, 'Monthly', 'MMM Y', sYear, eYear, 1, 12);
   if (regionType != 'Global' | eYear-sYear === 0) {
     plotPanel.add(monthlyChart);
   }

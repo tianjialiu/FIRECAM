@@ -9,7 +9,7 @@
 // https://doi.org/10.5194/essd-9-697-2017
 
 // Author: Tianjia Liu (tianjialiu@g.harvard.edu)
-// Last updated: September 22, 2019
+// Last updated: September 26, 2019
 
 // =================================================================
 // **********************   --    Code    --   *********************
@@ -17,9 +17,9 @@
 // --------------
 // Load Modules |
 // --------------
-var baseMap = require('users/tl2581/GlobalModules:baseMap.js');
-var baseRegions = require('users/tl2581/GlobalModules:baseRegions.js');
-var colPals = require('users/tl2581/GlobalModules:colorPalette.js');
+var baseMap = require('users/tl2581/packages:baseMap.js');
+var baseRegions = require('users/tl2581/packages:baseRegions.js');
+var colPals = require('users/tl2581/packages:colorPalette.js');
 var gfed4_params = require('users/tl2581/FIRECAM:Modules/GFEDv4s_params.js');
 
 // --------------

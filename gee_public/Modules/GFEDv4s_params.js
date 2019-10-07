@@ -100,7 +100,7 @@ exports.speciesNames = ['BA - Burned Area','DM - Dry Matter', 'C - Carbon',
   'CO2 - Carbon Dioxide', 'CO - Carbon Monoxide', 'CH4 - Methane',
   'NHMC - Non-Methane Hydrocarbons', 'H2 - Hydrogen',
   'NOx - Nitrogen Oxides', 'N2O - Nitrous Oxide',
-  'PM2.5 - Particulate Matter <2.5 um', 'TPM - Total Particulate Matter',
+  'PM2.5 - Particulate Matter <2.5 μm', 'TPM - Total Particulate Matter',
   'TPC - Total Carbon from Aerosols', 'OC - Organic Carbon',
   'BC - Black Carbon', 'SO2 - Sulfur Dioxide', 'C2H6 - Ethane',
   'CH3OH - Methanol', 'C2H5OH - Ethanol', 'C3H8 - Propane',
@@ -126,7 +126,7 @@ exports.speciesList = {
   'H2 - Hydrogen': 'H2',
   'NOx - Nitric Oxides': 'NOx',
   'N2O - Nitrous Oxide': 'N2O',
-  'PM2.5 - Particulate Matter <2.5 um': 'PM2.5',
+  'PM2.5 - Particulate Matter <2.5 μm': 'PM2.5',
   'TPM - Total Particulate Matter': 'TPM',
   'TPC - Total Carbon from Aerosols': 'TPC',
   'OC - Organic Carbon': 'OC',
@@ -264,9 +264,9 @@ var colPalseries_BA = {
   1: {color: 'FF0000'},
 };
 
-exports.plotEmiTS = function(plotPanel, imageCol, regionShp,
+exports.plotEmiTS = function(imageCol, regionShp,
   speciesLabel, timePeriod, dateFormat, 
-  sYear, eYear, sMonth, eMonth, nLines) {
+  sYear, eYear, sMonth, eMonth) {
   
   if (speciesLabel == 'BA') {
     return ui.Chart.image.series({
@@ -279,7 +279,11 @@ exports.plotEmiTS = function(plotPanel, imageCol, regionShp,
       .setSeriesNames(['BA','BA from small fires'])
       .setOptions({
         title: timePeriod + ' Burned Area',
-        vAxis: {title: 'Burned Area (sq. km)'},
+        titleTextStyle: {fontSize: '13.5'},
+        vAxis: {
+          title: 'Burned Area (sq. km)',
+          format: '####.#'
+        },
         hAxis: {
           format: dateFormat, 
           viewWindowMode:'explicit',
@@ -287,7 +291,6 @@ exports.plotEmiTS = function(plotPanel, imageCol, regionShp,
             min: ee.Date.fromYMD(sYear,sMonth,1).millis().getInfo(),
             max: ee.Date.fromYMD(eYear,eMonth,1).millis().getInfo()
           },
-          gridlines: {count: nLines}
         },
         height: '230px',
         series: colPalseries_BA,
@@ -303,7 +306,11 @@ exports.plotEmiTS = function(plotPanel, imageCol, regionShp,
       .setSeriesNames(LULCtot)
       .setOptions({
         title: timePeriod + ' Fire Emissions',
-        vAxis: {title: 'Emissions (Tg ' + speciesLabel + ')'},
+        titleTextStyle: {fontSize: '13.5'},
+        vAxis: {
+          title: 'Emissions (Tg ' + speciesLabel + ')',
+          format: '####.#'
+        },
         hAxis: {
           format: dateFormat, 
           viewWindowMode:'explicit',
@@ -311,7 +318,6 @@ exports.plotEmiTS = function(plotPanel, imageCol, regionShp,
             min: ee.Date.fromYMD(sYear,sMonth,1).millis().getInfo(),
             max: ee.Date.fromYMD(eYear,eMonth,1).millis().getInfo()
           },
-          gridlines: {count: nLines}
         },
         height: '230px',
         series: colPalseries,
@@ -320,12 +326,19 @@ exports.plotEmiTS = function(plotPanel, imageCol, regionShp,
 };
 
 exports.updateOpts = function(emiTS, speciesLabel, timePeriod, dateFormat, 
-  sYear, eYear, sMonth, eMonth, nLines) {
+  sYear, eYear, sMonth, eMonth) {
+  
+  var nLines = eYear-sYear;
+  if (nLines == 2) {sMonth = 7; eMonth = 7}
   
   if (speciesLabel == 'BA') {
     return emiTS.setOptions({
       title: timePeriod + ' Burned Area',
-      vAxis: {title: 'Burned Area (sq. km)'},
+      titleTextStyle: {fontSize: '13.5'},
+      vAxis: {
+        title: 'Burned Area (sq. km)',
+        format: '####.#'
+      },
       hAxis: {
         format: dateFormat, 
         viewWindowMode:'explicit',
@@ -333,7 +346,8 @@ exports.updateOpts = function(emiTS, speciesLabel, timePeriod, dateFormat,
           min: ee.Date.fromYMD(sYear,sMonth,1).millis().getInfo(),
           max: ee.Date.fromYMD(eYear,eMonth,1).millis().getInfo()
         },
-        gridlines: {count: nLines}
+        gridlines: {count: nLines},
+        minorGridlines: {count: 0}
       },
       height: '230px',
       series: colPalseries_BA
@@ -341,7 +355,11 @@ exports.updateOpts = function(emiTS, speciesLabel, timePeriod, dateFormat,
   } else {
     return emiTS.setOptions({
       title: timePeriod + ' Fire Emissions',
-      vAxis: {title: 'Emissions (Tg ' + speciesLabel + ')'},
+      titleTextStyle: {fontSize: '13.5'},
+      vAxis: {
+        title: 'Emissions (Tg ' + speciesLabel + ')',
+        format: '####.#'
+      },
       hAxis: {
         format: dateFormat, 
         viewWindowMode:'explicit',
@@ -349,7 +367,8 @@ exports.updateOpts = function(emiTS, speciesLabel, timePeriod, dateFormat,
           min: ee.Date.fromYMD(sYear,sMonth,1).millis().getInfo(),
           max: ee.Date.fromYMD(eYear,eMonth,1).millis().getInfo()
         },
-        gridlines: {count: nLines}
+        gridlines: {count: nLines},
+        minorGridlines: {count: 0}
       },
       height: '230px',
       series: colPalseries
@@ -391,7 +410,7 @@ exports.EFlist_Andreae = {
 exports.speciesNames_Andreae = [
   'CO2 - Carbon Dioxide', 'CO - Carbon Monoxide', 'CH4 - Methane',
   'H2 - Hydrogen', 'NOx - Nitrogen Oxides', 'N2O - Nitrous Oxide',
-  'PM2.5 - Particulate Matter <2.5 um', 'TPM - Total Particulate Matter',
+  'PM2.5 - Particulate Matter <2.5 μm', 'TPM - Total Particulate Matter',
   'TPC - Total Carbon from Aerosols', 'OC - Organic Carbon',
   'BC - Black Carbon', 'SO2 - Sulfur Dioxide', 'C2H6 - Ethane',
   'CH3OH - Methanol', 'C2H5OH - Ethanol', 'C3H8 - Propane',
@@ -416,9 +435,9 @@ exports.combineBands_Andreae = function(imageCol_OldEFs, imageCol_NewEFs) {
   return combinedBands;
 };
 
-exports.plotEmiTS_Andreae = function(plotPanel, imageCol,
+exports.plotEmiTS_Andreae = function(imageCol,
   regionShp, speciesLabel, timePeriod, dateFormat, 
-  sYear, eYear, sMonth, eMonth, nLines) {
+  sYear, eYear, sMonth, eMonth) {
   
   return ui.Chart.image.series({
     imageCollection: imageCol.select(compNames,['b1','b2']),
@@ -430,7 +449,11 @@ exports.plotEmiTS_Andreae = function(plotPanel, imageCol,
     .setSeriesNames([ 'Old EFs', 'New EFs (Andreae 2019)'])
     .setOptions({
       title: timePeriod + ' Fire Emissions',
-      vAxis: {title: 'Emissions (Tg ' + speciesLabel + ')'},
+      titleTextStyle: {fontSize: '13.5'},
+      vAxis: {
+        title: 'Emissions (Tg ' + speciesLabel + ')',
+        format: '####.#'
+      },
       hAxis: {
         format: dateFormat, 
         viewWindowMode:'explicit',
@@ -438,7 +461,6 @@ exports.plotEmiTS_Andreae = function(plotPanel, imageCol,
           min: ee.Date.fromYMD(sYear,sMonth,1).millis().getInfo(),
           max: ee.Date.fromYMD(eYear,eMonth,1).millis().getInfo()
         },
-        gridlines: {count: nLines}
       },
       height: '230px',
       series: colPalseries_BA,
@@ -446,11 +468,18 @@ exports.plotEmiTS_Andreae = function(plotPanel, imageCol,
 };
 
 exports.updateOpts_Andreae = function(emiTS, speciesLabel, timePeriod, dateFormat, 
-  sYear, eYear, sMonth, eMonth, nLines) {
+  sYear, eYear, sMonth, eMonth) {
+  
+  var nLines = eYear-sYear;
+  if (nLines == 2) {sMonth = 7; eMonth = 7}
   
   return emiTS.setOptions({
     title: timePeriod + ' Fire Emissions',
-    vAxis: {title: 'Emissions (Tg ' + speciesLabel + ')',},
+    titleTextStyle: {fontSize: '13.5'},
+    vAxis: {
+      title: 'Emissions (Tg ' + speciesLabel + ')',
+      format: '####.#'
+    },
     hAxis: {
       format: dateFormat, 
       viewWindowMode:'explicit',
@@ -458,7 +487,8 @@ exports.updateOpts_Andreae = function(emiTS, speciesLabel, timePeriod, dateForma
         min: ee.Date.fromYMD(sYear,sMonth,1).millis().getInfo(),
         max: ee.Date.fromYMD(eYear,eMonth,1).millis().getInfo()
       },
-      gridlines: {count: nLines}
+      gridlines: {count: nLines},
+      minorGridlines: {count: 0}
     },
     height: '230px',
     series: colPalseries_BA
@@ -479,9 +509,11 @@ exports.plotCompTS = function(imageCol_mean, speciesLabel, regionShp) {
     .setSeriesNames([ 'Old EFs', 'New EFs'])
     .setOptions({
       title: 'Avg. Annual Fire Emissions',
+      titleTextStyle: {fontSize: '13.5'},
       vAxis: {
         textPosition: 'none',
         title: 'Emissions (Tg ' + speciesLabel + ')',
+        format: '####.#'
       },
       hAxis: {
         viewWindowMode: 'explicit',

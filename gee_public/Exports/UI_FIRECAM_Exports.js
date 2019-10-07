@@ -6,7 +6,7 @@
 /*
 // Documentation: https://github.com/tianjialiu/FIRECAM
 // Author: Tianjia Liu
-// Last updated: September 22, 2019
+// Last updated: October 2, 2019
 
 // Purpose: explore regional differences in fire emissions from five
 // global fire emissions inventories (GFED, FINN, GFAS, QFED, FEER)
@@ -16,15 +16,18 @@
 // 1. Click 'Run' to initialize the User Interface on the map below
 // 2. Select a region and species; exports can be started from 'Tasks'
 
-// If you have your own polygon, you can replace 'regionShp' with an EE
-// feature under the 'Global' option. You can also specify the name of
-// your region by replacing 'regionName.'
+// If you have your own shapefile, you can replace 'userShp' with
+// an EE feature below. Use .union() if you have a featureCollection.
+// You can also specify the name of your region with the
+// 'userShpName' variable.
 
-// By default, the map will not show the bounds of the regions unless
+// By default, the map will not show the bounds of the region unless
 // you set showRegionOnMap to true
 */
 
 var showRegionOnMap = false;
+var userShp = false;
+var userShpName = 'CustomRegion';
 
 // =================================================================
 // *****************   --    User Interface    --   ****************
@@ -32,9 +35,9 @@ var showRegionOnMap = false;
 // --------------
 // Load Modules |
 // --------------
-var baseMap = require('users/tl2581/GlobalModules:baseMap.js');
-var baseRegions = require('users/tl2581/GlobalModules:baseRegions.js');
-var colPals = require('users/tl2581/GlobalModules:colorPalette.js');
+var baseMap = require('users/tl2581/packages:baseMap.js');
+var baseRegions = require('users/tl2581/packages:baseRegions.js');
+var colPals = require('users/tl2581/packages:colorPalette.js');
 var gfed4_params = require('users/tl2581/FIRECAM:Modules/GFEDv4s_params.js');
 var firecam = require('users/tl2581/FIRECAM:Modules/FIRECAM_params.js');
 
@@ -307,25 +310,27 @@ submitButton.onClick(function() {
     regionShp = globalShp;
     regionName = 'Global';
     
+    if (userShp) {
+      regionShp = userShp;
+      regionName = userShpName;
+    }
+    
     if (showRegionOnMap) {
       map.setCenter(50,0,1);
       map.addLayer(ee.Image().byte().rename('Selected Region')
         .paint(ee.FeatureCollection(regionShp), 0, 1), {palette: '#FF0000'}, 'Selected Region');
     }
-    // If you have your own polygon, you can replace 'regionShp' with it above
-    // under the 'Global' option. You can also specify the name of your region
-    // by replacing 'regionName.'
   }
   
   Export.table.toDrive({
     collection: getEmiTS(emiByYr, regionShp, 'Y'),
-    description: speciesLabel + '_Tg_Annual_' + regionName + '_' + sYear + '_' + eYear,
+    description: bandNamesList[speciesLabel] + '_Tg_Annual_' + regionName + '_' + sYear + '_' + eYear,
     selectors: ['Time','GFEDv4s', 'FINNv1p5', 'GFASv1p2', 'QFEDv2p5r1', 'FEERv1p0_G1p2']
   });
  
   Export.table.toDrive({
     collection: getEmiTS(emiByMonth, regionShp, 'Y-MM'),
-    description: speciesLabel + '_Tg_Monthly_' + regionName + '_' + sYear + '_' + eYear,
+    description: bandNamesList[speciesLabel] + '_Tg_Monthly_' + regionName + '_' + sYear + '_' + eYear,
     selectors: ['Time','GFEDv4s', 'FINNv1p5', 'GFASv1p2', 'QFEDv2p5r1', 'FEERv1p0_G1p2']
   });
 
