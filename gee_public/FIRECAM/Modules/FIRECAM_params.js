@@ -216,7 +216,7 @@ exports.updateOpts = function(emiTS, speciesLabel, timePeriod, dateFormat,
       series: colPal
     });
 };
-  
+
 exports.plotEmiBar = function(imageCol, regionShp,
   speciesLabel, timePeriod, sYear, eYear) {
   
@@ -228,8 +228,7 @@ exports.plotEmiBar = function(imageCol, regionShp,
     reducer: ee.Reducer.sum().unweighted(),
     scale: aggProj.nominalScale(),
     xProperty: 'xName',
-  }).setChartType('ColumnChart')
-  .setSeriesNames(['GFEDv4s','FINNv1.5','GFASv1.2','QFEDv2.5r1','FEERv1.0-G1.2'])
+  }).setSeriesNames(['GFEDv4s','FINNv1.5','GFASv1.2','QFEDv2.5r1','FEERv1.0-G1.2'])
     .setOptions({
       title: 'Average ' + timePeriod + ' Fire Emissions (' + sYear + '-' + eYear + ')',
       titleTextStyle: {fontSize: '13.5'},
@@ -242,7 +241,7 @@ exports.plotEmiBar = function(imageCol, regionShp,
       },
       height: '230px',
       series: colPal
-    });
+    }).setChartType('ColumnChart');
 };
 
 exports.plotEmiBarSD = function(imageCol, regionShp,

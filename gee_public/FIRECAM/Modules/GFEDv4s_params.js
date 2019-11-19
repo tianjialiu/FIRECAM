@@ -114,7 +114,26 @@ exports.speciesNames = ['BA - Burned Area','DM - Dry Matter', 'C - Carbon',
   'MEK - Methyl Eythl Ketone', 'CH3COCHO - Methylglyoxal',
   'HOCH2CHO - Glycoaldehyde'
 ];
-  
+
+exports.speciesNames_beta = ['DM - Dry Matter', 'C - Carbon',
+  'CO2 - Carbon Dioxide', 'CO - Carbon Monoxide', 'CH4 - Methane',
+  'NHMC - Non-Methane Hydrocarbons', 'H2 - Hydrogen',
+  'NOx - Nitrogen Oxides', 'N2O - Nitrous Oxide',
+  'PM2.5 - Particulate Matter <2.5 μm', 'TPM - Total Particulate Matter',
+  'TPC - Total Carbon from Aerosols', 'OC - Organic Carbon',
+  'BC - Black Carbon', 'SO2 - Sulfur Dioxide', 'C2H6 - Ethane',
+  'CH3OH - Methanol', 'C2H5OH - Ethanol', 'C3H8 - Propane',
+  'C2H2 - Acetylene', 'C2H4 - Ethylene', 'C3H6 - Propene',
+  'C5H8 - Isoprene', 'C10H16 - Limonene', 'C7H8 - Toluene',
+  'C6H6 - Benzene', 'C8H10 - Xylene', 'Toluene Lump',
+  'Higher Alkenes', 'Higher Alkanes', 'CH2O - Formaldehyde',
+  'C2H4O - Acetaldehyde', 'C3H6O - Acetone', 'NH3 - Ammonia',
+  'C2H6S - Dimethyl Sulfide', 'HCN - Hydrogen Cyanide',
+  'HCOOH - Formic Acid', 'CH3COOH - Acetic Acid',
+  'MEK - Methyl Eythl Ketone', 'CH3COCHO - Methylglyoxal',
+  'HOCH2CHO - Glycoaldehyde'
+];
+
 exports.speciesList = {
   'BA - Burned Area': 'BA',
   'DM - Dry Matter': 'DM',
@@ -124,7 +143,7 @@ exports.speciesList = {
   'CH4 - Methane': 'CH4',
   'NHMC - Non-Methane Hydrocarbons': 'NHMC',
   'H2 - Hydrogen': 'H2',
-  'NOx - Nitric Oxides': 'NOx',
+  'NOx - Nitrogen Oxides': 'NOx',
   'N2O - Nitrous Oxide': 'N2O',
   'PM2.5 - Particulate Matter <2.5 μm': 'PM2.5',
   'TPM - Total Particulate Matter': 'TPM',
@@ -446,7 +465,7 @@ exports.plotEmiTS_Andreae = function(imageCol,
     scale: scale,
     xProperty: 'system:time_start',
   }).setChartType('LineChart')
-    .setSeriesNames([ 'Old EFs', 'New EFs (Andreae 2019)'])
+    .setSeriesNames(['Old EFs', 'New EFs (Andreae 2019)'])
     .setOptions({
       title: timePeriod + ' Fire Emissions',
       titleTextStyle: {fontSize: '13.5'},
@@ -505,10 +524,9 @@ exports.plotCompTS = function(imageCol_mean, speciesLabel, regionShp) {
     reducer: ee.Reducer.sum().unweighted(),
     scale: scale,
     xProperty: 'xName',
-  }).setChartType('BarChart')
-    .setSeriesNames([ 'Old EFs', 'New EFs'])
+  }).setSeriesNames(['Old EFs', 'New EFs'])
     .setOptions({
-      title: 'Avg. Annual Fire Emissions',
+      title: 'Average Annual Fire Emissions',
       titleTextStyle: {fontSize: '13.5'},
       vAxis: {
         textPosition: 'none',
@@ -521,7 +539,7 @@ exports.plotCompTS = function(imageCol_mean, speciesLabel, regionShp) {
       },
       series: colPalseries_BA,
       height: '175px',
-  });
+  }).setChartType('BarChart');
 };
 
 

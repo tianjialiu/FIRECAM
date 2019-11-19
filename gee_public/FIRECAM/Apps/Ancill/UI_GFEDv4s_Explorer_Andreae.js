@@ -12,7 +12,7 @@
 // GFEDv4s emissions?
 
 // Author: Tianjia Liu (tianjialiu@g.harvard.edu)
-// Last updated: October 2, 2019
+// Last updated: October 24, 2019
 
 // =================================================================
 // **********************   --    Code    --   *********************
@@ -132,11 +132,11 @@ var hideShowButton = ui.Button({
 var yearSelectPanel = function() {
   var timeRangeLabel = ui.Label('1) Select Time Range:', {margin: '8px 8px 8px 8px', fontSize: '14.5px'});
   var startYearLabel = ui.Label('Start Year:', {margin: '3px 20px 8px 24px', fontSize: '14.5px'});
-  var startYearSlider = ui.Slider({min: 1997, max: 2016, value: 2005, step: 1, style: {margin: '3px 8px 8px 14px'}});
+  var startYearSlider = ui.Slider({min: 1997, max: 2018, value: 2005, step: 1, style: {margin: '3px 8px 8px 14px'}});
   startYearSlider.style().set('stretch', 'horizontal');
   
   var endYearLabel = ui.Label('End Year:', {margin: '3px 20px 8px 24px', fontSize: '14.5px'});
-  var endYearSlider = ui.Slider({min: 1997, max: 2016, value: 2015, step: 1, style: {margin: '3px 8px 8px 14px'}});
+  var endYearSlider = ui.Slider({min: 1997, max: 2018, value: 2015, step: 1, style: {margin: '3px 8px 8px 21px'}});
   endYearSlider.style().set('stretch', 'horizontal');
   
   var changeSliderYr = function() {
@@ -148,10 +148,14 @@ var yearSelectPanel = function() {
   startYearSlider.onChange(changeSliderYr);
   endYearSlider.onChange(changeSliderYr);
   
+  var betaLabel = ui.Label('Note: GFEDv4s emissions for 2017-18 are preliminary',
+    {margin: '3px 20px 8px 24px', fontSize: '12px', color: '#666'});
+
   return ui.Panel([
       timeRangeLabel,
       ui.Panel([startYearLabel, startYearSlider], ui.Panel.Layout.Flow('horizontal'), {stretch: 'horizontal'}),
       ui.Panel([endYearLabel, endYearSlider], ui.Panel.Layout.Flow('horizontal'), {stretch: 'horizontal'}),
+      betaLabel
     ]);
 };
 

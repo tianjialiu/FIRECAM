@@ -9,7 +9,7 @@
 // https://doi.org/10.5194/essd-9-697-2017
 
 // Author: Tianjia Liu (tianjialiu@g.harvard.edu)
-// Last updated: October 4, 2019
+// Last updated: November 15, 2019
 
 // =================================================================
 // **********************   --    Code    --   *********************
@@ -46,8 +46,8 @@ var countryList = baseRegions.countryList;
 // Emissions factors from DM (g species/ kg DM)
 // https://www.geo.vu.nl/~gwerf/GFED/GFED4/ancill/GFED4_Emission_Factors.txt
 var EFlist = gfed4_params.EFlist;
-var speciesNames = gfed4_params.speciesNames;
 var speciesList = gfed4_params.speciesList;
+var speciesNames = gfed4_params.speciesNames;
 
 // Land Use/ Land Cover (LULC) types - abbreviation
 // 1. Savanna, 2. Boreal Forest, 3. Temperate Forest,
@@ -127,11 +127,11 @@ var hideShowButton = ui.Button({
 var yearSelectPanel = function() {
   var timeRangeLabel = ui.Label('1) Select Time Range:', {margin: '8px 8px 8px 8px', fontSize: '14.5px'});
   var startYearLabel = ui.Label('Start Year:', {margin: '3px 20px 8px 24px', fontSize: '14.5px'});
-  var startYearSlider = ui.Slider({min: 1997, max: 2016, value: 2005, step: 1, style: {margin: '3px 8px 8px 14px'}});
+  var startYearSlider = ui.Slider({min: 1997, max: 2018, value: 2005, step: 1, style: {margin: '3px 8px 8px 14px'}});
   startYearSlider.style().set('stretch', 'horizontal');
   
   var endYearLabel = ui.Label('End Year:', {margin: '3px 20px 8px 24px', fontSize: '14.5px'});
-  var endYearSlider = ui.Slider({min: 1997, max: 2016, value: 2015, step: 1, style: {margin: '3px 8px 8px 14px'}});
+  var endYearSlider = ui.Slider({min: 1997, max: 2018, value: 2015, step: 1, style: {margin: '3px 8px 8px 21px'}});
   endYearSlider.style().set('stretch', 'horizontal');
   
   var changeSliderYr = function() {
@@ -143,10 +143,14 @@ var yearSelectPanel = function() {
   startYearSlider.onChange(changeSliderYr);
   endYearSlider.onChange(changeSliderYr);
   
+  var betaLabel = ui.Label('Note: GFEDv4s emissions for 2017-18 are preliminary',
+    {margin: '3px 20px 8px 24px', fontSize: '12px', color: '#666'});
+
   return ui.Panel([
       timeRangeLabel,
       ui.Panel([startYearLabel, startYearSlider], ui.Panel.Layout.Flow('horizontal'), {stretch: 'horizontal'}),
       ui.Panel([endYearLabel, endYearSlider], ui.Panel.Layout.Flow('horizontal'), {stretch: 'horizontal'}),
+      betaLabel
     ]);
 };
 
@@ -347,14 +351,20 @@ var getDrawGeometry = function(map, pos) {
 // ---------------
 // Species Panel |
 // ---------------
-var speciesSelectPanel = function() {
+var getSpeciesList = function(eYear) {
+  var speciesNames = gfed4_params.speciesNames;
+  if (eYear > 2016) {speciesNames = gfed4_params.speciesNames_beta}
+  return speciesNames;
+};
+
+var getSpeciesSelectPanel = function(speciesNames) {
   var speciesLabel = ui.Label('3) Select Species:', {padding: '5px 0px 0px 0px', fontSize: '14.5px'});
   var speciesSelect = ui.Select({items: speciesNames, value: 'CO2 - Carbon Dioxide', style: {stretch: 'horizontal'}});
   return ui.Panel([speciesLabel, speciesSelect], ui.Panel.Layout.Flow('horizontal'), {stretch: 'horizontal'});
 };
 
-var getSpecies = function(speciesSelectPanel, pos) {
-  return speciesSelectPanel.widgets().get(pos).getValue();
+var getSpecies = function(speciesSelectPanel) {
+  return speciesSelectPanel.widgets().get(1).getValue();
 };
 
 // -----------------
@@ -487,7 +497,7 @@ var yearSelectPanel = yearSelectPanel();
 var regionTypeSelectPanel = regionTypeSelectPanel(map);
 var regionSelectPanel = ui.Panel();
 setRegionList(regionNames, 'EQAS - Equatorial Asia');
-var speciesSelectPanel = speciesSelectPanel();
+var speciesSelectPanel = getSpeciesSelectPanel(speciesNames);
 
 // Display panels
 ui.root.clear();
@@ -501,6 +511,18 @@ map.add(controlWrapper);
 // Run calculations, linked to submit button
 var counter = 0;
 
+var endSlider = yearSelectPanel.widgets().get(2).widgets().get(1);
+endSlider.onChange(function() {
+  var speciesNames = getSpeciesList(endSlider.getValue());
+  var currentSpecies = getSpecies(speciesSelectPanel);
+  controlPanel.remove(speciesSelectPanel);
+  speciesSelectPanel = getSpeciesSelectPanel(speciesNames);
+  controlPanel.insert(4,speciesSelectPanel);
+  if (currentSpecies != 'BA - Burned Area') {
+    speciesSelectPanel.widgets().get(1).setValue(currentSpecies);
+  }
+});
+  
 submitButton.onClick(function() {
 
   // Dummy variables
@@ -520,10 +542,10 @@ submitButton.onClick(function() {
   // Input Parameters:
   var sYear = getYears(yearSelectPanel).startYear;
   var eYear = getYears(yearSelectPanel).endYear;
-
+  
   var xYears = ee.List.sequence(sYear,eYear,1);
   
-  var speciesLong = getSpecies(speciesSelectPanel,1);
+  var speciesLong = getSpecies(speciesSelectPanel);
   var speciesLabel = speciesList[speciesLong];
 
   // Default Map
@@ -613,24 +635,31 @@ submitButton.onClick(function() {
   }
 
   addCharts(sYear, eYear, speciesLabel, regionShp, regionType);
-  var speciesSelect = ui.Select({
-    items: speciesNames,
-    value: speciesLong,
-    onChange: function() {
-      map.remove(plotPanelParent);
-      speciesLong = getSpecies(plotSpeciesPanel,1);
-      speciesLabel = speciesList[speciesLong];
-      addCharts(sYear, eYear, speciesLabel, regionShp, regionType);
-      plotPanel.add(plotSpeciesPanel);
-    },
-    style: {
-      margin: '0px 75px 8px 5px',
-      stretch: 'horizontal'
-    }
-  });
+  
+  var getPlotSpeciesPanel = function(eYear) {
+    var speciesSelect = ui.Select({
+      items: getSpeciesList(eYear),
+      value: speciesLong,
+      onChange: function() {
+        map.remove(plotPanelParent);
+        speciesLong = getSpecies(plotSpeciesPanel);
+        speciesLabel = speciesList[speciesLong];
+        addCharts(sYear, eYear, speciesLabel, regionShp, regionType);
+        plotPanel.add(plotSpeciesPanel);
+      },
+      style: {
+        margin: '0px 75px 8px 5px',
+        stretch: 'horizontal'
+      }
+    });
+    
+    var plotSpeciesLabel = ui.Label('Change Plotted Species:', {margin: '5px 15px 8px 20px', fontSize: '14px'});
+    var plotSpeciesPanel = ui.Panel([plotSpeciesLabel,speciesSelect], ui.Panel.Layout.Flow('horizontal'));
 
-  var plotSpeciesLabel = ui.Label('Change Plotted Species:', {margin: '5px 15px 8px 20px', fontSize: '14px'});
-  var plotSpeciesPanel = ui.Panel([plotSpeciesLabel,speciesSelect], ui.Panel.Layout.Flow('horizontal'));
-
+    return plotSpeciesPanel;
+  };
+  
+  var plotSpeciesPanel = getPlotSpeciesPanel(eYear);
   plotPanel.add(plotSpeciesPanel);
+
 });
