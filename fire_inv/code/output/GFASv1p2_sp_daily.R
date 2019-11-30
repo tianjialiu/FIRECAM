@@ -3,7 +3,7 @@
 # by species [kg m-2 s-1]
 # monthly files, daily timesteps, 0.1deg
 # ===================================================
-# last updated: June 1, 2019
+# last updated: Nov 20, 2019
 # Tianjia Liu
 
 rm(list=ls())
@@ -12,17 +12,17 @@ source('~/Google Drive/scripts/R/fire_inv/globalParams.R')
 # -------------
 # Input Params
 # -------------
-xYears <- 2003:2016
+xYears <- 2003:2018
 xMonths <- 1:12
-varNameL <- c("CO","BC","OC","NOx","SO2")
-outputType <- "tif"
+varNameL <- c("CO","CO2","CH4","OC","BC","PM25")
+outputType <- "nc"
 
 GFASv1p2_pro <- function(varName, xYears, xMonths, outputType="tif") {
   
   invName <- "GFASv1p2"
-  timestamp(prefix=paste("Started...","##------ "))
   message("TASKS: ",invName," || ",varName," (",xYears[1]," to ",xYears[length(xYears)],")")
   message(paste0("/",month.abb[xMonths],"/"))
+  timestamp(prefix=paste("Started...","##------ "))
   
   # directories to input files, output NetCDFs, GeoTiffs
   inputFolder <- file.path(inputDir,invName)
@@ -113,6 +113,8 @@ GFASv1p2_pro <- function(varName, xYears, xMonths, outputType="tif") {
         writeRaster(stack(inv_sp),paste0(outname,".tif"),format="GTiff",overwrite=T)
       }
       
+      removeTmpFiles(h=1)
+      
       # -----------------
       # Construct NetCDF
       # -----------------
@@ -141,11 +143,10 @@ GFASv1p2_pro <- function(varName, xYears, xMonths, outputType="tif") {
         ncatt_put(ncout,"lon","axis","lon")
         ncatt_put(ncout,"lat","axis","lat")
         ncatt_put(ncout,"time","axis","time")
-        
+        ncatt_put(ncout,"time","calendar","standard")
+
         nc_close(ncout)
       }
-      
-      removeTmpFiles(h=nTmpHrs)
     }
   }
   timestamp(prefix=paste("Finished! ","##------ "))

@@ -3,7 +3,7 @@
 # by species [kg m-2 s-1]
 # monthly files, daily timesteps, 0.25deg
 # =========================================
-# last updated: June 1, 2019
+# last updated: Nov 20, 2019
 # Tianjia Liu
 
 rm(list=ls())
@@ -12,17 +12,17 @@ source('~/Google Drive/scripts/R/fire_inv/globalParams.R')
 # -------------
 # Input Params
 # -------------
-xYears <- 2003:2016
+xYears <- 2003:2018
 xMonths <- 1:12
-varNameL <- c("CO","BC","OC","NOx","SO2")
-outputType <- "tif"
+varNameL <- c("CO","CO2","CH4","OC","BC","PM25")
+outputType <- "nc"
 
 GFEDv4s_pro <- function(varName, xYears, xMonths, outputType="tif") {
   
   invName <- "GFEDv4s"
-  timestamp(prefix=paste("Started...","##------ "))
   message("TASKS: ",invName," || ",varName," (",xYears[1]," to ",xYears[length(xYears)],")")
   message(paste0("/",month.abb[xMonths],"/"))
+  timestamp(prefix=paste("Started...","##------ "))
   
   # directories to input files, output NetCDFs, GeoTiffs
   inputFolder <- file.path(inputDir,invName)
@@ -35,9 +35,11 @@ GFEDv4s_pro <- function(varName, xYears, xMonths, outputType="tif") {
   
   setwd(inputFolder)
   # convert HDF5 to raster
-  readGFED <- function(x,y) {
+  readGFED <- function(x,y,beta) {
     H5close()
-    h5file <- h5read(paste0(x,".hdf5"),y)
+    if (beta == F) {
+      h5file <- h5read(paste0(x,".hdf5"),y)
+    } else {h5file <- h5read(paste0(x,"_beta.hdf5"),y)}
     h5ras <- raster(t(h5file))
     extent(h5ras) <- c(-180,180,-90,90)
     projection(h5ras) <- latlong
@@ -45,7 +47,8 @@ GFEDv4s_pro <- function(varName, xYears, xMonths, outputType="tif") {
   }
   
   # area in m2
-  area_m2 <- readGFED(paste0("GFED4.1s_",xYears[1]),"ancill/grid_cell_area") 
+  if (xYears[1] <= 2016) {beta <- F} else {beta <- T}
+  area_m2 <- readGFED(paste0("GFED4.1s_",xYears[1]),"ancill/grid_cell_area",beta)
   
   # emissions factors for GFEDv4s [g species/ kg DM]
   EFs <- data.frame(read.table("ancill/GFED4_Emission_Factors.txt"))
@@ -65,6 +68,8 @@ GFEDv4s_pro <- function(varName, xYears, xMonths, outputType="tif") {
   nLat <- length(LatVec)
   
   for (iYear in seq_along(xYears)) {
+    if (xYears[iYear] <= 2016) {beta <- F} else {beta <- T}
+    
     for (iMonth in xMonths) {
       
       monthDays <- datesYr$Julian[which(datesYr$Year==xYears[iYear] & datesYr$Month==iMonth)]
@@ -78,15 +83,15 @@ GFEDv4s_pro <- function(varName, xYears, xMonths, outputType="tif") {
       monthStr <- sprintf("%02d",iMonth)
       
       # DM [kg DM / m^2 / month]
-      emiDM <- readGFED(prefix,paste0("emissions/",monthStr,"/DM"))
+      emiDM <- readGFED(prefix,paste0("emissions/",monthStr,"/DM"),beta)
       
       # partition by land cover [unitless, fractional, 0-1]
-      emiDM_SAVA <- readGFED(prefix,paste0("emissions/",monthStr,"/partitioning/DM_SAVA"))
-      emiDM_BORF <- readGFED(prefix,paste0("emissions/",monthStr,"/partitioning/DM_BORF"))
-      emiDM_TEMF <- readGFED(prefix,paste0("emissions/",monthStr,"/partitioning/DM_TEMF"))
-      emiDM_DEFO <- readGFED(prefix,paste0("emissions/",monthStr,"/partitioning/DM_DEFO"))
-      emiDM_PEAT <- readGFED(prefix,paste0("emissions/",monthStr,"/partitioning/DM_PEAT"))
-      emiDM_AGRI <- readGFED(prefix,paste0("emissions/",monthStr,"/partitioning/DM_AGRI"))
+      emiDM_SAVA <- readGFED(prefix,paste0("emissions/",monthStr,"/partitioning/DM_SAVA"),beta)
+      emiDM_BORF <- readGFED(prefix,paste0("emissions/",monthStr,"/partitioning/DM_BORF"),beta)
+      emiDM_TEMF <- readGFED(prefix,paste0("emissions/",monthStr,"/partitioning/DM_TEMF"),beta)
+      emiDM_DEFO <- readGFED(prefix,paste0("emissions/",monthStr,"/partitioning/DM_DEFO"),beta)
+      emiDM_PEAT <- readGFED(prefix,paste0("emissions/",monthStr,"/partitioning/DM_PEAT"),beta)
+      emiDM_AGRI <- readGFED(prefix,paste0("emissions/",monthStr,"/partitioning/DM_AGRI"),beta)
       
       # input species [g species / m2 / month]
       emi_sp <- emiDM * (emiDM_SAVA*EFs_sp$SAVA + emiDM_BORF*EFs_sp$BORF + emiDM_TEMF*EFs_sp$TEMF  + 
@@ -96,7 +101,7 @@ GFEDv4s_pro <- function(varName, xYears, xMonths, outputType="tif") {
       if (outputType == "tif") {inv_sp <- list()}
       for (iDay in seq_along(monthDays)) {
         # daily fraction
-        emi_frac <- readGFED(prefix,paste0("emissions/",monthStr,"/daily_fraction/day_",iDay))
+        emi_frac <- readGFED(prefix,paste0("emissions/",monthStr,"/daily_fraction/day_",iDay),beta)
         
         # input species [kg/ m2/ s]
         invDay_ras <-  emi_sp * emi_frac / (24*60*60) / 1000
@@ -122,6 +127,8 @@ GFEDv4s_pro <- function(varName, xYears, xMonths, outputType="tif") {
       if (outputType == "tif") {
         writeRaster(stack(inv_sp),paste0(outname,".tif"),format="GTiff",overwrite=T)
       }
+      
+      removeTmpFiles(h=1)
       
       # -----------------
       # Save NetCDF
@@ -151,11 +158,10 @@ GFEDv4s_pro <- function(varName, xYears, xMonths, outputType="tif") {
         ncatt_put(ncout,"lon","axis","lon")
         ncatt_put(ncout,"lat","axis","lat")
         ncatt_put(ncout,"time","axis","time")
+        ncatt_put(ncout,"time","calendar","standard")
         
         nc_close(ncout)
       }
-      
-      removeTmpFiles(h=nTmpHrs)
     }
   }
   timestamp(prefix=paste("Finished! ","##------ "))

@@ -4,7 +4,7 @@
 # monthly files, daily timesteps, 0.1deg (default)
 # (any spatial resolution possible >1km)
 # =================================================
-# last updated: June 1, 2019
+# last updated: Nov 20, 2019
 # Tianjia Liu
 
 rm(list=ls())
@@ -13,18 +13,18 @@ source('~/Google Drive/scripts/R/fire_inv/globalParams.R')
 # -------------
 # Input Params
 # -------------
-xYears <- 2003:2016
+xYears <- 2003:2018
 xMonths <- 1:12
-varNameL <- c("CO","BC","OC","NOx","SO2")
-outputType <- "tif"
+varNameL <- c("CO","CO2","CH4","OC","BC","PM25")
+outputType <- "nc"
 
 FINNv1p5_pro <- function(varName, xYears, xMonths, outputType="tif",
-                        xres = 0.1, yres = 0.1) {
+                         xres = 0.1, yres = 0.1) {
   
   invName <- "FINNv1p5"
-  timestamp(prefix=paste("Started...","##------ "))
   message("TASKS: ",invName," || ",varName," (",xYears[1]," to ",xYears[length(xYears)],")")
   message(paste0("/",month.abb[xMonths],"/"))
+  timestamp(prefix=paste("Started...","##------ "))
   
   # directories to input files, output NetCDFs, GeoTiffs
   inputFolder <- file.path(inputDir,invName,"monthly_txt")
@@ -74,12 +74,17 @@ FINNv1p5_pro <- function(varName, xYears, xMonths, outputType="tif",
       if (outputType == "tif") {inv_sp <- list()}
       for (iDay in seq_along(monthDays)) {
         invDay <- invMon[which(invMon$DAY == monthDays[iDay]),]
-        inv_spdf <- SpatialPointsDataFrame(data.frame(cbind(invDay$LONGI,invDay$LATI)),
-                                           data.frame(invDay[,-c(1:5)]),proj4string=latlong)
-        # input species [kg/ m2/ s]
-        invDay_ras <-  rasterize(inv_spdf,area_m2,orig_varName,sum) / area_m2 *
-          varFactor / (24*60*60)
-        invDay_ras[is.na(invDay_ras)] <- 0
+        
+        if (nrow(invDay) > 0) {
+          inv_spdf <- SpatialPointsDataFrame(data.frame(cbind(invDay$LONGI,invDay$LATI)),
+                                             data.frame(invDay[,-c(1:5)]),proj4string=latlong)
+          # input species [kg/ m2/ s]
+          invDay_ras <-  rasterize(inv_spdf,area_m2,orig_varName,sum) / area_m2 *
+            varFactor / (24*60*60)
+          invDay_ras[is.na(invDay_ras)] <- 0
+        } else {
+          invDay_ras <- setValues(area_m2,rep(0,length(area_m2))) 
+        }
         
         if (outputType == "tif") {inv_sp[[iDay]] <- invDay_ras}
         if (outputType == "nc") {
@@ -132,11 +137,12 @@ FINNv1p5_pro <- function(varName, xYears, xMonths, outputType="tif",
         ncatt_put(ncout,"lon","axis","lon")
         ncatt_put(ncout,"lat","axis","lat")
         ncatt_put(ncout,"time","axis","time")
+        ncatt_put(ncout,"time","calendar","standard")
         
         nc_close(ncout)
       }
       
-      removeTmpFiles(h=nTmpHrs)
+      removeTmpFiles(h=1)
     }
   }
   timestamp(prefix=paste("Finished! ","##------ "))
@@ -148,4 +154,3 @@ for (varName in varNameL) {
 }
 
 exit()
-
