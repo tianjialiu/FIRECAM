@@ -46,4 +46,4 @@ gee_basis/
 | 5 | VIIRS FRP Outside MODIS Burn Extent | 0 to 1 | unitless | additional small fires from VIIRS (375 m), a sensor with higher spatial resolution than MODIS (500 m, 1 km) |
 
 ## Publications
-1. Liu, T., L.J. Mickley, R.S. DeFries, M.E. Marlier, M.F. Khan, M.T. Latif, and A. Karambelas (in review). Diagnosing spatial uncertainties and relative biases in global fire emissions inventories: Indonesia as regional case study. *EarthArXiv*: https://doi.org/10.31223/osf.io/nh57j
+1. Liu, T., L.J. Mickley, R.S. DeFries, M.E. Marlier, M.F. Khan, M.T. Latif, and A. Karambelas (2020). Diagnosing spatial uncertainties and relative biases in global fire emissions inventories: Indonesia as regional case study. *Remote Sens. Environ.* 237, 111557. https://doi.org/10.1016/j.rse.2019.111557

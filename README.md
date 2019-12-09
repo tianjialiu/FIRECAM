@@ -77,7 +77,7 @@ Click the 'Apps/UI_FIRECAM.js' script in the 'users/tl2581/FIRECAM' repository. 
 * May 2019: added R/EE code for calculating the relative fire confidence metrics under the "fire_metrics" subfolder; added "Global" and "Custom" options to FIRECAM, GFEDv4s apps
 
 ## Publications
-1. Liu, T., L.J. Mickley, R.S. DeFries, M.E. Marlier, M.F. Khan, M.T. Latif, and A. Karambelas (in review). Diagnosing spatial uncertainties and relative biases in global fire emissions inventories: Indonesia as regional case study. *EarthArXiv*: https://doi.org/10.31223/osf.io/nh57j
+1. Liu, T., L.J. Mickley, R.S. DeFries, M.E. Marlier, M.F. Khan, M.T. Latif, and A. Karambelas (2020). Diagnosing spatial uncertainties and relative biases in global fire emissions inventories: Indonesia as regional case study. *Remote Sens. Environ.* 237, 111557. https://doi.org/10.1016/j.rse.2019.111557
 
 2. van der Werf, G.R., J.T. Randerson, L. Giglio, T.T. van Leeuwen, Y. Chen, B.M. Rogers, M. Mu, M.J.E. van Marle, D.C. Morton, G.J. Collatz, R.J. Yokelson, and P.S. Kasibhatla (2017). Global fire emissions estimates during 1997-2016. *Earth Syst. Sci. Data* 9, 697–720. https://doi.org/10.5194/essd-9-697-2017
 

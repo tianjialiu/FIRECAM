@@ -19,7 +19,7 @@ exports.yearPanel = function() {
   var FIRECAM_websiteLabel = ui.Label('[FIRECAM]', {margin: '0px 0px 5px 8px', fontSize: '12.5px'}, 'https://sites.google.com/view/firecam/home');
   var websiteLabel = ui.Panel([SMOKE_websiteLabel, FIRECAM_websiteLabel],ui.Panel.Layout.flow('horizontal'));
   
-  var paperLabel = ui.Label('Citation: Liu et al. (in review)', {margin: '5px 0px 5px 8px', fontSize: '12.5px'}, 'https://eartharxiv.org/nh57j/');
+  var paperLabel = ui.Label('Citation: Liu et al. (2020, Remote Sens. Environ.)', {margin: '5px 0px 5px 8px', fontSize: '12.5px'}, 'https://doi.org/10.1016/j.rse.2019.111557');
   var githubRepoLabel = ui.Label('GitHub: Code/Info', {margin: '0px 0px 5px 8px', fontSize: '12.5px'}, 'https://github.com/tianjialiu/SMOKE-Policy-Tool');
 
   var inputSectionLabel = ui.Label('Input Parameters', {margin: '8px 8px 5px 8px', fontWeight: 'bold', fontSize: '20px'});

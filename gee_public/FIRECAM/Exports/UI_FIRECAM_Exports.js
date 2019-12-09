@@ -6,7 +6,7 @@
 /*
 // Documentation: https://github.com/tianjialiu/FIRECAM
 // Author: Tianjia Liu
-// Last updated: October 2, 2019
+// Last updated: December 8, 2019
 
 // Purpose: explore regional differences in fire emissions from five
 // global fire emissions inventories (GFED, FINN, GFAS, QFED, FEER)
@@ -117,7 +117,7 @@ var infoPanel = function() {
   var FIRECAMLabelLong = ui.Label('Fire Inventories: Regional Evaluation, Comparison, and Metrics', {margin: '8px 30px 0px 8px', fontSize: '16px', color: '#777'});
   var websiteLabel = ui.Label('[Website]', {margin: '3px 5px 3px 8px', fontSize: '13px'}, 'https://sites.google.com/view/firecam/home');
   var githubRepoLabel = ui.Label('GitHub: Code/Info', {margin: '0px 8px 5px 8px', fontSize: '13px'}, 'https://github.com/tianjialiu/FIRECAM');
-  var citationLabel = ui.Label('Citation: Liu et al. (in review)', {margin: '8px 8px 5px 8px', fontSize: '13px'}, 'https://eartharxiv.org/nh57j/');
+  var citationLabel = ui.Label('Citation: Liu et al. (2020, Remote Sens. Environ.)', {margin: '8px 8px 5px 8px', fontSize: '13px'}, 'https://doi.org/10.1016/j.rse.2019.111557');
   var inputParamsLabel = ui.Label('Input Parameters', {margin: '8px 8px 5px 8px', fontWeight: 'bold', fontSize: '20px'});
   
   return ui.Panel({

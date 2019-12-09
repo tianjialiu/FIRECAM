@@ -9,7 +9,7 @@
 // https://github.com/tianjialiu/FIRECAM
 
 // Author: Tianjia Liu
-// Last updated: October 2, 2019
+// Last updated: December 8, 2019
 
 // Purpose: explore how the modeled impact of Indonesian fires
 // on public health in Equatorial Asia differs in using
@@ -17,9 +17,9 @@
 // GFEDv4s, FINNv1.5, GFASv1.2, QFEDv2.5r1, FEERv1-G1.2
 
 // Citation:
-// Liu et al. (in review) Diagnosing spatial uncertainties and
+// Liu et al. (in press) Diagnosing spatial uncertainties and
 // relative biases in global fire emissions inventories:
-// Indonesia as regional case study.
+// Indonesia as regional case study. Remote. Sens. Environ.
 // EarthArXiv: https://dx.doi.org/10.31223/osf.io/nh57j
 
 // To start: click 'Run' above the code editor to initialize the
@@ -47,10 +47,10 @@
 // ------------------
 // - Publications - |
 // ------------------
-// 1. Liu et al. (in review) Diagnosing spatial uncertainties and
+// 1. Liu et al. (2020) Diagnosing spatial uncertainties and
 // relative biases in global fire emissions inventories:
-// Indonesia as regional case study.
-// EarthArXiv: https://doi.org/10.31223/osf.io/nh57j
+// Indonesia as regional case study. Remote Sens. Environ. 237, 111557.
+// https://doi.org/10.1016/j.rse.2019.111557
 
 // 2. Marlier, M.E. et al. (2019). Fires, Smoke Exposure, and Public Health:
 // An Integrative Framework to Maximize Health Benefits from Peatland Restoration.
