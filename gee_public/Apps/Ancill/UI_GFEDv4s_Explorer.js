@@ -8,11 +8,8 @@
 // Global fire emissions estimates during 1997-2016
 // https://doi.org/10.5194/essd-9-697-2017
 
-// How do the new emissions factors from Andreae (2019) impact
-// GFEDv4s emissions?
-
-// Author: Tianjia Liu (tianjialiu@g.harvard.edu)
-// Last updated: October 24, 2019
+// @author Tianjia Liu (tianjialiu@g.harvard.edu)
+// Last updated: January 21, 2019
 
 // =================================================================
 // **********************   --    Code    --   *********************
@@ -49,23 +46,21 @@ var countryList = baseRegions.countryList;
 // Emissions factors from DM (g species/ kg DM)
 // https://www.geo.vu.nl/~gwerf/GFED/GFED4/ancill/GFED4_Emission_Factors.txt
 var EFlist = gfed4_params.EFlist;
-var EFlist_Andreae = gfed4_params.EFlist_Andreae;
-var speciesNames = gfed4_params.speciesNames_Andreae;
 var speciesList = gfed4_params.speciesList;
+var speciesNames = gfed4_params.speciesNames;
 
 // Land Use/ Land Cover (LULC) types - abbreviation
 // 1. Savanna, 2. Boreal Forest, 3. Temperate Forest,
 // 4. Deforestation/ Tropical Forest, 5. Peatland,
 // 6. Agricultural
 var LULC = gfed4_params.LULC;
+var LULCtot = gfed4_params.LULCtot;
 
 // Calculate emissions of input species by month in kg/ grid cell
 var getEmiByMonth = gfed4_params.getEmiByMonth;
 
 // Calculate emissions of input species by year in kg/ grid cell
 var getEmiByYr = gfed4_params.getEmiByYr;
-
-var combineBands_Andreae = gfed4_params.combineBands_Andreae;
 
 // ---------------------
 // Reducers and Charts |
@@ -77,10 +72,8 @@ var getCountryShp = gfed4_params.getCountryShp;
 var getGridShp = gfed4_params.getGridShp;
 
 // Charts
-var plotEmiTS = gfed4_params.plotEmiTS_Andreae;
-var updateOpts = gfed4_params.updateOpts_Andreae;
-var plotCompTS = gfed4_params.plotCompTS;
-var plotCompTS_text = gfed4_params.plotCompTS_text;
+var plotEmiTS = gfed4_params.plotEmiTS;
+var updateOpts = gfed4_params.updateOpts;
 
 // =================================================================
 // *****************   --    User Interface    --   ****************
@@ -91,17 +84,19 @@ var plotCompTS_text = gfed4_params.plotCompTS_text;
 var infoPanel = function() {
   var GFEDLabelShort = ui.Label('GFEDv4s Explorer', {margin: '6px 0px 0px 8px', fontWeight: 'bold', fontSize: '24px', border: '1px solid black', padding: '3px 3px 3px 3px', backgroundColor: '#FFFFFF00'});
   var GFEDLabelLong = ui.Label('Global Fire Emissions Database, version 4s', {margin: '8px 8px 0px 8px', fontSize: '16px'});
-  var AndreaeLong = ui.Label('How much does the Andreae (2019, ACP) emissions factors update impact GFEDv4s emissions?', {margin: '5px 8px 0px 8px', fontSize: '12.5px'});
   var paperLabel = ui.Label('Citation: van der Werf et al. (2017, ESSD)', {margin: '5px 0px 5px 8px', fontSize: '12.5px'}, 'https://doi.org/10.5194/essd-9-697-2017');
   var websiteLabel = ui.Label('[Data]', {margin: '5px 0px 5px 8px', fontSize: '12.5px'}, 'https://www.globalfiredata.org/');
   var codeLabel = ui.Label('[Code]', {margin: '5px 0px 5px 4px', fontSize: '12.5px'}, 'https://github.com/tianjialiu/FIRECAM/');
+  var FIRECAMLabel = ui.Label('To compare GFEDv4s with other inventories, please use the', {margin: '2px 0px 1px 8px', fontSize: '11.8px'});
+  var FIRECAMLabellink = ui.Label('FIRECAM tool', {margin: '0px 0px 5px 8px', fontSize: '12px'}, 'https://globalfires.earthengine.app/view/firecam');
   var inputParamsLabel = ui.Label('Input Parameters', {margin: '8px 8px 5px 8px', fontWeight: 'bold', fontSize: '20px'});
 
   return ui.Panel({
     widgets: [
       GFEDLabelShort, GFEDLabelLong,
       ui.Panel([paperLabel, websiteLabel, codeLabel], ui.Panel.Layout.Flow('horizontal'), {stretch: 'horizontal'}),
-      AndreaeLong, inputParamsLabel
+      FIRECAMLabel, FIRECAMLabellink,
+      inputParamsLabel
     ],
     style: {backgroundColor: '#FFFFFF00'}
   });
@@ -132,11 +127,11 @@ var hideShowButton = ui.Button({
 var yearSelectPanel = function() {
   var timeRangeLabel = ui.Label('1) Select Time Range:', {margin: '8px 8px 8px 8px', fontSize: '14.5px'});
   var startYearLabel = ui.Label('Start Year:', {margin: '3px 20px 8px 24px', fontSize: '14.5px'});
-  var startYearSlider = ui.Slider({min: 1997, max: 2018, value: 2005, step: 1, style: {margin: '3px 8px 8px 14px'}});
+  var startYearSlider = ui.Slider({min: 1997, max: 2019, value: 2005, step: 1, style: {margin: '3px 8px 8px 14px'}});
   startYearSlider.style().set('stretch', 'horizontal');
   
   var endYearLabel = ui.Label('End Year:', {margin: '3px 20px 8px 24px', fontSize: '14.5px'});
-  var endYearSlider = ui.Slider({min: 1997, max: 2018, value: 2015, step: 1, style: {margin: '3px 8px 8px 21px'}});
+  var endYearSlider = ui.Slider({min: 1997, max: 2019, value: 2015, step: 1, style: {margin: '3px 8px 8px 21px'}});
   endYearSlider.style().set('stretch', 'horizontal');
   
   var changeSliderYr = function() {
@@ -148,7 +143,7 @@ var yearSelectPanel = function() {
   startYearSlider.onChange(changeSliderYr);
   endYearSlider.onChange(changeSliderYr);
   
-  var betaLabel = ui.Label('Note: GFEDv4s emissions for 2017-18 are preliminary',
+  var betaLabel = ui.Label('Note: GFEDv4s emissions for 2017-19 are preliminary',
     {margin: '3px 20px 8px 24px', fontSize: '12px', color: '#666'});
 
   return ui.Panel([
@@ -356,14 +351,20 @@ var getDrawGeometry = function(map, pos) {
 // ---------------
 // Species Panel |
 // ---------------
-var speciesSelectPanel = function() {
+var getSpeciesList = function(eYear) {
+  var speciesNames = gfed4_params.speciesNames;
+  if (eYear > 2016) {speciesNames = gfed4_params.speciesNames_beta}
+  return speciesNames;
+};
+
+var getSpeciesSelectPanel = function(speciesNames) {
   var speciesLabel = ui.Label('3) Select Species:', {padding: '5px 0px 0px 0px', fontSize: '14.5px'});
   var speciesSelect = ui.Select({items: speciesNames, value: 'CO2 - Carbon Dioxide', style: {stretch: 'horizontal'}});
   return ui.Panel([speciesLabel, speciesSelect], ui.Panel.Layout.Flow('horizontal'), {stretch: 'horizontal'});
 };
 
-var getSpecies = function(speciesSelectPanel, pos) {
-  return speciesSelectPanel.widgets().get(pos).getValue();
+var getSpecies = function(speciesSelectPanel) {
+  return speciesSelectPanel.widgets().get(1).getValue();
 };
 
 // -----------------
@@ -424,7 +425,7 @@ var emiLegend = function(speciesLabel, units, maxVal, sYear, eYear) {
 // ------------
 // Plot Panel |
 // ------------
-var plotPanelLabel = ui.Label('Emissions Comparison with Old/New EFs',
+var plotPanelLabel = ui.Label('Emissions by Land Use/Land Cover',
   {fontWeight: 'bold', fontSize: '20px', margin: '7px 8px 5px 18px'});
 
 var addCharts = function(sYear, eYear, speciesLabel, regionShp, regionType) {
@@ -432,26 +433,21 @@ var addCharts = function(sYear, eYear, speciesLabel, regionShp, regionType) {
   // Retrieve emissions factors
   var EFs = ee.Image(EFlist[speciesLabel]).rename(LULC)
     .reproject({crs: crs, crsTransform: crsTrans});
-  
-  var EFs_Andreae = ee.Image(EFlist_Andreae[speciesLabel]).rename(LULC)
-    .reproject({crs: crs, crsTransform: crsTrans});
-    
+
   var emiByMonth = getEmiByMonth(EFs, speciesLabel, sYear, eYear);
   var emiByYr = getEmiByYr(emiByMonth, sYear, eYear);
   
-  var emiByMonth_Andreae = getEmiByMonth(EFs_Andreae, speciesLabel, sYear, eYear);
-  var emiByYr_Andreae = getEmiByYr(emiByMonth_Andreae, sYear, eYear);
-  
-  var emiByMonth_comp = combineBands_Andreae(emiByMonth, emiByMonth_Andreae);
-  var emiByYr_comp = combineBands_Andreae(emiByYr, emiByYr_Andreae);
-  
-  var emiByYr_compMean = ee.Image(emiByYr_comp.mean());
-  
   // Display Charts:
+  if (speciesLabel == 'BA') {
+    plotPanelParent.widgets().get(0).setValue('Burned Area');
+  } else {
+    plotPanelParent.widgets().get(0).setValue('Emissions by Land Use/Land Cover');
+  }
+  
   map.add(plotPanelParent);
   plotPanel = plotPanel.clear();
   
-  var annualChart = plotEmiTS(emiByYr_comp, regionShp,
+  var annualChart = plotEmiTS(emiByYr, regionShp,
     speciesLabel, 'Annual', 'Y', sYear, eYear, 1, 1);
   
   if (eYear-sYear <= 5) {
@@ -461,18 +457,12 @@ var addCharts = function(sYear, eYear, speciesLabel, regionShp, regionType) {
   }
   
   plotPanel.add(annualChart); plotPanel.add(ui.Label('', {margin: '-25px 8px 8px'}));
-  plotPanel.add(plotCompTS(emiByYr_compMean, speciesLabel, regionShp));
   
-  var avgBudget = plotCompTS_text(emiByYr_compMean, regionShp);
-  var avgBudgetOld = ee.Number(avgBudget.get('Old'));
-  var avgBudgetNew = ee.Number(avgBudget.get('New'));
-  
-  var perChange = (avgBudgetNew.subtract(avgBudgetOld)).divide(avgBudgetOld).multiply(100);
-  var perChangeLabel = ui.Label('Percent Change: ' + 
-    perChange.round().getInfo() + '%',
-    {margin: '-3px 0px 13px 20px', fontSize: '13px', border: '1px solid black', padding: '3px'});
-  
-  plotPanel.add(perChangeLabel);
+  var monthlyChart = plotEmiTS(emiByMonth, regionShp,
+    speciesLabel, 'Monthly', 'MMM Y', sYear, eYear, 1, 12);
+  if (regionType != 'Global' | eYear-sYear === 0) {
+    plotPanel.add(monthlyChart);
+  }
 };
 
 // -----------------------------------
@@ -507,7 +497,7 @@ var yearSelectPanel = yearSelectPanel();
 var regionTypeSelectPanel = regionTypeSelectPanel(map);
 var regionSelectPanel = ui.Panel();
 setRegionList(regionNames, 'EQAS - Equatorial Asia');
-var speciesSelectPanel = speciesSelectPanel();
+var speciesSelectPanel = getSpeciesSelectPanel(speciesNames);
 
 // Display panels
 ui.root.clear();
@@ -521,6 +511,18 @@ map.add(controlWrapper);
 // Run calculations, linked to submit button
 var counter = 0;
 
+var endSlider = yearSelectPanel.widgets().get(2).widgets().get(1);
+endSlider.onChange(function() {
+  var speciesNames = getSpeciesList(endSlider.getValue());
+  var currentSpecies = getSpecies(speciesSelectPanel);
+  controlPanel.remove(speciesSelectPanel);
+  speciesSelectPanel = getSpeciesSelectPanel(speciesNames);
+  controlPanel.insert(4,speciesSelectPanel);
+  if (currentSpecies != 'BA - Burned Area') {
+    speciesSelectPanel.widgets().get(1).setValue(currentSpecies);
+  }
+});
+  
 submitButton.onClick(function() {
 
   // Dummy variables
@@ -540,10 +542,10 @@ submitButton.onClick(function() {
   // Input Parameters:
   var sYear = getYears(yearSelectPanel).startYear;
   var eYear = getYears(yearSelectPanel).endYear;
-
+  
   var xYears = ee.List.sequence(sYear,eYear,1);
   
-  var speciesLong = getSpecies(speciesSelectPanel,1);
+  var speciesLong = getSpecies(speciesSelectPanel);
   var speciesLabel = speciesList[speciesLong];
 
   // Default Map
@@ -633,24 +635,31 @@ submitButton.onClick(function() {
   }
 
   addCharts(sYear, eYear, speciesLabel, regionShp, regionType);
-  var speciesSelect = ui.Select({
-    items: speciesNames,
-    value: speciesLong,
-    onChange: function() {
-      map.remove(plotPanelParent);
-      speciesLong = getSpecies(plotSpeciesPanel,1);
-      speciesLabel = speciesList[speciesLong];
-      addCharts(sYear, eYear, speciesLabel, regionShp, regionType);
-      plotPanel.add(plotSpeciesPanel);
-    },
-    style: {
-      margin: '0px 75px 8px 5px',
-      stretch: 'horizontal'
-    }
-  });
+  
+  var getPlotSpeciesPanel = function(eYear) {
+    var speciesSelect = ui.Select({
+      items: getSpeciesList(eYear),
+      value: speciesLong,
+      onChange: function() {
+        map.remove(plotPanelParent);
+        speciesLong = getSpecies(plotSpeciesPanel);
+        speciesLabel = speciesList[speciesLong];
+        addCharts(sYear, eYear, speciesLabel, regionShp, regionType);
+        plotPanel.add(plotSpeciesPanel);
+      },
+      style: {
+        margin: '0px 75px 8px 5px',
+        stretch: 'horizontal'
+      }
+    });
+    
+    var plotSpeciesLabel = ui.Label('Change Plotted Species:', {margin: '5px 15px 8px 20px', fontSize: '14px'});
+    var plotSpeciesPanel = ui.Panel([plotSpeciesLabel,speciesSelect], ui.Panel.Layout.Flow('horizontal'));
 
-  var plotSpeciesLabel = ui.Label('Change Plotted Species:', {margin: '5px 15px 8px 20px', fontSize: '14px'});
-  var plotSpeciesPanel = ui.Panel([plotSpeciesLabel,speciesSelect], ui.Panel.Layout.Flow('horizontal'));
-
+    return plotSpeciesPanel;
+  };
+  
+  var plotSpeciesPanel = getPlotSpeciesPanel(eYear);
   plotPanel.add(plotSpeciesPanel);
+
 });

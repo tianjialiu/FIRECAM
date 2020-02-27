@@ -12,7 +12,7 @@ var invCol = ee.ImageCollection(projFolder + 'GFEDv4s');
 exports.invCol = invCol;
 
 // Ancillary: Area pgeter grid cell, m2
-var gridArea = ee.Image(projFolder + 'GFEDv4ancill').select('area_m2');
+var gridArea = ee.Image(projFolder + 'GFEDv4s_ancill').select('area_m2');
 exports.gridArea = gridArea;
 
 // Projection: Geographic, 0.25deg

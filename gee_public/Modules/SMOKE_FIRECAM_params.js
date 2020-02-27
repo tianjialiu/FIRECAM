@@ -13,14 +13,23 @@ var adjointFolder = projFolder + 'GC_adjoint_sensitivities/';
 
 var crsLatLon = 'EPSG:4326';
 var sens_gridRes = [0.6666666666666667,0,69.66666666666667,0,-0.5,55.25];
-  
+
+var invNames = ['GFEDv4s','FINNv1p5','GFASv1p2',
+  'QFEDv2p5r1','FEERv1p0_G1p2'];
+exports.invNames = invNames;
+
+var invDispNames = ['GFEDv4s','FINNv1.5','GFASv1.2',
+  'QFEDv2.5r1','FEERv1.0-G1.2'];
+exports.invDispNames = invDispNames;
+
 var invList = {
   'GFEDv4s': 'GFEDv4s',
   'FINNv1.5':'FINNv1p5',
   'GFASv1.2':'GFASv1p2',
   'QFEDv2.5r1':'QFEDv2p5r1',
-  'FEERv1-G1.2':'FEERv1p0_G1p2'
+  'FEERv1.0-G1.2':'FEERv1p0_G1p2'
 };
+exports.invList = invList;
 
 var adjResList = {
   'GFEDv4s': '0p25deg',
@@ -170,7 +179,7 @@ var getEmissReceptorMon = function(inEmiInvName,inMonth,inYear,metYear,inSens) {
 };
 
 // Smoke PM2.5 exposure (μg/m3), monthly time series
-exports.getPM = function(inEmiInvName,inputYear,metYear,receptor) {
+var getPM = function(inEmiInvName,inputYear,metYear,receptor) {
   var adjRes = adjResList[inEmiInvName];
   var adjointFolder_ds = projFolder + 'GC_adjoint_sensitivities_' + adjRes + '/';
   var inSens = getSensitivity(receptor,adjointFolder_ds);
@@ -182,10 +191,52 @@ exports.getPM = function(inEmiInvName,inputYear,metYear,receptor) {
     var emissReceptorMon = getEmissReceptorMon(inEmiInvName,iMonth,inputYear,metYear,inSens);
     
     return imageToFeature(emissReceptorMon,outputRegion,gridScale)
-      .select(['sum'],['Smoke_PM2p5'])
+      .select(['sum'],[inEmiInvName])
       .set('system:time_start',ee.Date.fromYMD(inputYear,iMonth,1).millis());
   });
   return(ee.FeatureCollection(emissReceptor));
+};
+
+exports.getPMinv = function(inputYear,metYear,receptor) {
+    
+  var PMts_GFED = getPM('GFEDv4s',inputYear,metYear,receptor);
+  var PMts_FINN = getPM('FINNv1p5',inputYear,metYear,receptor);
+  var PMts_GFAS = getPM('GFASv1p2',inputYear,metYear,receptor);
+  var PMts_QFED = getPM('QFEDv2p5r1',inputYear,metYear,receptor);
+  var PMts_FEER = getPM('FEERv1p0_G1p2',inputYear,metYear,receptor);
+  
+  var emissReceptor = ee.List.sequence(1,12,1).map(function(iMonth) {
+    var filterMon = ee.Filter.calendarRange(iMonth,iMonth,'month');
+    
+    var PMmon_GFED = ee.Feature(PMts_GFED.filter(filterMon).first()).get('GFEDv4s');
+    var PMmon_FINN = ee.Feature(PMts_FINN.filter(filterMon).first()).get('FINNv1p5');
+    var PMmon_GFAS = ee.Feature(PMts_GFAS.filter(filterMon).first()).get('GFASv1p2');
+    var PMmon_QFED = ee.Feature(PMts_QFED.filter(filterMon).first()).get('QFEDv2p5r1');
+    var PMmon_FEER = ee.Feature(PMts_FEER.filter(filterMon).first()).get('FEERv1p0_G1p2');
+    
+    var PMtsMon = ee.Feature(null, {GFEDv4s: PMmon_GFED, FINNv1p5: PMmon_FINN,
+      GFASv1p2: PMmon_GFAS, QFEDv2p5r1: PMmon_QFED, FEERv1p0_G1p2: PMmon_FEER});
+    
+    return PMtsMon.set('system:time_start',ee.Date.fromYMD(inputYear,iMonth,1).millis());
+  });
+  return(ee.FeatureCollection(emissReceptor));
+};
+
+exports.getPMavg = function(PMtsInv,inputYear,metYear) {
+  var PMtsInvFS = PMtsInv.filter(ee.Filter.calendarRange(sMonth,eMonth,'month'));
+  
+  var PMavg_GFED = PMtsInvFS.aggregate_mean('GFEDv4s');
+  var PMavg_FINN = PMtsInvFS.aggregate_mean('FINNv1p5');
+  var PMavg_GFAS = PMtsInvFS.aggregate_mean('GFASv1p2');
+  var PMavg_QFED = PMtsInvFS.aggregate_mean('QFEDv2p5r1');
+  var PMavg_FEER = PMtsInvFS.aggregate_mean('FEERv1p0_G1p2');
+
+  var PMtsInvAvgAll = ee.Feature(null, {GFEDv4s: PMavg_GFED, FINNv1p5: PMavg_FINN,
+    GFASv1p2: PMavg_GFAS, QFEDv2p5r1: PMavg_QFED, FEERv1p0_G1p2: PMavg_FEER,
+    xName: inputYear + ' + ' + metYear + ' met'
+  });
+
+  return PMtsInvAvgAll;
 };
 
 // =============
@@ -235,7 +286,7 @@ exports.getPMmap = function(inEmiInvName,inputYear,metYear,receptor) {
     .reproject({crs: gridScale, scale: gridScale.nominalScale()}));
 };
 
-exports.PMRamp = ['#FFFFFF','#FBC127','#F67D15','#D44842',
+exports.PMColRamp = ['#FFFFFF','#FBC127','#F67D15','#D44842',
   '#9F2963','#65146E','#280B54','#000000'];
 
 // OC + BC Emissions, Jul-Oct average (μg m-2 s-1)
@@ -262,28 +313,60 @@ exports.emissColRamp = ['#FFFFFF','#FFFFB2','#FED976','#FEB24C','#FD8D3C',
 // ===============
 // Display Charts
 // ===============
+var colPal = {
+  0: {color: '777777'},
+  1: {color: '87CEEB'},
+  2: {color: 'FF0000'},
+  3: {color: 'FDB751'},
+  4: {color: '800080'},
+};
+
 // Smoke PM2.5 (μg m-3) time series, monthly average
-exports.getPMchart = function(PMts,PMavg,OCtot,BCtot,plotPanel) {
-  plotPanel = plotPanel.clear();
-  var PMchart = ui.Chart.feature.byFeature(PMts,'system:time_start','Smoke_PM2p5')
+exports.getPMtsChart = function(PMtsInv) {
+  return ui.Chart.feature.byFeature({
+    features: PMtsInv,
+    xProperty: 'system:time_start',
+    yProperties: invNames
+  }).setChartType('LineChart')
+    .setSeriesNames(['GFEDv4s','FINNv1.5','GFASv1.2','QFEDv2.5r1','FEERv1.0-G1.2'])
     .setOptions({
-      title: 'Population-Weighted Smoke PM2.5 Exposure',
+      title: 'Smoke PM2.5 Exposure',
+      titleTextStyle: {fontSize: '13.5'},
       hAxis: {'format':'MMM'},
-      vAxis: {title: 'Smoke PM2.5 (μg/m³)'},
-      legend: {position: 'none'},
+      vAxis: {
+        title: 'Smoke PM2.5 (μg/m³)',
+        titleTextStyle: {fontSize: '12'}
+      },
       lineWidth: 2,
       pointSize: 5,
+      series: colPal,
+      height: '230px'
     });
-  plotPanel.add(PMchart);
+};
 
-  plotPanel.add(ui.Label('Jul-Oct Mean PM2.5: ' + PMavg.getInfo() + ' μg/m³',
-    {margin: '-10px 0px -5px 25px', padding: '0px 0px 8px 0px', stretch: 'horizontal'}));
-  plotPanel.add(ui.Label('Jul-Oct Total OC: ' + OCtot.getInfo() + ' Tg | Total BC: ' + BCtot.getInfo() + ' Tg',
-    {margin: '0px 0px -5px 25px', padding: '0px 0px 10px 0px', stretch: 'horizontal'}));
+exports.getPMavgChart = function(PMtsAvg) {
+  return ui.Chart.feature.byFeature({
+    features: PMtsAvg,
+    xProperty: 'xName',
+    yProperties: invNames
+  }).setChartType('ColumnChart')
+    .setSeriesNames(['GFEDv4s','FINNv1.5','GFASv1.2','QFEDv2.5r1','FEERv1.0-G1.2'])
+    .setOptions({
+      title: 'Smoke PM2.5 Exposure',
+      titleTextStyle: {fontSize: '13'},
+      vAxis: {
+        title: 'Jul-Oct Avg. Smoke PM2.5 (μg/m³)',
+        titleTextStyle: {fontSize: '11.5'}
+      },
+      lineWidth: 2,
+      pointSize: 5,
+      series: colPal,
+      height: '230px'
+    });
 };
 
 // Contribution of PM2.5 exposure by Indonesian province
-exports.getPMContrByProvChart = function(inEmiInvName,PMmap,plotPanel) {
+exports.getPMContrByProvChart = function(inEmiInvName,PMmap) {
   var inEmiInv = getInEmiInv(inEmiInvName);
   var gridScale = getGridScale(inEmiInv);
   
@@ -299,31 +382,15 @@ exports.getPMContrByProvChart = function(inEmiInvName,PMmap,plotPanel) {
     .setChartType('PieChart')
     .setOptions({
       title: 'Smoke PM2.5 Contribution by Province',
+      titleTextStyle: {fontSize: '13'},
       legend: 'NAME_1',
     });
-  plotPanel.add(PMProvChart);
+  return PMProvChart;
 };
 
 // =============
 // Display Text
 // =============
-// Jul-Oct average PM2.5 exposure (μg m-3)
-exports.getPMavg = function(inEmiInvName,inputYear,metYear,receptor) {
-  var inEmiInv = getInEmiInv(inEmiInvName);
-  var adjRes = adjResList[inEmiInvName];
-  var gridScale = getGridScale(inEmiInv);
-  
-  var adjointFolder_ds = projFolder + 'GC_adjoint_sensitivities_' + adjRes + '/';
-  var inSens = getSensitivity(receptor,adjointFolder_ds);
-
-  var emissReceptor = ee.List.sequence(sMonth,eMonth,1).map(function(iMonth) {
-    var emissReceptorMon = getEmissReceptorMon(inEmiInvName,iMonth,inputYear,metYear,inSens);
-      
-    return imageToFeature(emissReceptorMon,outputRegion,gridScale);
-  });
-  return ee.Number(ee.FeatureCollection(emissReceptor)
-    .aggregate_mean('sum')).format('%.2f');
-};
 
 // Jul-Oct total OC & BC emissions (Tg)
 exports.getEmissTotal = function(inEmiInvName,inputYear,metYear,inSpecies) {
@@ -391,5 +458,6 @@ exports.closestMetYear = {
   2015: 2006,
   2016: 2008,
   2017: 2008,
-  2018: 2009
+  2018: 2009,
+  2019: 2006
 };

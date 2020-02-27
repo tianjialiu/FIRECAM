@@ -13,7 +13,7 @@ Please see our [website](https://sites.google.com/view/firecam/home) for more in
 FIRECAM can be accessed through (1) Earth Engine Apps and (2) the Google Earth Engine (GEE) Javascript playground. While EE Apps facilitates access to FIRECAM for any user (GEE account not required), accessing the FIRECAM repository in the GEE playground allows rapid exports of timeseries and additional data analysis. The latter is also a fallback option if EE Apps is running too slowly.
 
 ### Ancillary Apps
-* [GFEDv4s Explorer](https://globalfires.earthengine.app/view/gfedv4s): Explore GFEDv4s emissions (1997-2016) for burned area and all available chemical species, partitioned by land use/land cover
+* [GFEDv4s Explorer](https://globalfires.earthengine.app/view/gfedv4s): Explore GFEDv4s emissions (1997-2016, 2017-2019 beta estimates) for burned area and all available chemical species, partitioned by land use/land cover
     - *Note*: Burned area from small fires is approximate based on the small fire fraction for emissions
 * [GFEDv4s Animated Burned Area](https://globalfires.earthengine.app/view/gfedv4s-monthly-ba-animated): Visualize the seasonality of GFEDv4s burned area. 
     - *Note*: GFEDv4s BA is averaged into monthly means. Please wait until all the images load (check the layer list in the upper-right hand corner of the map) before clicking 'Play.'
@@ -70,6 +70,7 @@ The repository should then appear in the top-left panel under 'Reader' as 'users
 Click the 'Apps/UI_FIRECAM.js' script in the 'users/tl2581/FIRECAM' repository. The script should appear in the code editor. Click 'Run' in the top-right corner of the code editor to activate the user interface. The repository also contains a script to export monthly and annual timeseries data ('Exports/UI_FIRECAM_Exports.js').
 
 ## Updates
+* January 2020: updated ancillary GFEDv4s apps with preliminary 2019 emissions
 * October 2019: fixed FIRECAM emissions layers with 0.5° x 0.5° reprojection, updated FINNv1.5 emissions for 2016 with revised files from NCAR, added 2017-2018 emissions for all inventories; updated FIRECAM exports to allow user-defined polygons; added SMOKE-FIRECAM Tool
 * September 2019: added "Draw" option to FIRECAM and GFEDv4s apps; added GFEDv4s monthly averaged burned area animation and GFEDv4s with Andreae (2019) EFs ancillary apps
 * February 2019: added data download/processing code under the "fire_inv" subfolder; added "Country/Sub-Region" and "Pixel" options to FIRECAM app; created ancillary app for GFEDv4s (GFEDv4s Explorer)

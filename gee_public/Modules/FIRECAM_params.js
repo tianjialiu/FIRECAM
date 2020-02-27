@@ -14,6 +14,8 @@ exports.basisRegions = basisRegions;
 var invNames = ['GFEDv4s','FINNv1p5','GFASv1p2','QFEDv2p5r1','FEERv1p0_G1p2'];
 exports.invNames = invNames;
 
+var invDispNames = ['GFEDv4s','FINNv1.5','GFASv1.2','QFEDv2.5r1','FEERv1.0-G1.2'];
+
 exports.speciesNames = ['CO - Carbon Monoxide', 'CO2 - Carbon Dioxide',
   'CH4 - Methane', 'OC - Organic Carbon', 'BC - Black Carbon',
   'PM2.5 - Particulate Matter <2.5 μm'];
@@ -121,7 +123,8 @@ exports.getEmiByMonth = function(species, sYear, eYear) {
   var filterYr = ee.Filter.calendarRange(sYear,eYear,'year');
   var emiByMonth = FIRECAM_sp.filter(filterYr)
     .map(function(image) {
-      return image.select('.*_' + bandNamesList[species])
+      return image.multiply(image.gte(0))
+        .select('.*_' + bandNamesList[species])
         .rename(invNames).divide(1e9)
         .reproject({crs: crs, crsTransform: crsTrans})
         .copyProperties(image,['system:time_start']);
@@ -165,7 +168,7 @@ exports.plotEmiTS = function(imageCol, regionShp,
     scale: aggProj.nominalScale(),
     xProperty: 'system:time_start',
   }).setChartType('LineChart')
-    .setSeriesNames(['GFEDv4s','FINNv1.5','GFASv1.2','QFEDv2.5r1','FEERv1.0-G1.2'])
+    .setSeriesNames(invDispNames)
     .setOptions({
       title: timePeriod + ' Fire Emissions',
       titleTextStyle: {fontSize: '13.5'},
@@ -228,7 +231,7 @@ exports.plotEmiBar = function(imageCol, regionShp,
     reducer: ee.Reducer.sum().unweighted(),
     scale: aggProj.nominalScale(),
     xProperty: 'xName',
-  }).setSeriesNames(['GFEDv4s','FINNv1.5','GFASv1.2','QFEDv2.5r1','FEERv1.0-G1.2'])
+  }).setSeriesNames(invDispNames)
     .setOptions({
       title: 'Average ' + timePeriod + ' Fire Emissions (' + sYear + '-' + eYear + ')',
       titleTextStyle: {fontSize: '13.5'},
@@ -392,4 +395,4 @@ exports.lulcPeat_colPal = ['#000000','#05450A','#92AF1F','#6A2424','#D99125','#F
 // -----------------------------------
 // Peatland distribution from GFEDv4s
 // -----------------------------------
-exports.peat = ee.Image(projFolder + 'GFEDv4s_peatCfrac');
+exports.peat = ee.Image(projFolder + 'GFEDv4s_ancill').select('peatFrac');

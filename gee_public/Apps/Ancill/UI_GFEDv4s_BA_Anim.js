@@ -8,7 +8,7 @@
 // Global fire emissions estimates during 1997-2016
 // https://doi.org/10.5194/essd-9-697-2017
 
-// Author: Tianjia Liu (tianjialiu@g.harvard.edu)
+// @author Tianjia Liu (tianjialiu@g.harvard.edu)
 // Last updated: September 26, 2019
 
 // =================================================================
