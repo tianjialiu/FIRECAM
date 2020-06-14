@@ -202,7 +202,7 @@ var getEmiByMonth = function(EFs, varType, sYear, eYear) {
       var BAsf = gfedMon.select('small_fire_fraction');
       
       var BA = BAfrac.addBands(BAfrac.multiply(BAsf))
-        .multiply(gridArea).divide(1e6).rename(['BA','BAsf'])
+        .multiply(gridArea).divide(1e6).divide(1e3).rename(['BA','BAsf'])
         .reproject({crs: crs, crsTransform: crsTrans})
         .copyProperties(gfedMon,['system:time_start']);
       
@@ -295,12 +295,12 @@ exports.plotEmiTS = function(imageCol, regionShp,
       scale: scale,
       xProperty: 'system:time_start',
     }).setChartType('LineChart')
-      .setSeriesNames(['BA','BA from small fires'])
+      .setSeriesNames(['BA','small fire fraction'])
       .setOptions({
         title: timePeriod + ' Burned Area',
         titleTextStyle: {fontSize: '13.5'},
         vAxis: {
-          title: 'Burned Area (sq. km)',
+          title: 'Burned Area (sq. km, thousands)',
           format: '####.#'
         },
         hAxis: {

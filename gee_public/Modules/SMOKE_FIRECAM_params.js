@@ -24,10 +24,10 @@ exports.invDispNames = invDispNames;
 
 var invList = {
   'GFEDv4s': 'GFEDv4s',
-  'FINNv1.5':'FINNv1p5',
-  'GFASv1.2':'GFASv1p2',
-  'QFEDv2.5r1':'QFEDv2p5r1',
-  'FEERv1.0-G1.2':'FEERv1p0_G1p2'
+  'FINNv1.5': 'FINNv1p5',
+  'GFASv1.2': 'GFASv1p2',
+  'QFEDv2.5r1': 'QFEDv2p5r1',
+  'FEERv1.0-G1.2': 'FEERv1p0_G1p2'
 };
 exports.invList = invList;
 
@@ -40,7 +40,7 @@ var adjResList = {
 };
 
 var getInEmiInv = function(inEmiInvName) {
-  return ee.ImageCollection(globalFiresFolder + inEmiInvName + '_sp');
+  return ee.ImageCollection(globalFiresFolder + inEmiInvName);
 };
 
 var getGridScale = function(inEmiInv) {

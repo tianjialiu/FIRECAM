@@ -4,7 +4,7 @@
 # monthly files, daily timesteps, 0.1deg (default)
 # (any spatial resolution possible >1km)
 # =================================================
-# last updated: Nov 20, 2019
+# last updated: Apr 18, 2020
 # Tianjia Liu
 
 rm(list=ls())
@@ -67,8 +67,7 @@ FINNv1p5_pro <- function(varName, xYears, xMonths, outputType="tif",
       # -----------
       setwd(inputFolder)
       monthStr <- sprintf("%02d",iMonth)
-      invYr <- read.table(dir(".",paste0(invName,"_",xYears[iYear],"_",monthStr)),sep=",",header=T)
-      invMon <- invYr[invYr$DAY %in% monthDays,]
+      invMon <- read.table(dir(".",paste0(invName,"_",xYears[iYear],"_",monthStr)),sep=",",header=T)
       
       if (outputType == "nc") {inv_sp <- array(0,dim=c(nLon,nLat,nDays))}
       if (outputType == "tif") {inv_sp <- list()}

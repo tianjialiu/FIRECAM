@@ -6,7 +6,7 @@
 /*
 // Documentation: https://github.com/tianjialiu/FIRECAM
 // @author Tianjia Liu (tianjialiu@g.harvard.edu)
-// Last updated: December 31, 2019
+// Last updated: June 11, 2020
 
 // Purpose: explore regional differences in fire emissions from five
 // global fire emissions inventories (GFED, FINN, GFAS, QFED, FEER)
@@ -100,18 +100,20 @@ var peat = firecam.peat;
 // Info Panel |
 // ------------
 var infoPanel = function() {
-  var FIRECAMLabelShort = ui.Label('FIRECAM Online Tool', {margin: '14px 0px 0px 8px', fontWeight: 'bold', fontSize: '24px', border: '1px solid black', padding: '3px 3px 3px 3px'});
-  var FIRECAMLabelLong = ui.Label('Fire Inventories: Regional Evaluation, Comparison, and Metrics', {margin: '8px 30px 0px 8px', fontSize: '16px', color: '#777'});
-  var invLabel = ui.Label('GFEDv4s, FINNv1.5, GFASv1.2, QFEDv2.5r1, FEERv1.0-G1.2', {margin: '3px 5px 0px 8px', fontSize: '11.7px', color: '#999'});
-  var websiteLabel = ui.Label('[Website]', {margin: '3px 5px 3px 8px', fontSize: '13px'}, 'https://sites.google.com/view/firecam/home');
-  var githubRepoLabel = ui.Label('GitHub: Code/Info', {margin: '0px 8px 5px 8px', fontSize: '13px'}, 'https://github.com/tianjialiu/FIRECAM');
-  var citationLabel = ui.Label('Citation: Liu et al. (2020, Remote Sens. Environ.)', {margin: '8px 8px 5px 8px', fontSize: '13px'}, 'https://doi.org/10.1016/j.rse.2019.111557');
-  var inputParamsLabel = ui.Label('Input Parameters', {margin: '8px 8px 5px 8px', fontWeight: 'bold', fontSize: '20px'});
+  var FIRECAMLabelShort = ui.Label('FIRECAM Online Tool', {margin: '14px 0px 0px 13px', fontWeight: 'bold', fontSize: '24px', border: '1px solid black', padding: '3px 3px 3px 3px'});
+  var FIRECAMLabelLong = ui.Label('Fire Inventories: Regional Evaluation, Comparison, and Metrics', {margin: '8px 30px 0px 13px', fontSize: '16px', color: '#777'});
+  var invLabel = ui.Label('GFEDv4s, FINNv1.5, GFASv1.2, QFEDv2.5r1, FEERv1.0-G1.2', {margin: '3px 5px 0px 13px', fontSize: '11.7px', color: '#999'});
+  var websiteLabel = ui.Label('[Website]', {margin: '3px 5px 3px 13px', fontSize: '13px'}, 'https://sites.google.com/view/firecam/home');
+  var githubRepoLabel = ui.Label('GitHub: Code/Info', {margin: '0px 8px 5px 13px', fontSize: '13px'}, 'https://github.com/tianjialiu/FIRECAM');
+  var citationLabel = ui.Label('Citation: Liu et al. (2020, Remote Sens. Environ.)', {margin: '8px 8px 5px 13px', fontSize: '13px'}, 'https://doi.org/10.1016/j.rse.2019.111557');
+  var headDivider = ui.Panel(ui.Label(),ui.Panel.Layout.flow('horizontal'),
+    {margin: '10px 0px 5px 0px',height:'1.25px',border:'0.75px solid black',stretch:'horizontal'});
+  var inputParamsLabel = ui.Label('Input Parameters', {margin: '8px 8px 5px 13px', fontWeight: 'bold', fontSize: '20px'});
   
   return ui.Panel({
     widgets: [FIRECAMLabelShort, FIRECAMLabelLong, invLabel, websiteLabel, citationLabel, 
-      githubRepoLabel, inputParamsLabel],
-    style: {margin: '0px 0px 0px 5px'}
+      githubRepoLabel, headDivider, inputParamsLabel],
+    style: {margin: '0px 0px 0px 0px'}
   });
 };
 
@@ -121,11 +123,11 @@ var infoPanel = function() {
 var yearSelectPanel = function() {
   var timeRangeLabel = ui.Label('1) Select Time Range:', {margin: '8px 8px 8px 13px', fontSize: '14.5px'});
   var startYearLabel = ui.Label('Start Year:', {margin: '3px 20px 8px 29px', fontSize: '14.5px'});
-  var startYearSlider = ui.Slider({min: 2003, max: 2018, value: 2005, step: 1, style: {margin: '3px 8px 8px 14px'}});
+  var startYearSlider = ui.Slider({min: 2003, max: 2019, value: 2005, step: 1, style: {margin: '3px 8px 8px 14px'}});
   startYearSlider.style().set('stretch', 'horizontal');
   
   var endYearLabel = ui.Label('End Year:', {margin: '3px 27px 8px 29px', fontSize: '14.5px'});
-  var endYearSlider = ui.Slider({min: 2003, max: 2018, value: 2015, step: 1, style: {margin: '3px 8px 8px 14px'}});
+  var endYearSlider = ui.Slider({min: 2003, max: 2019, value: 2015, step: 1, style: {margin: '3px 8px 8px 14px'}});
   endYearSlider.style().set('stretch', 'horizontal');
   
   var changeSliderYr = function() {
@@ -137,7 +139,7 @@ var yearSelectPanel = function() {
   startYearSlider.onChange(changeSliderYr);
   endYearSlider.onChange(changeSliderYr);
   
-  var betaLabel = ui.Label('Note: GFEDv4s emissions for 2017-18 are preliminary',
+  var betaLabel = ui.Label('Note: GFEDv4s emissions for 2017-19 are preliminary',
     {margin: '3px 20px 8px 29px', fontSize: '12px', color: '#666'});
   
   return ui.Panel([
@@ -409,7 +411,10 @@ var continuousLegend = function(controlPanel, title, colPal, minVal, maxVal, uni
 
 
 var legendPanel = function(controlPanel) {
-  controlPanel.add(ui.Label('Legends', {fontWeight: 'bold', fontSize: '20px', margin: '10px 8px 8px 13px'}));
+  var footDivider = ui.Panel(ui.Label(),ui.Panel.Layout.flow('horizontal'),
+    {margin: '10px 0px 6px 0px',height:'1.25px',border:'0.75px solid black',stretch:'horizontal'});
+  controlPanel.add(footDivider);
+  controlPanel.add(ui.Label('Legend', {fontWeight: 'bold', fontSize: '20px', margin: '10px 8px 8px 13px'}));
   controlPanel.add(ui.Label('', {margin: '0 0 0 0'}));
   
   continuousLegend(controlPanel,'BA-AFA Discrepancy',
@@ -556,7 +561,7 @@ var map = ui.Map();
 map.style().set({cursor:'crosshair'});
 map.setCenter(0,10,2);
 map.setControlVisibility({fullscreenControl: false});
-map.setOptions('Map', {'Map':[], 'Dark': baseMap.darkTheme}, ['Map','Dark']);
+map.setOptions('Dark', {'Dark': baseMap.darkTheme});
 
 var infoPanel = infoPanel();
 var yearSelectPanel = yearSelectPanel();
@@ -630,14 +635,12 @@ submitButton.onClick(function() {
     .multiply(bandMulti[species]);
   
   var mapYr = ee.Number((sYear + eYear)/2).round();
+  mapYr = ee.Algorithms.If(mapYr.gt(2018),2018,mapYr);
   var lulcMapYr = getLULCmap(mapYr);
   
   // Display Maps:
-  map.clear(); map.setOptions('Map', {'Map':[], 'Dark':baseMap.darkTheme}, ['Map','Dark']);
+  map.clear(); map.setOptions('Dark', {'Dark': baseMap.darkTheme});
   map.add(emiLegend(speciesLabel, unitsLabel, maxVal, sYear, eYear));
-  
-  map.addLayer(ee.Image(1).clip(basisRegions).rename('Basis Regions'),
-    {palette: '#000000', opacity: 0.8}, 'Basis Regions');
     
   map.addLayer(lulcMapYr, {palette: lulc_colPal, min: 1, max: 7}, 'Land Use/Land Cover ' + mapYr.getInfo(), false);
   map.addLayer(peat.gt(0).selfMask(), {palette: ['#800080']}, 'Peatlands', false);

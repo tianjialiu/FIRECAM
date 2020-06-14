@@ -29,8 +29,13 @@ Annual TXT (with daily timesteps) can be downloaded [here](http://bai.acom.ucar.
 
 To standarize and break-up the annual TXT files into more manageable monthly TXT files, use the `FINN_txt_monthly.R` script under `code/preprocess/`. (Note that this pre-processing step is required to use the R code to process the FINN data.) The `FINNv1p5_scale_factors.csv` under `ancill/` converts FINN emissions to units of kg.
 
+FINNv1.5 flles for the most recent year can be downloaded from UCAR's ftp server (2019-present):
+```
+wget -m -np -nH --cut-dirs=3 -e robots=off -A gz  https://www.acom.ucar.edu/acresp/MODELING/finn_emis_txt
+```
+
 ### 3. GFASv1.2
-Monthly NetCDF files (with daily timesteps) can be downloaded from the ECWMF server. However, this process is very intensive and requires a lot of storage space, since each file (per species, per month) is not compressed at 347-384 MB. Several species can be downloaded together and saved to the same file, but I prefer to download each species as a separate file. Do not download all parameters to the same file, as ECMWF has a 30GB limit per request.
+Monthly NetCDF files (with daily timesteps) can be downloaded from the ECWMF server. However, this process is very intensive and requires a lot of storage space, since each file (per species, per month) is not compressed (347-384 MB). Several species can be downloaded together and saved to the same file, but I prefer to download each species as a separate file. Do not download all parameters to the same file, as ECMWF has a 30GB limit per request. After you download your files, running a simple netCDF compression for each file in a batch shell script (`nccopy -d1 originalfile.nc newfile.nc`) can drastically reduce the file size (to a ~3 MB!).
 
 You must first [register for a ECWMF account](https://apps.ecmwf.int/registration/). Then, install the ECMWF key and Python library following the instructions [here](https://confluence.ecmwf.int//display/WEBAPI/Access+ECMWF+Public+Datasets#AccessECMWFPublicDatasets-key).
 
@@ -56,6 +61,7 @@ Fire_raw/
             GFED4_Emission_Factors.txt
     FINNv1p5/
         monthly_txt/
+        nrt/
         ancill/
             FINNv1p5_scale_factors.csv
     GFASv1p2/

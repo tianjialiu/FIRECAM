@@ -190,7 +190,7 @@ exports.plotEmiTS = function(imageCol, regionShp,
       series: colPal
     });
 };
-
+          
 exports.updateOpts = function(emiTS, speciesLabel, timePeriod, dateFormat, 
   sYear, eYear, sMonth, eMonth) {
   

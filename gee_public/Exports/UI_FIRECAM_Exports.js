@@ -19,7 +19,7 @@
 // If you have your own shapefile, you can replace 'userShp' with
 // an EE feature below. Use .union() if you have a featureCollection.
 // You can also specify the name of your region with the
-// 'userShpName' variable.
+// 'userShpName' variable. Make sure you are on the 'Global' option.
 
 // By default, the map will not show the bounds of the region unless
 // you set showRegionOnMap to true
@@ -88,14 +88,14 @@ var getEmiByYr = firecam.getEmiByYr;
 
 // Generate output tables
 var getEmiTS = function(imageCol, regionShp, timeFormat) {
-  var emiTS = imageCol.toList(500,0)
+  var emiTS = imageCol
     .map(function(image) {
       var sumEmi = ee.Image(image).reduceRegions({
         collection: regionShp,
         reducer: ee.Reducer.sum().unweighted(),
         crs: crs,
         crsTransform: crsTrans
-      }).toList(1,0).get(0);
+      }).first();
       
       var date = ee.Date(ee.Image(image).get('system:time_start')).format(timeFormat);
       sumEmi = ee.Feature(sumEmi).set('Time',date);
@@ -133,11 +133,11 @@ var infoPanel = function() {
 var yearSelectPanel = function() {
   var timeRangeLabel = ui.Label('1) Select Time Range:', {margin: '8px 8px 8px 13px', fontSize: '14.5px'});
   var startYearLabel = ui.Label('Start Year:', {margin: '3px 20px 8px 29px', fontSize: '14.5px'});
-  var startYearSlider = ui.Slider({min: 2003, max: 2016, value: 2005, step: 1, style: {margin: '3px 8px 8px 14px'}});
+  var startYearSlider = ui.Slider({min: 2003, max: 2019, value: 2005, step: 1, style: {margin: '3px 8px 8px 14px'}});
   startYearSlider.style().set('stretch', 'horizontal');
   
   var endYearLabel = ui.Label('End Year:', {margin: '3px 20px 8px 29px', fontSize: '14.5px'});
-  var endYearSlider = ui.Slider({min: 2003, max: 2016, value: 2015, step: 1, style: {margin: '3px 8px 8px 14px'}});
+  var endYearSlider = ui.Slider({min: 2003, max: 2019, value: 2015, step: 1, style: {margin: '3px 8px 8px 14px'}});
   endYearSlider.style().set('stretch', 'horizontal');
   
   var changeSliderYr = function() {
@@ -311,7 +311,7 @@ submitButton.onClick(function() {
     regionName = 'Global';
     
     if (userShp) {
-      regionShp = userShp;
+      regionShp = getGridShp(userShp);
       regionName = userShpName;
     }
     

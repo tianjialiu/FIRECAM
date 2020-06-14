@@ -12,7 +12,7 @@
 // GFEDv4s emissions?
 
 // @author Tianjia Liu (tianjialiu@g.harvard.edu)
-// Last updated: January 21, 2019
+// Last updated: June 11, 2020
 
 // =================================================================
 // **********************   --    Code    --   *********************
@@ -333,7 +333,7 @@ var setDrawBounds = function(map) {
         map.layers().map(clearLayers);
       }
 
-      if (counter > 0) {map.remove(plotPanelParent)}
+      if (counter > 0) {plotPanel = plotPanel.clear()}
     }
   });
 
@@ -359,6 +359,7 @@ var getDrawGeometry = function(map, pos) {
 var speciesSelectPanel = function() {
   var speciesLabel = ui.Label('3) Select Species:', {padding: '5px 0px 0px 0px', fontSize: '14.5px'});
   var speciesSelect = ui.Select({items: speciesNames, value: 'CO2 - Carbon Dioxide', style: {stretch: 'horizontal'}});
+  
   return ui.Panel([speciesLabel, speciesSelect], ui.Panel.Layout.Flow('horizontal'), {stretch: 'horizontal'});
 };
 
@@ -430,12 +431,14 @@ var plotPanelLabel = ui.Label('Emissions Comparison with Old/New EFs',
 var addCharts = function(sYear, eYear, speciesLabel, regionShp, regionType) {
 
   // Retrieve emissions factors
+  // original GFEDv4s EFs, mostly from Akagi et al. 2011
   var EFs = ee.Image(EFlist[speciesLabel]).rename(LULC)
     .reproject({crs: crs, crsTransform: crsTrans});
   
+  // updated EFs from Andreae 2019
   var EFs_Andreae = ee.Image(EFlist_Andreae[speciesLabel]).rename(LULC)
     .reproject({crs: crs, crsTransform: crsTrans});
-    
+  
   var emiByMonth = getEmiByMonth(EFs, speciesLabel, sYear, eYear);
   var emiByYr = getEmiByYr(emiByMonth, sYear, eYear);
   
@@ -448,7 +451,6 @@ var addCharts = function(sYear, eYear, speciesLabel, regionShp, regionType) {
   var emiByYr_compMean = ee.Image(emiByYr_comp.mean());
   
   // Display Charts:
-  map.add(plotPanelParent);
   plotPanel = plotPanel.clear();
   
   var annualChart = plotEmiTS(emiByYr_comp, regionShp,
@@ -473,6 +475,23 @@ var addCharts = function(sYear, eYear, speciesLabel, regionShp, regionType) {
     {margin: '-3px 0px 13px 20px', fontSize: '13px', border: '1px solid black', padding: '3px'});
   
   plotPanel.add(perChangeLabel);
+  
+  var EFLabel = ui.Label('Emission Factors (g/kg)',
+    {margin: '3px 0px 5px 20px', fontSize: '16px', fontWeight: 'bold'});
+
+  var EFs_table = ee.FeatureCollection([
+    ee.Feature(null,{EFs:'Original'})
+      .set(ee.Dictionary.fromLists(LULC,ee.Array(EFlist[speciesLabel]).project([1]).toList())),
+    ee.Feature(null,{EFs:'Updated'})
+      .set(ee.Dictionary.fromLists(LULC,ee.Array(EFlist_Andreae[speciesLabel]).project([1]).toList()))
+  ]);
+  
+  var EFs_tableChart = ui.Panel(
+    ui.Chart.feature.byFeature(EFs_table,'EFs').setChartType('Table'),
+    ui.Panel.Layout.flow('horizontal'), {margin: '0px 5px 10px 13px'});
+  
+  plotPanel.add(EFLabel);
+  plotPanel.add(EFs_tableChart);
 };
 
 // -----------------------------------
@@ -493,14 +512,14 @@ var controlWrapper = ui.Panel({
 // Plot panel
 var plotPanel = ui.Panel(null, null, {stretch: 'horizontal'});
 var plotPanelParent = ui.Panel([plotPanelLabel, plotPanel], null,
-  {width: '450px', position: 'bottom-right'});
+  {maxWidth: '410px',padding: '5px 0px 8px 0px'});
 
 // Map panel
 var map = ui.Map();
 map.style().set({cursor:'crosshair'});
 map.setCenter(0,10,2);
 map.setControlVisibility({fullscreenControl: false});
-map.setOptions('Map', {'Dark': baseMap.darkTheme});
+map.setOptions('Dark', {'Dark': baseMap.darkTheme});
 
 var infoPanel = infoPanel();
 var yearSelectPanel = yearSelectPanel();
@@ -511,12 +530,16 @@ var speciesSelectPanel = speciesSelectPanel();
 
 // Display panels
 ui.root.clear();
-ui.root.add(map);
 
 controlPanel = controlPanel.add(infoPanel).add(yearSelectPanel).add(regionTypeSelectPanel)
   .add(regionSelectPanel).add(speciesSelectPanel).add(submitButton);
   
 map.add(controlWrapper);
+
+var init_panels = ui.SplitPanel({firstPanel: map,
+  secondPanel: plotPanelParent});
+
+ui.root.add(init_panels);
 
 // Run calculations, linked to submit button
 var counter = 0;
@@ -534,7 +557,7 @@ submitButton.onClick(function() {
   }
 
   // Clear map and panels
-  map.clear(); map.setOptions('Map', {'Dark': baseMap.darkTheme});
+  map.clear(); map.setOptions('Dark', {'Dark': baseMap.darkTheme});
   counter = counter + 1;
   
   // Input Parameters:
@@ -546,11 +569,12 @@ submitButton.onClick(function() {
   var speciesLong = getSpecies(speciesSelectPanel,1);
   var speciesLabel = speciesList[speciesLong];
 
-  // Default Map
+  // Default Map: DM emissions
   var display_sp = 'DM'; var unitsLabel = 'Mg'; var maxVal = 500;
   
   var EFs_display = ee.Image(EFlist[display_sp]).rename(LULC)
     .reproject({crs: crs, crsTransform: crsTrans});
+  
   var emiByMonth_display = getEmiByMonth(EFs_display, display_sp, sYear, eYear);
   var emiByYr_display = getEmiByYr(emiByMonth_display, sYear, eYear);
   var emiByYrMean_display = emiByYr_display.reduce(ee.Reducer.mean()).divide(1e6);
@@ -561,9 +585,6 @@ submitButton.onClick(function() {
   if (counter > 1) {controlPanel.remove(controlPanel.widgets().get(6))}
   map.add(controlWrapper); controlPanel.add(legendPanel);
   
-  map.addLayer(ee.Image(1).clip(basisRegions).rename('Basis Regions'),
-    {palette: '#000000', opacity: 0.8}, 'Basis Regions');
-    
   map.addLayer(emiByYrMean_display.select('Total.*').multiply(1e9).selfMask(),
     {palette: colPals.Spectral, min: 0, max: maxVal}, 'GFEDv4s');
 
@@ -624,7 +645,7 @@ submitButton.onClick(function() {
     regionSelectPanel.clear(); setDrawBounds(map);
     map.centerObject(regionShp);
     map.addLayer(ee.Image().byte().rename('Selected Region')
-     .paint(ee.FeatureCollection(regionShp), 0, 1), {palette: '#FF0000'}, 'Selected Region');
+    .paint(ee.FeatureCollection(regionShp), 0, 1), {palette: '#FF0000'}, 'Selected Region');
   }
 
   if (regionType == 'Global') {
@@ -649,6 +670,7 @@ submitButton.onClick(function() {
     }
   });
 
+    
   var plotSpeciesLabel = ui.Label('Change Plotted Species:', {margin: '5px 15px 8px 20px', fontSize: '14px'});
   var plotSpeciesPanel = ui.Panel([plotSpeciesLabel,speciesSelect], ui.Panel.Layout.Flow('horizontal'));
 

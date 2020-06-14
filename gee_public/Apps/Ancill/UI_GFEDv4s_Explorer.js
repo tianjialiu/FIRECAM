@@ -9,7 +9,7 @@
 // https://doi.org/10.5194/essd-9-697-2017
 
 // @author Tianjia Liu (tianjialiu@g.harvard.edu)
-// Last updated: January 21, 2019
+// Last updated: June 11, 2020
 
 // =================================================================
 // **********************   --    Code    --   *********************
@@ -490,7 +490,7 @@ var map = ui.Map();
 map.style().set({cursor:'crosshair'});
 map.setCenter(0,10,2);
 map.setControlVisibility({fullscreenControl: false});
-map.setOptions('Map', {'Dark': baseMap.darkTheme});
+map.setOptions('Dark', {'Dark': baseMap.darkTheme});
 
 var infoPanel = infoPanel();
 var yearSelectPanel = yearSelectPanel();
@@ -536,7 +536,7 @@ submitButton.onClick(function() {
   }
 
   // Clear map and panels
-  map.clear(); map.setOptions('Map', {'Dark': baseMap.darkTheme});
+  map.clear(); map.setOptions('Dark', {'Dark': baseMap.darkTheme});
   counter = counter + 1;
   
   // Input Parameters:
@@ -562,9 +562,6 @@ submitButton.onClick(function() {
   
   if (counter > 1) {controlPanel.remove(controlPanel.widgets().get(6))}
   map.add(controlWrapper); controlPanel.add(legendPanel);
-  
-  map.addLayer(ee.Image(1).clip(basisRegions).rename('Basis Regions'),
-    {palette: '#000000', opacity: 0.8}, 'Basis Regions');
     
   map.addLayer(emiByYrMean_display.select('Total.*').multiply(1e9).selfMask(),
     {palette: colPals.Spectral, min: 0, max: maxVal}, 'GFEDv4s');

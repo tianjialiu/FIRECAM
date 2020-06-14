@@ -9,7 +9,7 @@
 // https://github.com/tianjialiu/FIRECAM
 
 // @author Tianjia Liu (tianjialiu@g.harvard.edu)
-// Last updated: January 8, 2019
+// Last updated: April 21, 2020
 
 // Purpose: explore how the modeled impact of Indonesian fires
 // on smoke exposure in Equatorial Asia differs in using
@@ -96,10 +96,13 @@ var yearPanel = function() {
   var paperLabel = ui.Label('Citation: Liu et al. (2020, Remote Sens. Environ.)', {margin: '5px 0px 5px 8px', fontSize: '12.5px'}, 'https://doi.org/10.1016/j.rse.2019.111557');
   var githubRepoLabel = ui.Label('GitHub: Code/Info', {margin: '0px 0px 5px 8px', fontSize: '12.5px'}, 'https://github.com/tianjialiu/SMOKE-Policy-Tool');
 
+  var headDivider = ui.Panel(ui.Label(),ui.Panel.Layout.flow('horizontal'),
+    {margin: '10px 0px 5px 0px',height:'1.25px',border:'0.75px solid black',stretch:'horizontal'});
+ 
   var inputSectionLabel = ui.Label('Input Parameters', {margin: '8px 8px 5px 8px', fontWeight: 'bold', fontSize: '20px'});
   
   var inputYearLabel = ui.Label('1) Fire Emissions Year:', {fontSize: '14.5px'});
-  var inputYearSlider = ui.Slider({min: 2003, max: 2018, value: 2015, step: 1});
+  var inputYearSlider = ui.Slider({min: 2003, max: 2019, value: 2015, step: 1});
   inputYearSlider.style().set('stretch', 'horizontal');
   
   var metYearLabel = ui.Label('2) Meteorology Year:', {fontSize: '14.5px'});
@@ -119,7 +122,7 @@ var yearPanel = function() {
 
   return ui.Panel([
     policyToolLabel, ui.Panel([ui.Panel([infoLabel, websiteLabel],ui.Panel.Layout.Flow('vertical')),
-      paperLabel, githubRepoLabel],
+      paperLabel, githubRepoLabel, headDivider],
       ui.Panel.Layout.Flow('vertical'), {stretch: 'horizontal'}),
     inputSectionLabel,
     ui.Panel([inputYearLabel, inputYearSlider], ui.Panel.Layout.Flow('horizontal'), {stretch: 'horizontal'}),
@@ -222,8 +225,9 @@ var continuousLegend = function(controlPanel, title, colPal, minVal,
 };
 
 var legendPanel = function(controlPanel) {
-  controlPanel.add(ui.Label('----------------------------------------------------------------------------------',
-    {margin: '-6px 8px 12px 8px', stretch: 'horizontal', textAlign: 'center'}));
+  var footDivider = ui.Panel(ui.Label(),ui.Panel.Layout.flow('horizontal'),
+    {margin: '6px 0px 20px 0px',height:'1.25px',border:'0.75px solid black',stretch:'horizontal'});
+  controlPanel.add(footDivider);
   controlPanel.add(ui.Label('Legends', {fontWeight: 'bold', fontSize: '20px', margin: '-3px 8px 8px 15px'}));
   
   controlPanel.add(ui.Label('SMOKE Layers',
