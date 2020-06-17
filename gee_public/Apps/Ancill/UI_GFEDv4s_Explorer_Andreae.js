@@ -12,7 +12,7 @@
 // GFEDv4s emissions?
 
 // @author Tianjia Liu (tianjialiu@g.harvard.edu)
-// Last updated: June 11, 2020
+// Last updated: June 16, 2020
 
 // =================================================================
 // **********************   --    Code    --   *********************
@@ -175,7 +175,7 @@ var regionTypeSelectPanel = function(map) {
   var regionTypeSelect = ui.Select({items: ['Global', 'Basis Region', 'Country/ Sub-Region', 'Custom', 'Pixel', 'Draw'],
     value: 'Basis Region', style: {stretch: 'horizontal'},
     onChange: function(selected) {
-      regionSelectPanel.clear();
+      regionSelectPanel.clear(); map.unlisten();
       if (selected == 'Global') {}
       if (selected == 'Basis Region') {setRegionList(regionNames, 'EQAS - Equatorial Asia')}
       if (selected == 'Country/ Sub-Region') {setRegionList(countryNames, 'Indonesia')}
@@ -224,12 +224,9 @@ var setCoords = function(map, regionType) {
     ]);
 
   map.onClick(function(coords) {
-    regionType = getRegionType(regionTypeSelectPanel);
-    if (regionType == 'Pixel') {
-      regionSelectPanel.clear(); regionSelectPanel.add(coordsPanel);
-      regionSelectPanel.widgets().get(0).widgets().get(1).widgets().get(1).setValue(coords.lon);
-      regionSelectPanel.widgets().get(0).widgets().get(1).widgets().get(3).setValue(coords.lat);
-    }
+    regionSelectPanel.clear(); regionSelectPanel.add(coordsPanel);
+    regionSelectPanel.widgets().get(0).widgets().get(1).widgets().get(1).setValue(coords.lon);
+    regionSelectPanel.widgets().get(0).widgets().get(1).widgets().get(3).setValue(coords.lat);
   });
   
   return regionSelectPanel.add(coordsPanel);
@@ -261,13 +258,11 @@ var setBounds = function(map, regionType) {
     ]);
     
   map.onClick(function(coords) {
-    if (regionType == 'Custom') {
-      regionSelectPanel.clear(); regionSelectPanel.add(boundsPanel);
-      var cursorBounds = ee.String('Print lon/lat coordinates of cursor: [' +
-        ee.Number(coords.lon).format('%.2f').getInfo() +
-        ', ' + ee.Number(coords.lat).format('%.2f').getInfo() + ']').getInfo();
-      regionSelectPanel.widgets().get(0).widgets().get(2).setValue(cursorBounds);
-    }
+    regionSelectPanel.clear(); regionSelectPanel.add(boundsPanel);
+    var cursorBounds = ee.String('Print lon/lat coordinates of cursor: [' +
+      ee.Number(coords.lon).format('%.2f').getInfo() +
+      ', ' + ee.Number(coords.lat).format('%.2f').getInfo() + ']').getInfo();
+    regionSelectPanel.widgets().get(0).widgets().get(2).setValue(cursorBounds);
   });
   
   return regionSelectPanel.add(boundsPanel);
@@ -610,12 +605,9 @@ submitButton.onClick(function() {
   if (regionType == 'Pixel') {
     var coordsPanel = regionSelectPanel.widgets().get(0);
       map.onClick(function(coords) {
-        regionType = getRegionType(regionTypeSelectPanel);
-        if (regionType == 'Pixel') {
-          regionSelectPanel.clear(); regionSelectPanel.add(coordsPanel);
-          regionSelectPanel.widgets().get(0).widgets().get(1).widgets().get(1).setValue(coords.lon);
-          regionSelectPanel.widgets().get(0).widgets().get(1).widgets().get(3).setValue(coords.lat);
-        }
+        regionSelectPanel.clear(); regionSelectPanel.add(coordsPanel);
+        regionSelectPanel.widgets().get(0).widgets().get(1).widgets().get(1).setValue(coords.lon);
+        regionSelectPanel.widgets().get(0).widgets().get(1).widgets().get(3).setValue(coords.lat);
       });
       
     regionShp = getGridShp(getCoords(regionSelectPanel));
@@ -627,12 +619,9 @@ submitButton.onClick(function() {
   if (regionType == 'Custom') {
     var boundsPanel = regionSelectPanel.widgets().get(0);
     map.onClick(function(coords) {
-      regionType = getRegionType(regionTypeSelectPanel);
-      if (regionType == 'Custom') {
-        regionSelectPanel.clear(); regionSelectPanel.add(boundsPanel);
-        var cursorBounds = cursorBoundsText(coords);
-        regionSelectPanel.widgets().get(0).widgets().get(2).setValue(cursorBounds);
-      }
+      regionSelectPanel.clear(); regionSelectPanel.add(boundsPanel);
+      var cursorBounds = cursorBoundsText(coords);
+      regionSelectPanel.widgets().get(0).widgets().get(2).setValue(cursorBounds);
     });
     regionShp = getGridShp(getBounds(regionSelectPanel));
     
