@@ -9,7 +9,7 @@
 // https://doi.org/10.5194/essd-9-697-2017
 
 // @author Tianjia Liu (tianjialiu@g.harvard.edu)
-// Last updated: June 16, 2020
+// Last updated: June 24, 2020
 
 // =================================================================
 // **********************   --    Code    --   *********************
@@ -174,8 +174,8 @@ var regionTypeSelectPanel = function(map) {
       if (selected == 'Global') {}
       if (selected == 'Basis Region') {setRegionList(regionNames, 'EQAS - Equatorial Asia')}
       if (selected == 'Country/ Sub-Region') {setRegionList(countryNames, 'Indonesia')}
-      if (selected == 'Pixel') {setCoords(map, selected)}
-      if (selected == 'Custom') {setBounds(map, selected)}
+      if (selected == 'Pixel') {setCoords(map)}
+      if (selected == 'Custom') {setBounds(map)}
       if (selected == 'Draw') {setDrawBounds(map)}
     }
   });
@@ -200,8 +200,7 @@ var setRegionList = function(shpNames, defaultName) {
       {stretch: 'horizontal', margin: '-8px 0px 0px 0px'}));
 };
 
-var setCoords = function(map, regionType) {
-  if (regionType == 'Pixel') {
+var setCoords = function(map) {
   var coordsLabel = ui.Label('Enter lon/lat below or click on map to update coordinates',
     {margin: '3px 8px 6px 23px', fontSize: '11.5px'});
 
@@ -222,10 +221,9 @@ var setCoords = function(map, regionType) {
     regionSelectPanel.clear(); regionSelectPanel.add(coordsPanel);
     regionSelectPanel.widgets().get(0).widgets().get(1).widgets().get(1).setValue(coords.lon);
     regionSelectPanel.widgets().get(0).widgets().get(1).widgets().get(3).setValue(coords.lat);
-});
+  });
   
   return regionSelectPanel.add(coordsPanel);
-  }
 };
     
 var getCoords = function(regionSelectPanel) {
@@ -235,8 +233,7 @@ var getCoords = function(regionSelectPanel) {
   return ee.Geometry.Point(lon,lat);
 };
 
-var setBounds = function(map, regionType) {
-  if (regionType == 'Custom') {
+var setBounds = function(map) {
   var boundsLabel = ui.Label('Enter custom bounds as an array of lon/lat coordinates',
     {margin: '3px 8px 6px 23px', fontSize: '11.5px'});
 
@@ -261,7 +258,6 @@ var setBounds = function(map, regionType) {
   });
   
   return regionSelectPanel.add(boundsPanel);
-  }
 };
 
 var cursorBoundsText = function(coords) {
