@@ -243,8 +243,58 @@ var getEmiByYr = function(emiByMonth, sYear, eYear) {
   return ee.ImageCollection(emiByYr);
 };
 
+
+// Calculate emissions of input species by day in kg/ grid cell
+var getEmiByDay = function(EFs, varType, inYear) {
+  
+  var filterYr = ee.Filter.calendarRange(inYear, inYear, 'year');
+  var invCol_Yrs = invCol.filter(filterYr);
+  
+  var emiByDay = invCol_Yrs.map(function(gfedMon) {
+   
+    var dailyFrac = gfedMon.select(['Day.*']);
+    var inMonth = gfedMon.date().get('month');
+    
+    if (varType == 'BA') {
+      var BAfrac = gfedMon.select('burned_fraction');
+      
+      var BA = BAfrac.multiply(gridArea).divide(1e6).divide(1e3)
+        .rename(['BA']);
+          
+      var BAday = BA.multiply(dailyFrac)
+        .reproject({crs: crs, crsTransform: crsTrans});
+        
+      return BAday;
+    } else {
+      var DM = gfedMon.select('DM'); // kg per m2
+      var DMfrac = gfedMon.select('DM_.*'); // fraction
+      var sp = DM.multiply(DMfrac).multiply(EFs).multiply(gridArea)
+        .multiply(1e-12); // Tg per grid cell
+      
+      var spTotal = sp.reduce(ee.Reducer.sum());
+    
+      var emiDay = spTotal.multiply(dailyFrac)
+        .reproject({crs: crs, crsTransform: crsTrans});
+    
+      return emiDay;
+    }
+  });
+  
+  emiByDay = ee.ImageCollection(emiByDay).toBands();
+  var nDays = emiByDay.bandNames().length();
+  var firstDay = ee.Date.fromYMD(inYear,1,1);
+  emiByDay = ee.ImageCollection(ee.List.sequence(0,nDays.subtract(1),1)
+    .map(function(iDay) {
+      return emiByDay.select([iDay]).rename('Total')
+        .set('system:time_start',firstDay.advance(iDay,'day').millis());
+    }));
+      
+  return emiByDay;
+};
+
 exports.getEmiByMonth = getEmiByMonth;
 exports.getEmiByYr = getEmiByYr;
+exports.getEmiByDay = getEmiByDay;
 
 // ---------------------
 // Reducers and Charts |
@@ -393,6 +443,57 @@ exports.updateOpts = function(emiTS, speciesLabel, timePeriod, dateFormat,
       series: colPalseries
     });
   }
+};
+
+exports.plotEmiTSday = function(imageCol, inYear, regionShp, speciesLabel) {
+  
+  if (speciesLabel == 'BA') {
+    return ui.Chart.image.series({
+      imageCollection: imageCol,
+      region: regionShp,
+      reducer: ee.Reducer.sum().unweighted(),
+      scale: scale,
+      xProperty: 'system:time_start',
+    }).setChartType('LineChart')
+      .setSeriesNames(['BA'])
+      .setOptions({
+        title: 'Daily Burned Area (' + inYear + ')',
+        titleTextStyle: {fontSize: '13.5'},
+        vAxis: {
+          title: 'Burned Area (sq. km, thousands)',
+          format: '####.#'
+        },
+        hAxis: {
+          format: 'MMM-dd',
+        },
+        legend: {position: 'none'},
+        height: '230px',
+        series: {0: {color: '000000', lineWidth: 1.75}}
+      });
+  } else {
+    return ui.Chart.image.series({
+      imageCollection: imageCol,
+      region: regionShp,
+      reducer: ee.Reducer.sum().unweighted(),
+      scale: scale,
+      xProperty: 'system:time_start',
+    }).setChartType('LineChart')
+      .setSeriesNames(['Total'])
+      .setOptions({
+        title: 'Daily Fire Emissions (' + inYear + ')',
+        titleTextStyle: {fontSize: '13.5'},
+        vAxis: {
+          title: 'Emissions (Tg ' + speciesLabel + ')',
+          format: '####.#'
+        },
+        hAxis: {
+          format: 'MMM-dd'
+        },
+        legend: {position: 'none'},
+        height: '230px',
+        series: {0: {color: '000000', lineWidth: 1.75}}
+      });
+    }
 };
 
 

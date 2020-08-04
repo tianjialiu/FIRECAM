@@ -9,7 +9,7 @@
 // https://doi.org/10.5194/essd-9-697-2017
 
 // @author Tianjia Liu (tianjialiu@g.harvard.edu)
-// Last updated: June 24, 2020
+// Last updated: July 26, 2020
 
 // =================================================================
 // **********************   --    Code    --   *********************
@@ -62,6 +62,9 @@ var getEmiByMonth = gfed4_params.getEmiByMonth;
 // Calculate emissions of input species by year in kg/ grid cell
 var getEmiByYr = gfed4_params.getEmiByYr;
 
+// Calculate emissions of input species by day in kg/ grid cell
+var getEmiByDay = gfed4_params.getEmiByDay;
+
 // ---------------------
 // Reducers and Charts |
 // ---------------------
@@ -73,6 +76,7 @@ var getGridShp = gfed4_params.getGridShp;
 
 // Charts
 var plotEmiTS = gfed4_params.plotEmiTS;
+var plotEmiTSday = gfed4_params.plotEmiTSday;
 var updateOpts = gfed4_params.updateOpts;
 
 // =================================================================
@@ -427,6 +431,7 @@ var addCharts = function(sYear, eYear, speciesLabel, regionShp, regionType) {
 
   var emiByMonth = getEmiByMonth(EFs, speciesLabel, sYear, eYear);
   var emiByYr = getEmiByYr(emiByMonth, sYear, eYear);
+  var emiByDay = getEmiByDay(EFs, speciesLabel, eYear);
   
   // Display Charts:
   if (speciesLabel == 'BA') {
@@ -451,9 +456,13 @@ var addCharts = function(sYear, eYear, speciesLabel, regionShp, regionType) {
   
   var monthlyChart = plotEmiTS(emiByMonth, regionShp,
     speciesLabel, 'Monthly', 'MMM Y', sYear, eYear, 1, 12);
+  var dailyChart = plotEmiTSday(emiByDay, eYear, regionShp, speciesLabel);
+    
   if (regionType != 'Global' | eYear-sYear === 0) {
-    plotPanel.add(monthlyChart);
+    plotPanel.add(monthlyChart); plotPanel.add(ui.Label('', {margin: '-25px 8px 8px'}));
+    plotPanel.add(dailyChart); plotPanel.add(ui.Label('', {margin: '-25px 8px 8px'}));
   }
+  
 };
 
 // -----------------------------------
@@ -474,7 +483,7 @@ var controlWrapper = ui.Panel({
 // Plot panel
 var plotPanel = ui.Panel(null, null, {stretch: 'horizontal'});
 var plotPanelParent = ui.Panel([plotPanelLabel, plotPanel], null,
-  {width: '450px', position: 'bottom-right'});
+  {width: '450px', height: '80%', position: 'bottom-right'});
 
 // Map panel
 var map = ui.Map();
@@ -618,6 +627,42 @@ submitButton.onClick(function() {
 
   addCharts(sYear, eYear, speciesLabel, regionShp, regionType);
   
+  var getDailyYrPanel = function() {
+    var dailyYrSlider = ui.Slider({
+      min: sYear,
+      max: eYear,
+      value: eYear,
+      step: 1,
+      onChange: function(inYear) {
+        plotPanel.remove(plotPanel.widgets().get(4));
+        speciesLong = getSpecies(plotSpeciesPanel);
+        speciesLabel = speciesList[speciesLong];
+        var EFs = ee.Image(EFlist[speciesLabel]).rename(LULC)
+          .reproject({crs: crs, crsTransform: crsTrans});
+        var emiByDay = getEmiByDay(EFs, speciesLabel, inYear);
+        var dailyChart = plotEmiTSday(emiByDay, inYear, regionShp, speciesLabel);
+        plotPanel.insert(4,dailyChart);
+      },
+      style: {
+        margin: '5px 75px 8px 5px',
+        stretch: 'horizontal'
+      }
+    });
+  
+    var dailyYrLabel = ui.Label('Change Plotted Year:', {margin: '5px 15px 8px 20px', fontSize: '14px'});
+    var dailyYrPanel = ui.Panel([dailyYrLabel,dailyYrSlider], ui.Panel.Layout.Flow('horizontal'));
+
+    return dailyYrPanel;
+  };
+
+  var plotOptsDivider = ui.Panel(ui.Label(),ui.Panel.Layout.flow('horizontal'),
+    {margin: '10px 0px 15px 0px',height:'1px',border:'0.5px solid black',stretch:'horizontal'});
+
+  if (regionType != 'Global' & eYear > sYear) {
+    plotPanel.add(getDailyYrPanel());
+    plotPanel.add(plotOptsDivider);
+  }
+  
   var getPlotSpeciesPanel = function(eYear) {
     var speciesSelect = ui.Select({
       items: getSpeciesList(eYear),
@@ -627,6 +672,10 @@ submitButton.onClick(function() {
         speciesLong = getSpecies(plotSpeciesPanel);
         speciesLabel = speciesList[speciesLong];
         addCharts(sYear, eYear, speciesLabel, regionShp, regionType);
+        if (regionType != 'Global') {
+          plotPanel.add(getDailyYrPanel());
+          plotPanel.add(plotOptsDivider);
+        }
         plotPanel.add(plotSpeciesPanel);
       },
       style: {
@@ -640,8 +689,8 @@ submitButton.onClick(function() {
 
     return plotSpeciesPanel;
   };
-  
+ 
   var plotSpeciesPanel = getPlotSpeciesPanel(eYear);
   plotPanel.add(plotSpeciesPanel);
-
+  
 });

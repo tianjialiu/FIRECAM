@@ -18,6 +18,7 @@ FIRECAM can be accessed through (1) Earth Engine Apps and (2) the Google Earth E
 * [GFEDv4s Animated Burned Area](https://globalfires.earthengine.app/view/gfedv4s-monthly-ba-animated): Visualize the seasonality of GFEDv4s burned area. 
     - *Note*: GFEDv4s BA is averaged into monthly means. Please wait until all the images load (check the layer list in the upper-right hand corner of the map) before clicking 'Play.'
 * [GFEDv4s Explorer, with Andreae (2019) EFs](https://globalfires.earthengine.app/view/gfedv4s-andreae-2019-efs): How much does the [Andreae (2019, ACP)](https://www.atmos-chem-phys.net/19/8523/2019/acp-19-8523-2019.html) emissions factors updates impact GFEDv4s emissions?
+* [FIRMS Explorer](https://globalfires.earthengine.app/view/firms): Plot daily timeseries of near-real-time active fire counts from FIRMS/MODIS by region
 
 ## FIRECAM App
 (*Earth Engine Apps, no Google Earth Engine account required*)
@@ -70,6 +71,9 @@ The repository should then appear in the top-left panel under 'Reader' as 'users
 Click the 'Apps/UI_FIRECAM.js' script in the 'users/tl2581/FIRECAM' repository. The script should appear in the code editor. Click 'Run' in the top-right corner of the code editor to activate the user interface. The repository also contains a script to export monthly and annual timeseries data ('Exports/UI_FIRECAM_Exports.js').
 
 ## Updates
+* August 2020: added FIRMS ancillary app
+* July 2020: added daily timeseries for GFEDv4s app
+* April 2020: updated FIRECAM and SMOKE-FIRECAM apps with 2019 emissions
 * January 2020: updated ancillary GFEDv4s apps with preliminary 2019 emissions
 * October 2019: fixed FIRECAM emissions layers with 0.5° x 0.5° reprojection, updated FINNv1.5 emissions for 2016 with revised files from NCAR, added 2017-2018 emissions for all inventories; updated FIRECAM exports to allow user-defined polygons; added SMOKE-FIRECAM Tool
 * September 2019: added "Draw" option to FIRECAM and GFEDv4s apps; added GFEDv4s monthly averaged burned area animation and GFEDv4s with Andreae (2019) EFs ancillary apps

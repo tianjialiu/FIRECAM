@@ -132,8 +132,8 @@ var getYears = function(yearSelectPanel) {
 // -----------------
 // Submit Buttons
 // -----------------
-var playButton = ui.Button({label: 'Play',  style: {stretch: 'horizontal'}});
-var stopButton = ui.Button({label: 'Stop',  style: {stretch: 'horizontal'}});
+var playButton = ui.Button({label: '▶ ️️️Play',  style: {stretch: 'horizontal'}});
+var stopButton = ui.Button({label: '🛑 Stop',  style: {stretch: 'horizontal'}});
 var loadButton = ui.Button({label: 'Load Images',  style: {stretch: 'horizontal'}});
 
 var waitMessage = ui.Label('Please wait until all images are fully loaded before initializing animation.',
