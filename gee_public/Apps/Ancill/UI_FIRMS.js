@@ -1,17 +1,6 @@
 /**** Start of imports. If edited, may not auto-convert in the playground. ****/
 var firms = ee.ImageCollection("FIRMS"),
-    geometry = 
-    /* color: #f5f5f5 */
-    /* displayProperties: [
-      {
-        "type": "rectangle"
-      }
-    ] */
-    ee.Geometry.Polygon(
-        [[[17.764030566055794, 9.004885763150753],
-          [17.764030566055794, 5.080438986378634],
-          [24.619499316055794, 5.080438986378634],
-          [24.619499316055794, 9.004885763150753]]], null, false);
+    geometry = /* color: #bebebe */ee.Geometry.MultiPoint();
 /***** End of imports. If edited, may not auto-convert in the playground. *****/
 // *****************************************************************
 // =================================================================
@@ -21,7 +10,7 @@ var firms = ee.ImageCollection("FIRMS"),
 /*
 // Documentation: https://github.com/tianjialiu/FIRECAM
 // @author Tianjia Liu (tianjialiu@g.harvard.edu)
-// Last updated: August 4, 2020
+// Last updated: August 6, 2020
 
 // Purpose: plot timeseries of MODIS/FIRMS active fire counts
 // by region and day of year, across years
@@ -38,6 +27,7 @@ var firms = ee.ImageCollection("FIRMS"),
 var baseMap = require('users/tl2581/packages:baseMap.js');
 Map.drawingTools().setShown(false);
 Map.setOptions('Map', {'Dark': baseMap.darkTheme});
+Map.setCenter(20,10,4);
 
 // Define symbols for the labels.
 var symbol = {
@@ -128,7 +118,7 @@ while (nLayers > 0) {
 // Initialize a dummy GeometryLayer with null geometry acts as a placeholder
 // for drawn geometries.
 var dummyGeometry = ui.Map.GeometryLayer({
-  geometries: null, name: 'geometry', color: 'F5F5F5'});
+  geometries: null, name: 'geometry', color: 'BEBEBE'});
 
 // Add the dummy geometry as a layer of the drawing tools widget.
 drawingTools.layers().add(dummyGeometry);

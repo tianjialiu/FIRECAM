@@ -247,8 +247,8 @@ exports.plotEmiBar = function(imageCol, regionShp,
     }).setChartType('ColumnChart');
 };
 
-exports.plotEmiBarSD = function(imageCol, regionShp,
-  speciesLabel, timePeriod, sYear, eYear) {
+exports.plotEmiBarInt = function(imageCol, regionShp,
+  speciesLabel, timePeriod, sYear, eYear, plotPanel) {
   
   var invOrder = {
     0:'GFEDv4s',
@@ -258,9 +258,9 @@ exports.plotEmiBarSD = function(imageCol, regionShp,
     4:'FEERv1p0_G1p2'
   };
   
-  var emiByYearRegion = ee.FeatureCollection(imageCol.toList(500,0)
-    .map(function(x) {
-      var sumRegion = ee.Image(x).reduceRegions({
+  var emiByYearRegion = ee.FeatureCollection(imageCol
+    .map(function(image) {
+      var sumRegion = image.reduceRegions({
         collection: regionShp,
         reducer: ee.Reducer.sum().unweighted(),
         scale: aggProj.nominalScale(),
@@ -275,73 +275,50 @@ exports.plotEmiBarSD = function(imageCol, regionShp,
 
     return [tot_mean, tot_min, tot_max];
   };
- 
-  var inDate = 'Date(' + sYear + ',0)';
-  var dataTable = {
-    cols: [{id: 'Date', label: 'Date', type: 'date'}],
-    rows: []
-  };
-
-  var i = 1;
-  invNames.forEach(function(invName) {
-    dataTable.cols[i++] = {
-      type: 'number',
-      id: invName,
-      label: invName,
-    };
-    dataTable.cols[i++] = {
-      type: 'number',
-      id: invName + '_range',
-      label: invName + '_range',
-      role: 'interval'
-    };
-    dataTable.cols[i++] = {
-      type: 'number',
-      id: invName + '_range',
-      label: invName + '_range',
-      role: 'interval'
-    };
-  });
-
+  
+  var dataTable = [null];
+  
   var invNum = [0,1,2,3,4];
   invNum.forEach(function(inv) {
     var summInv = getStats(invNames[inv]);
-    dataTable.rows[inv] = {c:{0:{v:inDate}}};
-    dataTable.rows[inv].c[inv*3+1] = {v:summInv[0].getInfo()};
-    dataTable.rows[inv].c[inv*3+2] = {v:summInv[1].getInfo()};
-    dataTable.rows[inv].c[inv*3+3] = {v:summInv[2].getInfo()};
+    dataTable[inv*3+1] = summInv[0];
+    dataTable[inv*3+2] = summInv[1];
+    dataTable[inv*3+3] = summInv[2];
   });
   
-  var avg_chart = ui.Chart(dataTable)
-    .setChartType('ColumnChart')
-    .setSeriesNames('GFEDv4s',0)
-    .setSeriesNames('FINNv1.5',3)
-    .setSeriesNames('GFASv1.2',6)
-    .setSeriesNames('QFEDv2.5r1',9)
-    .setSeriesNames('FEERv1.0-G1.2',12)
-    .setOptions({
-      title: 'Average ' + timePeriod + ' Fire Emissions (' + sYear + '-' + eYear + ')',
-      titleTextStyle: {fontSize: '13.5'},
-      vAxis: {
-        title: 'Emissions (Tg ' + speciesLabel + ')',
-        titleTextStyle: {fontSize: '12'},
-        format: '####.#'
-      },
-      hAxis: {
-        format:' ',
-        viewWindowMode:'explicit',
-        viewWindow: {
-          min: ee.Date.fromYMD(sYear,1,1).advance(-1,'month').millis().getInfo(),
-          max: ee.Date.fromYMD(sYear,1,1).advance(1,'month').millis().getInfo()
-        }
-      },
-      series: colPal,
-      height: '230px'
+  var colNames = ee.List([[
+    {label: 'Inventory', type: 'string'},
+    {label: 'GFEDv4s'}, {id: 'p25', role: 'interval'}, {id: 'p75', role: 'interval'},
+    {label: 'FINNv1.5'}, {id: 'p25', role: 'interval'}, {id: 'p75', role: 'interval'},
+    {label: 'GFASv1.2'}, {id: 'p25', role: 'interval'}, {id: 'p75', role: 'interval'},
+    {label: 'QFEDv2.5r1'}, {id: 'p25', role: 'interval'}, {id: 'p75', role: 'interval'},
+    {label: 'FEERv1.0-G1.2'}, {id: 'p25', role: 'interval'}, {id: 'p75', role: 'interval'}
+  ]]);
+
+  dataTable = colNames.cat([dataTable]);
+
+  dataTable.evaluate(function(dataTable) {
+    var avg_chart = ui.Chart(dataTable)
+      .setChartType('ColumnChart')
+      .setOptions({
+        title: 'Average ' + timePeriod + ' Fire Emissions (' + sYear + '-' + eYear + ')',
+        titleTextStyle: {fontSize: '13.5'},
+        vAxis: {
+          title: 'Emissions (Tg ' + speciesLabel + ')',
+          titleTextStyle: {fontSize: '12'},
+          format: '####.#'
+        },
+        hAxis: {
+          format:' ',
+          viewWindowMode:'explicit',
+        },
+        series: colPal,
+        height: '230px'
+    });
+    plotPanel.insert(0,avg_chart);
   });
-  
-  return avg_chart;
-  
 };
+
 
 // ------------------------------
 // - - - - - - LULC - - - - - - |

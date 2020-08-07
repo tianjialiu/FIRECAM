@@ -6,7 +6,7 @@
 /*
 // Documentation: https://github.com/tianjialiu/FIRECAM
 // @author Tianjia Liu (tianjialiu@g.harvard.edu)
-// Last updated: June 24, 2020
+// Last updated: August 6, 2020
 
 // Purpose: explore regional differences in fire emissions from five
 // global fire emissions inventories (GFED, FINN, GFAS, QFED, FEER)
@@ -84,7 +84,7 @@ var getEmiByYr = firecam.getEmiByYr;
 var plotEmiTS = firecam.plotEmiTS;
 var updateOpts = firecam.updateOpts;
 var plotEmiBar = firecam.plotEmiBar;
-var plotEmiBarSD = firecam.plotEmiBarSD;
+var plotEmiBarInt = firecam.plotEmiBarInt;
 
 // MODIS MCD12Q1 aggregated LULC
 // based on FINNv1.0 delineation
@@ -717,14 +717,14 @@ submitButton.onClick(function() {
     items: ['Mean Only','Mean [Min, Max]'],
     value: 'Mean Only',
     onChange: function(selected) {
-      plotPanel.remove(totalChart);
+      plotPanel.remove(plotPanel.widgets().get(0));
       if (selected == 'Mean Only') {
         totalChart = plotEmiBar(emiByYrMean, regionShp, species, 'Annual', sYear, eYear);
+        plotPanel.insert(0,totalChart);
       }
       if (selected == 'Mean [Min, Max]') {
-        totalChart = plotEmiBarSD(emiByYr, regionShp, species, 'Annual', sYear, eYear);
+        plotEmiBarInt(emiByYr, regionShp, species, 'Annual', sYear, eYear, plotPanel);
       }
-      plotPanel.insert(0,totalChart);
     },
     style: {
       margin: '0px 75px 8px 5px',
