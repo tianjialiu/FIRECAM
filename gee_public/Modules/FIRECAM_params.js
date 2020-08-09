@@ -100,7 +100,8 @@ exports.aggProj = aggProj;
 // Reducers and Charts |
 // ---------------------
 exports.getRegionShp = function(basisID) {
-  return basisRegions.filterMetadata('basis','equals',basisID);
+  return basisRegions.filterMetadata('basis','equals',basisID)
+    .geometry();
 };
 
 exports.globalShp = basisRegions.geometry().bounds();
@@ -109,13 +110,15 @@ exports.getCountryShp = function(region) {
   return ee.Image(1).clip(ee.FeatureCollection('USDOS/LSIB_SIMPLE/2017')
     .filter(ee.Filter.eq('country_na',region)))
     .reproject({crs: crs, crsTransform: crsTrans}).gt(0)
-    .reduceToVectors({geometry: basisRegions.union()});
+    .reduceToVectors({geometry: basisRegions.union()})
+    .geometry();
 };
 
 exports.getGridShp = function(region) {
   return ee.Image(1).clip(region)
     .reproject({crs: crs, crsTransform: crsTrans}).gt(0)
-    .reduceToVectors({geometry: basisRegions.union()});
+    .reduceToVectors({geometry: basisRegions.union()})
+    .geometry();
 };
 
 exports.getEmiByMonth = function(species, sYear, eYear) {
