@@ -106,12 +106,10 @@ exports.getRegionShp = function(basisID) {
 
 exports.globalShp = basisRegions.geometry().bounds();
 
+var lsib_0p5deg = ee.FeatureCollection(projFolder + 'ADM_shp/LSIB_basis_0p5deg');
 exports.getCountryShp = function(region) {
-  return ee.Image(1).clip(ee.FeatureCollection('USDOS/LSIB_SIMPLE/2017')
-    .filter(ee.Filter.eq('country_na',region)))
-    .reproject({crs: crs, crsTransform: crsTrans}).gt(0)
-    .reduceToVectors({geometry: basisRegions.union()})
-    .geometry();
+  return lsib_0p5deg.filter(ee.Filter.eq('country_na',region))
+    .first().geometry();
 };
 
 exports.getGridShp = function(region) {
