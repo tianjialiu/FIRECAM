@@ -352,7 +352,7 @@ exports.plotEmiTS = function(imageCol, regionShp,
         titleTextStyle: {fontSize: '13.5'},
         vAxis: {
           title: 'Burned Area (sq. km, thousands)',
-          format: '####.#'
+          format: '####.###########'
         },
         hAxis: {
           format: dateFormat, 
@@ -379,7 +379,7 @@ exports.plotEmiTS = function(imageCol, regionShp,
         titleTextStyle: {fontSize: '13.5'},
         vAxis: {
           title: 'Emissions (Tg ' + speciesLabel + ')',
-          format: '####.#'
+          format: '####.###########'
         },
         hAxis: {
           format: dateFormat, 
@@ -407,7 +407,7 @@ exports.updateOpts = function(emiTS, speciesLabel, timePeriod, dateFormat,
       titleTextStyle: {fontSize: '13.5'},
       vAxis: {
         title: 'Burned Area (sq. km)',
-        format: '####.#'
+        format: '####.###########'
       },
       hAxis: {
         format: dateFormat, 
@@ -428,7 +428,7 @@ exports.updateOpts = function(emiTS, speciesLabel, timePeriod, dateFormat,
       titleTextStyle: {fontSize: '13.5'},
       vAxis: {
         title: 'Emissions (Tg ' + speciesLabel + ')',
-        format: '####.#'
+        format: '####.###########'
       },
       hAxis: {
         format: dateFormat, 
@@ -462,7 +462,7 @@ exports.plotEmiTSday = function(imageCol, inYear, regionShp, speciesLabel) {
         titleTextStyle: {fontSize: '13.5'},
         vAxis: {
           title: 'Burned Area (sq. km, thousands)',
-          format: '####.#'
+          format: '####.###########'
         },
         hAxis: {
           format: 'MMM-dd',
@@ -485,7 +485,7 @@ exports.plotEmiTSday = function(imageCol, inYear, regionShp, speciesLabel) {
         titleTextStyle: {fontSize: '13.5'},
         vAxis: {
           title: 'Emissions (Tg ' + speciesLabel + ')',
-          format: '####.#'
+          format: '####.###########'
         },
         hAxis: {
           format: 'MMM-dd'
@@ -573,7 +573,7 @@ exports.plotEmiTS_Andreae = function(imageCol,
       titleTextStyle: {fontSize: '13.5'},
       vAxis: {
         title: 'Emissions (Tg ' + speciesLabel + ')',
-        format: '####.#'
+        format: '####.###########'
       },
       hAxis: {
         format: dateFormat, 
@@ -599,7 +599,7 @@ exports.updateOpts_Andreae = function(emiTS, speciesLabel, timePeriod, dateForma
     titleTextStyle: {fontSize: '13.5'},
     vAxis: {
       title: 'Emissions (Tg ' + speciesLabel + ')',
-      format: '####.#'
+      format: '####.###########'
     },
     hAxis: {
       format: dateFormat, 
@@ -633,7 +633,7 @@ exports.plotCompTS = function(imageCol_mean, speciesLabel, regionShp) {
       vAxis: {
         textPosition: 'none',
         title: 'Emissions (Tg ' + speciesLabel + ')',
-        format: '####.#'
+        format: '####.###########'
       },
       hAxis: {
         viewWindowMode: 'explicit',

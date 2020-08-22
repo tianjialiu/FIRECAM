@@ -9,7 +9,7 @@
 // https://doi.org/10.5194/essd-9-697-2017
 
 // @author Tianjia Liu (tianjialiu@g.harvard.edu)
-// Last updated: July 26, 2020
+// Last updated: August 21, 2020
 
 // =================================================================
 // **********************   --    Code    --   *********************
@@ -456,11 +456,15 @@ var addCharts = function(sYear, eYear, speciesLabel, regionShp, regionType) {
   
   var monthlyChart = plotEmiTS(emiByMonth, regionShp,
     speciesLabel, 'Monthly', 'MMM Y', sYear, eYear, 1, 12);
-  var dailyChart = plotEmiTSday(emiByDay, eYear, regionShp, speciesLabel);
     
   if (regionType != 'Global' | eYear-sYear === 0) {
-    plotPanel.add(monthlyChart); plotPanel.add(ui.Label('', {margin: '-25px 8px 8px'}));
-    plotPanel.add(dailyChart); plotPanel.add(ui.Label('', {margin: '-25px 8px 8px'}));
+    plotPanel.add(monthlyChart);
+    if (eYear >= 2003) {
+      var dailyChart = plotEmiTSday(emiByDay, eYear, regionShp, speciesLabel);
+      plotPanel.add(ui.Label('', {margin: '-25px 8px 8px'}));
+      plotPanel.add(dailyChart);
+      plotPanel.add(ui.Label('', {margin: '-25px 8px 8px'}));
+    }
   }
   
 };
@@ -628,8 +632,11 @@ submitButton.onClick(function() {
   addCharts(sYear, eYear, speciesLabel, regionShp, regionType);
   
   var getDailyYrPanel = function() {
+    var min_sYear = sYear;
+    if (sYear < 2003) {min_sYear = 2003;}
+    
     var dailyYrSlider = ui.Slider({
-      min: sYear,
+      min: min_sYear,
       max: eYear,
       value: eYear,
       step: 1,
@@ -658,9 +665,9 @@ submitButton.onClick(function() {
   var plotOptsDivider = ui.Panel(ui.Label(),ui.Panel.Layout.flow('horizontal'),
     {margin: '10px 0px 15px 0px',height:'1px',border:'0.5px solid black',stretch:'horizontal'});
 
-  if (regionType != 'Global' & eYear > sYear) {
+  if (regionType != 'Global' & eYear > sYear & eYear >= 2003) {
     plotPanel.add(getDailyYrPanel());
-    plotPanel.add(plotOptsDivider);
+    if (eYear > sYear) {plotPanel.add(plotOptsDivider)}
   }
   
   var getPlotSpeciesPanel = function(eYear) {
@@ -672,9 +679,9 @@ submitButton.onClick(function() {
         speciesLong = getSpecies(plotSpeciesPanel);
         speciesLabel = speciesList[speciesLong];
         addCharts(sYear, eYear, speciesLabel, regionShp, regionType);
-        if (regionType != 'Global') {
+        if (regionType != 'Global' & eYear > sYear & eYear >= 2003) {
           plotPanel.add(getDailyYrPanel());
-          plotPanel.add(plotOptsDivider);
+          if (eYear > sYear) {plotPanel.add(plotOptsDivider)}
         }
         plotPanel.add(plotSpeciesPanel);
       },

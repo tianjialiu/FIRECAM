@@ -176,7 +176,7 @@ exports.plotEmiTS = function(imageCol, regionShp,
       vAxis: {
         title: 'Emissions (Tg ' + speciesLabel + ')',
         titleTextStyle: {fontSize: '12'},
-        format: '####.#'
+        format: '####.###########'
       },
       hAxis: {
         format: dateFormat, 
@@ -204,7 +204,7 @@ exports.updateOpts = function(emiTS, speciesLabel, timePeriod, dateFormat,
       vAxis: {
         title: 'Emissions (Tg ' + speciesLabel + ')',
         titleTextStyle: {fontSize: '12'},
-        format: '####.#'
+        format: '####.###########'
       },
       hAxis: {
         format: dateFormat, 
@@ -241,7 +241,7 @@ exports.plotEmiBar = function(imageCol, regionShp,
         titleTextStyle: {fontSize: '12'},
         viewWindowMode:'explicit',
         viewWindow: {min: 0},
-        format: '####.#'
+        format: '####.###########'
       },
       height: '230px',
       series: colPal
@@ -307,7 +307,7 @@ exports.plotEmiBarInt = function(imageCol, regionShp,
         vAxis: {
           title: 'Emissions (Tg ' + speciesLabel + ')',
           titleTextStyle: {fontSize: '12'},
-          format: '####.#'
+          format: '####.###########'
         },
         hAxis: {
           format:' ',
