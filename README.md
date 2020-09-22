@@ -23,7 +23,7 @@ FIRECAM can be accessed through (1) Earth Engine Apps and (2) the Google Earth E
 ## FIRECAM App
 (*Earth Engine Apps, no Google Earth Engine account required*)
 <br><br>
-![banner image](https://github.com/tianjialiu/FIRECAM/blob/master/docs/imgs/FIRECAM.png)
+![banner image](https://github.com/tianjialiu/FIRECAM/blob/main/docs/imgs/FIRECAM.png)
 
 ### Step 1: Time Range
 *Select a time range.* Use the start year and end year sliders to select a time range for the annual and monthly regional emissions time series charts.
@@ -37,7 +37,7 @@ FIRECAM can be accessed through (1) Earth Engine Apps and (2) the Google Earth E
 5. **Custom**: user-defined polygon using an array of longitude, latitude coordinates; the tool re-defines the polygon to match the 0.5° x 0.5° grid of the basis regions
 5. **Draw**: user-defined polygon, drawn interactively on the base map; the tool re-defines the polygon to match the 0.5° x 0.5° grid of the basis regions
 <br><br>
-![banner image](https://github.com/tianjialiu/FIRECAM/blob/master/docs/imgs/basisRegions.png)
+![banner image](https://github.com/tianjialiu/FIRECAM/blob/main/docs/imgs/basisRegions.png)
 
 ### Step 3: Species
 *Select a species.* The six available species are CO<sub>2</sub>, CO, CH<sub>4</sub>, organic carbon (OC), black carbon (BC), and fine particulate matter (PM<sub>2.5</sub>)
