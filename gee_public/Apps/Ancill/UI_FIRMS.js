@@ -1,6 +1,10 @@
 /**** Start of imports. If edited, may not auto-convert in the playground. ****/
 var firms = ee.ImageCollection("FIRMS"),
-    geometry = /* color: #bebebe */ee.Geometry.MultiPoint();
+    geometry = /* color: #ffffff */ee.Geometry.Polygon(
+        [[[15, 10],
+          [15, 3.5],
+          [26, 3.5],
+          [26, 10]]]);
 /***** End of imports. If edited, may not auto-convert in the playground. *****/
 // *****************************************************************
 // =================================================================
@@ -10,7 +14,7 @@ var firms = ee.ImageCollection("FIRMS"),
 /*
 // Documentation: https://github.com/tianjialiu/FIRECAM
 // @author Tianjia Liu (tianjialiu@g.harvard.edu)
-// Last updated: August 6, 2020
+// Last updated: November 14, 2020
 
 // Purpose: plot timeseries of MODIS/FIRMS active fire counts
 // by region and day of year, across years
@@ -26,13 +30,15 @@ var firms = ee.ImageCollection("FIRMS"),
 // We'll add our own buttons for geometry selection.
 var baseMap = require('users/tl2581/packages:baseMap.js');
 Map.drawingTools().setShown(false);
-Map.setOptions('Map', {'Dark': baseMap.darkTheme});
+Map.setOptions('Dark', {'Dark': baseMap.darkTheme});
 Map.setCenter(20,10,4);
+Map.setControlVisibility({layerList: false, zoomControl: false});
 
 // Define symbols for the labels.
 var symbol = {
   rectangle: '⬛',
-  polygon: '🔺'
+  polygon: '🔺',
+  pan: '🤚'
 };
 
 // Set up a ui.Panel to hold instructions and the geometry drawing buttons.
@@ -59,44 +65,75 @@ var submitButton = ui.Button({
       
 var mainPanel = ui.Panel({
   widgets: [
-    ui.Label('FIRMS Active Fires',{fontSize:'18px',fontWeight:'bold',margin: '6px 8px 2px 8px'}),
+    ui.Label('FIRMS Active Fires',{fontSize:'20px',fontWeight:'bold',margin: '6px 8px 2px 8px'}),
     ui.Label('1) Select time range:',{fontSize:'14.5px'}),
-    ui.Panel([ui.Label('Start Year: ',{color:'#777'}),startYearSlider],ui.Panel.Layout.Flow('horizontal'),{stretch:'horizontal',margin:'-5px -8px 0px 8px'}),
-    ui.Panel([ui.Label('End Year: ',{color:'#777'}),endYearSlider],ui.Panel.Layout.Flow('horizontal'),{stretch:'horizontal',margin:'-7px -8px 0px 8px'}),
+    ui.Panel([ui.Label('Start Year: ',{color:'#777',margin:'8px 3px 8px 8px'}),startYearSlider],ui.Panel.Layout.Flow('horizontal'),{stretch:'horizontal',margin:'-5px -8px 0px 8px'}),
+    ui.Panel([ui.Label('End Year: ',{color:'#777',margin:'8px 10px 8px 8px'}),endYearSlider],ui.Panel.Layout.Flow('horizontal'),{stretch:'horizontal',margin:'-7px -8px 0px 8px'}),
     ui.Label('Filter by the day of year [1-366]:',{color:'#333',fontSize:'12px',margin:'5px 0px 0px 16px'}),
     ui.Label('NASA\'s Julian day calendar',{fontSize:'12px',margin:'2px 0px 5px 16px'},'https://landweb.modaps.eosdis.nasa.gov/browse/calendar.html'),
     ui.Panel([ui.Label('DOY Range: ',{color:'#777',margin:'12px 0 0 8px'}),doyText],ui.Panel.Layout.Flow('horizontal'),{stretch:'horizontal',margin:'-3px 8px 0px 8px'}),
-    ui.Label('2) Select a drawing mode:',{fontSize:'14.5px'}),
+    ui.Label('2) Select a drawing mode:',{fontSize:'14.5px',margin:'8px 8px 3px 8px'}),
+    ui.Label('On the map, draw a geometry. Limit to small regions to reduce computational time. You can also edit and move the geometry after clicking on \'Pan Map\'.',
+      {fontSize:'13px',margin:'1px 8px 3px 8px',color:'#777'}),
+    ui.Panel({
+      widgets: [
+        ui.Button({
+          label: symbol.rectangle + ' Rectangle',
+          onClick: drawRectangle,
+          style: {stretch: 'horizontal', margin:'8px 4px 8px 8px'}}),
+        ui.Button({
+          label: symbol.polygon + ' Polygon',
+          onClick: drawPolygon,
+          style: {stretch: 'horizontal', margin:'8px 8px 8px 4px'}})
+        ],
+      layout: ui.Panel.Layout.Flow('horizontal')
+    }),
     ui.Button({
-      label: symbol.rectangle + ' Rectangle',
-      onClick: drawRectangle,
-      style: {stretch: 'horizontal'}}),
-    ui.Button({
-      label: symbol.polygon + ' Polygon',
-      onClick: drawPolygon,
-      style: {stretch: 'horizontal',margin:'2px 8px 8px 8px'}}),
-    ui.Label('On the map, draw a geometry. Limit to small regions. You can also edit and move the geometry.',
-      {fontSize:'13.5px',margin:'3px 8px 7px 8px',color:'#777'}),
+      label: symbol.pan + ' Pan Map',
+      onClick: panMap,
+      style: {stretch: 'horizontal',margin:'2px 55px 10px 55px'}}),
     submitButton
   ],
-  style: {position: 'bottom-left', stretch:'horizontal', width: '220px'},
+  style: {position: 'bottom-left', stretch:'horizontal',
+    width: '230px', maxHeight: '90%', padding: '5px'},
   layout: ui.Panel.Layout.Flow('vertical'),
 });
 
 
 // Define a panel to hold the time series chart.
-var chartPanel = ui.Panel({
+var chartPanelParent = ui.Panel({
   style: {
-    height: '235px',
     width: '600px',
-    position: 'bottom-right'
+    position: 'bottom-right',
+    maxHeight: '90%'
   }
+});
+
+var chartPanel = ui.Panel([],null,{margin: '0 -8px 0px -18px'});
+var chartSelectPanel = ui.Panel([],
+  ui.Panel.Layout.Flow('horizontal'), {
+    margin: '-8px 0 0 0', padding: '0', width: '270px'
+  });
+
+var hideChartMode = true;
+var hideShowChartButton = ui.Button({
+  label: 'Hide Chart',
+  onClick: function() {
+    hideChartMode = !hideChartMode;
+    hideShowChartButton.setLabel(hideChartMode ? 'Hide Chart': 'Show Chart');
+    if (!hideChartMode) {
+      chartPanelParent.style().set({width: '92px', height: '45px'});
+    } else {
+      chartPanelParent.style().set({width: '600px', height: 'auto'});
+    }
+  },
+    style: {padding: '0', margin: '0'}
 });
 
 // Define a panel to hold the legend.
 var legendPanel = ui.Panel({
   style: {
-    padding: '6px 3px 5px 5px',
+    padding: '6px 3px 0px 5px',
     position: 'bottom-right'
   }
 });
@@ -115,20 +152,15 @@ while (nLayers > 0) {
   nLayers = drawingTools.layers().length();
 }
 
-// Initialize a dummy GeometryLayer with null geometry acts as a placeholder
-// for drawn geometries.
-var dummyGeometry = ui.Map.GeometryLayer({
-  geometries: null, name: 'geometry', color: 'BEBEBE'});
-
-// Add the dummy geometry as a layer of the drawing tools widget.
-drawingTools.layers().add(dummyGeometry);
-
-
 // Define a function to clear the geometry from the layer when a
 // drawing mode button is clicked.
 function clearGeometry() {
   var layers = drawingTools.layers();
-  layers.get(0).geometries().remove(layers.get(0).geometries().get(0));
+  var nGeom = layers.get(0).geometries().length();
+  
+  for (var iLayer = 0; iLayer < nGeom; iLayer++) {
+    layers.get(0).geometries().remove(layers.get(0).geometries().get(0));
+  } 
 }
 
 // Define function for dealing with a click on the rectangle button.
@@ -143,6 +175,10 @@ function drawPolygon() {
   clearGeometry();
   drawingTools.setShape('polygon');
   drawingTools.draw();
+}
+
+function panMap() {
+  drawingTools.stop();
 }
 
 // Color palette
@@ -171,6 +207,9 @@ var colPal = ee.Dictionary({
 
 var continuousLegend = function(title, colPal, minVal, maxVal, units) {
 
+  var footDivider = ui.Panel(ui.Label(),ui.Panel.Layout.flow('horizontal'),
+    {margin: '0px 0px 10px 0px',height:'1.25px',border:'0.75px solid black',stretch:'horizontal'});
+
   var legendTitle = ui.Label(title, {fontWeight: 'bold', fontSize: '16px', margin: '0 0 6px 8px'});
   var unitsLabel = ui.Label(units, {margin: '-6px 0 6px 8px'});
 
@@ -179,7 +218,7 @@ var continuousLegend = function(title, colPal, minVal, maxVal, units) {
   var makeColorBarParams = function(palette) {
     return {
       bbox: [0, 0, 1, 0.1],
-      dimensions: '110x15',
+      dimensions: '110x12',
       format: 'png',
       min: 0,
       max: 1,
@@ -204,21 +243,54 @@ var continuousLegend = function(title, colPal, minVal, maxVal, units) {
     layout: ui.Panel.Layout.flow('horizontal')
   });
 
-  return ui.Panel([legendTitle,unitsLabel,colorBar,legendLabels]);
+  return ui.Panel([footDivider,legendTitle,unitsLabel,colorBar,legendLabels]);
 };
+
+var proj = firms.first().projection();
+var scale = proj.nominalScale();
+
+if (ui.url.get('startYear') !== undefined) {
+  startYearSlider.setValue(ui.url.get('startYear'));
+}
+
+if (ui.url.get('endYear') !== undefined) {
+  endYearSlider.setValue(ui.url.get('endYear'));
+}
+
+if (ui.url.get('DOY') !== undefined) {
+  doyText.setValue(ui.url.get('DOY'));
+}
+
+var geometry;
+if (ui.url.get('geometry') !== undefined) {
+  geometry = ee.Deserializer.fromJSON(ui.url.get('geometry'));
+} else {
+  // Initialize a dummy GeometryLayer with null geometry acts as a placeholder
+  // for drawn geometries.
+  geometry = ee.Geometry.Rectangle([15,3.5,26,10]);
+}
+
+var dummyGeometry = ui.Map.GeometryLayer(
+  {
+    geometries: [geometry],
+    name: 'geometry', color: '#FFF'
+  });
+    
+drawingTools.layers().add(dummyGeometry);
+Map.centerObject(geometry,4);
 
 // Define function to generate chart and add it to the chart panel.
 var dirtyMap = false;
 function chartBurnedArea() {
   // Make the chart panel visible the first time.
   if (dirtyMap === false) {
-    Map.add(chartPanel);
-    Map.add(legendPanel);
+    Map.add(chartPanelParent.add(hideShowChartButton).add(chartPanel).add(chartSelectPanel));
+    mainPanel.add(legendPanel);
     dirtyMap = true;
   }
   
   // Clear the chart and legend panels.
-  chartPanel.clear();
+  chartPanel.clear(); chartSelectPanel.clear();
   legendPanel.clear();
   
   // Get the geometry.
@@ -236,51 +308,130 @@ function chartBurnedArea() {
   var nYear = ee.Number(endYear).subtract(ee.Number(startYear)).add(1);
   
   var firmsRange = ee.ImageCollection('FIRMS').select(['T21'],['FireCount'])
-    .filterDate(ee.Date.fromYMD(startYear,1,1),ee.Date.fromYMD(endYear+1,1,1))
-    .map(function(x) {
-      return x.gt(0).selfMask().copyProperties(x,['system:time_start']);
-    });
-  
-  var firmsYr = firmsRange.filter(ee.Filter.calendarRange(startYear,endYear,'year'))
+    .filter(ee.Filter.calendarRange(startYear,endYear,'year'))
     .filter(ee.Filter.calendarRange(startDay,endDay,'day_of_year'))
-    .sum();
+    .map(function(x) {return x.gt(0).copyProperties(x,['system:time_start'])});
+
+  var firmsByYearCuml = ee.List.sequence(startYear,endYear,1).map(function(iYear) {
+    
+    var firmsYr = firmsRange
+      .filter(ee.Filter.calendarRange(iYear,iYear,'year'))
+      .toBands();
+  
+    var bandNames = firmsYr.bandNames()
+      .map(function(x) {return ee.String(x).slice(4,7)});
+      
+    firmsYr = ee.Feature(firmsYr.rename(bandNames)
+      .selfMask()
+      .reduceRegions({
+        collection: aoi,
+        reducer: ee.Reducer.sum().unweighted(),
+        crs: proj,
+        scale: scale,
+      }).first());
+    
+    var firmsYrCS = firmsYr.toArray(bandNames).accum(0);
+  
+    return ee.Feature(null,{Year:iYear})
+      .set(ee.Dictionary.fromLists(bandNames,firmsYrCS.toList()));
+  });
+
+  firmsByYearCuml = ee.FeatureCollection(firmsByYearCuml);
+  var yrStr = ee.List.sequence(startYear,endYear,1)
+    .map(function(x) {return ee.String(ee.Number(x).toInt())});
+  
+  var firmsByDayCuml = ee.List.sequence(startDay,endDay,1).map(function(JDay) {
+    var firmsDay = ee.Feature(null,{DOY:JDay});
+    
+    for (var iYear = startYear; iYear <= endYear; iYear++) {
+      var firmsYr = firmsByYearCuml.filter(ee.Filter.eq('Year',iYear)).first();
+      firmsDay = firmsDay.set(ee.String(ee.Number(iYear).toInt()),
+        firmsYr.getNumber(ee.Number(JDay).format('%03d')));
+    }
+    return firmsDay;
+  });
+
+  var firmsYr = firmsRange.sum();
+  
+  var colPaln = colPal.get(ee.String(ee.Number(nYear).format())).getInfo();
   
   Map.layers().remove(Map.layers().get(0));
   Map.addLayer(firmsYr.selfMask(),
-    {palette:['yellow','orange','red'], min: 1, max: endYear-startYear+1},
+    {palette:colPaln, min: 1, max: endYear-startYear+1},
     'FIRMS Count');
 
-  var colPaln = colPal.get(ee.String(ee.Number(nYear).format()));
+  var getChartByDOY = function() {
+    return ui.Chart.image.doySeriesByYear({
+        imageCollection: firmsRange,
+        bandName: 'FireCount',
+        region: aoi,
+        regionReducer: ee.Reducer.sum(),
+        scale: scale, 
+        sameDayReducer: ee.Reducer.sum(),
+        startDay: startDay,
+        endDay: endDay
+      }).setChartType('LineChart')
+      .setOptions({
+        vAxis: {
+          title: 'Fire Counts',
+          viewWindow: {
+          min: 0,
+        },
+          format:'#####'
+        },
+        hAxis: {
+          title: 'DOY',
+          format: '###',
+        },
+        height: '211px',
+        colors: colPaln
+    });
+  };
+  
+  var getChartByDOYcuml = function() {
+    return ui.Chart.feature.byFeature(firmsByDayCuml,'DOY')
+      .setChartType('LineChart')
+      .setOptions({
+        vAxis: {
+          title: 'Fire Counts',
+          viewWindow: {
+          min: 0,
+        },
+          format:'scientific'
+        },
+        hAxis: {
+          title: 'DOY',
+          format: '###',
+        },
+        interpolateNulls: true,
+        height: '211px',
+        colors: colPaln
+    });
+  };
+  
+  var chartSelectType = ui.Label('Select Chart Type:',{margin: '13px 8px 0px 13px'});
+  var chartSelect = ui.Select(['Count','Cumulative Sum'],'Count');
+  chartSelect.style().set('stretch', 'horizontal');
 
-  var chart = ui.Chart.image.doySeriesByYear({
-      imageCollection: firmsRange,
-      bandName: 'FireCount',
-      region: aoi,
-      regionReducer: ee.Reducer.sum(),
-      scale: 1000, 
-      sameDayReducer: ee.Reducer.sum(),
-      startDay: startDay,
-      endDay: endDay
-    }).setChartType('LineChart')
-    .setOptions({
-      vAxis: {
-        title: 'Fire Counts',
-        viewWindow: {
-        min: 0,
-      },
-        format:'#####'
-      },
-      hAxis: {
-        title: 'DOY',
-        format: '###',
-      },
-      height: '211px',
-      colors: colPaln.getInfo()
+  chartSelect.onChange(function(selected) {
+    chartPanel.clear();
+    if (selected == 'Count') {chartPanel.add(getChartByDOY())}
+    if (selected == 'Cumulative Sum') {chartPanel.add(getChartByDOYcuml())}
   });
   
-  chartPanel.add(ui.Panel(chart,null,{margin: '-8px -8px 0px -18px'}));
+  chartPanel.add(getChartByDOY());
+  chartSelectPanel.add(chartSelectType).add(chartSelect);
   
   legendPanel.add(continuousLegend('Active Fires',colPaln,1,endYear-startYear+1,'number of years'));
+  
+  ui.url.set({
+    'startYear':startYear,
+    'endYear':endYear,
+    'DOY':doyText.getValue(),
+    'geometry':aoi.toGeoJSONString(),
+  });
+
+  Map.centerObject(aoi);
 }
 
 submitButton.onClick(chartBurnedArea);
