@@ -12,7 +12,7 @@
 // GFEDv4s emissions?
 
 // @author Tianjia Liu (tianjialiu@g.harvard.edu)
-// Last updated: June 24, 2020
+// Last updated: November 17, 2020
 
 // =================================================================
 // **********************   --    Code    --   *********************
@@ -89,7 +89,7 @@ var plotCompTS_text = gfed4_params.plotCompTS_text;
 // Info Panel |
 // ------------
 var infoPanel = function() {
-  var GFEDLabelShort = ui.Label('GFEDv4s Explorer', {margin: '6px 0px 0px 8px', fontWeight: 'bold', fontSize: '24px', border: '1px solid black', padding: '3px 3px 3px 3px', backgroundColor: '#FFFFFF00'});
+  var GFEDLabelShort = ui.Label('GFEDv4s Explorer', {margin: '6px 0px 0px 8px', fontWeight: 'bold', fontSize: '24px', border: '1px solid black', padding: '5px', backgroundColor: '#FFFFFF00'});
   var GFEDLabelLong = ui.Label('Global Fire Emissions Database, version 4s', {margin: '8px 8px 0px 8px', fontSize: '16px'});
   var AndreaeLong = ui.Label('How much does the Andreae (2019, ACP) emissions factors update impact GFEDv4s emissions?', {margin: '5px 8px 0px 8px', fontSize: '12.5px'});
   var paperLabel = ui.Label('Citation: van der Werf et al. (2017, ESSD)', {margin: '5px 0px 5px 8px', fontSize: '12.5px'}, 'https://doi.org/10.5194/essd-9-697-2017');
@@ -115,11 +115,11 @@ var hideShowButton = ui.Button({
     hideShowButton.setLabel(hideMode ? 'Hide': 'Show');
     if (!hideMode) {
       controlWrapper.remove(controlPanel);
-      hideShowButton.style().set({padding: '0 0 0 0', margin: '0 0 0 0'});
+      hideShowButton.style().set({padding: '0', margin: '0'});
       controlWrapper.style().set({width: '70px'});
     } else {
       controlWrapper.insert(0,controlPanel);
-      hideShowButton.style().set({padding: '0 0 0 0px', margin: '0 0 0 -55px'});
+      hideShowButton.style().set({padding: '0', margin: '0 0 0 -55px'});
       controlWrapper.style().set({width: '360px'});
     }
   },
@@ -256,9 +256,7 @@ var setBounds = function(map) {
     
   map.onClick(function(coords) {
     regionSelectPanel.clear(); regionSelectPanel.add(boundsPanel);
-    var cursorBounds = ee.String('Print lon/lat coordinates of cursor: [' +
-      ee.Number(coords.lon).format('%.2f').getInfo() +
-      ', ' + ee.Number(coords.lat).format('%.2f').getInfo() + ']').getInfo();
+    var cursorBounds = cursorBoundsText(coords);
     regionSelectPanel.widgets().get(0).widgets().get(2).setValue(cursorBounds);
   });
   
@@ -491,7 +489,7 @@ var addCharts = function(sYear, eYear, speciesLabel, regionShp, regionType) {
 // Control panel
 var controlPanel = ui.Panel({
   layout: ui.Panel.Layout.flow('vertical'),
-  style: {width: '345px', position: 'bottom-left', backgroundColor: '#FFFFFF00'}
+  style: {width: '345px', position: 'bottom-left', padding: '0'}
 });
 
 var controlWrapper = ui.Panel({
@@ -561,14 +559,14 @@ submitButton.onClick(function() {
   var speciesLabel = speciesList[speciesLong];
 
   // Default Map: DM emissions
-  var display_sp = 'DM'; var unitsLabel = 'Mg'; var maxVal = 500;
+  var display_sp = 'DM'; var unitsLabel = 'Gg'; var maxVal = 500;
   
   var EFs_display = ee.Image(EFlist[display_sp]).rename(LULC)
     .reproject({crs: crs, crsTransform: crsTrans});
   
   var emiByMonth_display = getEmiByMonth(EFs_display, display_sp, sYear, eYear);
   var emiByYr_display = getEmiByYr(emiByMonth_display, sYear, eYear);
-  var emiByYrMean_display = emiByYr_display.reduce(ee.Reducer.mean()).divide(1e6);
+  var emiByYrMean_display = emiByYr_display.reduce(ee.Reducer.mean()).multiply(1e3);
 
   // Display Maps:
   var legendPanel = emiLegend(display_sp, unitsLabel, maxVal, sYear, eYear);
@@ -576,7 +574,7 @@ submitButton.onClick(function() {
   if (counter > 1) {controlPanel.remove(controlPanel.widgets().get(6))}
   map.add(controlWrapper); controlPanel.add(legendPanel);
   
-  map.addLayer(emiByYrMean_display.select('Total.*').multiply(1e9).selfMask(),
+  map.addLayer(emiByYrMean_display.select('Total.*').selfMask(),
     {palette: colPals.Spectral, min: 0, max: maxVal}, 'GFEDv4s');
 
   if (regionType == 'Basis Region' | regionType == 'Country/ Sub-Region') {
@@ -595,7 +593,7 @@ submitButton.onClick(function() {
     }
     map.centerObject(regionShp);
     map.addLayer(ee.Image().byte().rename('Selected Region')
-    .paint(ee.FeatureCollection(regionShp), 0, 1), {palette: '#FF0000'}, 'Selected Region');
+      .paint(ee.FeatureCollection(regionShp), 0, 1), {palette: '#FF0000'}, 'Selected Region');
   }
   
   if (regionType == 'Pixel') {

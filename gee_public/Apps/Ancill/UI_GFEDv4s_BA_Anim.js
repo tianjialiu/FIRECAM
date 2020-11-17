@@ -53,7 +53,7 @@ var monthDict = {
 // Info Panel |
 // ------------
 var infoPanel = function() {
-  var GFEDLabelShort = ui.Label('GFEDv4s Burned Area', {margin: '6px 0px 0px 8px', fontWeight: 'bold', fontSize: '24px', border: '1px solid black', padding: '3px 3px 3px 3px', backgroundColor: '#FFFFFF00'});
+  var GFEDLabelShort = ui.Label('GFEDv4s Burned Area', {margin: '6px 0px 0px 8px', fontWeight: 'bold', fontSize: '24px', border: '1px solid black', padding: '5px', backgroundColor: '#FFFFFF00'});
   var GFEDLabelLong = ui.Label('Global Fire Emissions Database, version 4s', {margin: '8px 8px 0px 8px', fontSize: '16px'});
   var paperLabel = ui.Label('Citation: van der Werf et al. (2017, ESSD)', {margin: '5px 0px 5px 8px', fontSize: '12.5px'}, 'https://doi.org/10.5194/essd-9-697-2017');
   var websiteLabel = ui.Label('[Data]', {margin: '5px 0px 5px 8px', fontSize: '12.5px'}, 'https://www.globalfiredata.org/');
@@ -78,19 +78,19 @@ var hideShowButton = ui.Button({
     hideShowButton.setLabel(hideMode ? 'Hide': 'Show');
     if (!hideMode) {
       controlWrapper.remove(controlPanel);
-      hideShowButton.style().set({padding: '0 0 0 0', margin: '3px 0 3px 8px'});
+      hideShowButton.style().set({padding: '0', margin: '3px 0 3px 8px'});
       controlWrapper.style().set({width: '240px'});
-      animWrapper.style().set({width: '225px'});
+      animWrapper.style().set({width: '233px'});
       panelWrapper.style().set({width: '240px'});
     } else {
       controlWrapper.insert(0,controlPanel);
-      hideShowButton.style().set({padding: '0 0 0 0', margin: '0 0 0 -55px'});
+      hideShowButton.style().set({padding: '0', margin: '0 0 0 -55px'});
       controlWrapper.style().set({width: '340px'});
-      animWrapper.style().set({width: '325px'});
+      animWrapper.style().set({width: '333px'});
       panelWrapper.style().set({width: '340px'});
     }
   },
-  style: {padding: '0 0 0 0px', margin: '0 0 0 -55px'}
+  style: {padding: '0', margin: '0 0 0 -55px'}
 });
   
 // ------------
@@ -136,8 +136,8 @@ var playButton = ui.Button({label: '▶ ️️️Play',  style: {stretch: 'horiz
 var stopButton = ui.Button({label: '🛑 Stop',  style: {stretch: 'horizontal'}});
 var loadButton = ui.Button({label: 'Load Images',  style: {stretch: 'horizontal'}});
 
-var waitMessage = ui.Label('Please wait until all images are fully loaded before initializing animation.',
-  {fontSize:'10pt', textAlign: 'center', margin: '8px 8px 0 8px'});
+var waitMessage = ui.Label(' Please check the \'Layers\' tab in the upper-right corner of the map and wait until all images are fully loaded before initializing the animation. It takes a few seconds for the animation to begin.',
+  {fontSize:'10pt', margin: '8px 8px 0 8px'});
 
 // --------
 // Legend
@@ -200,24 +200,26 @@ var getLegend = function(speciesLabel, units, maxVal, sYear, eYear) {
 // Control panel
 var controlPanel = ui.Panel({
   layout: ui.Panel.Layout.flow('vertical'),
-  style: {width: '325px', position: 'bottom-left'}
+  style: {width: '325px', position: 'bottom-left', padding: '0'}
 });
 
 var controlWrapper = ui.Panel({
   widgets: [controlPanel, hideShowButton],
   layout: ui.Panel.Layout.flow('horizontal'),
-  style: {width: '340px', position: 'bottom-left'}
+  style: {width: '340px', position: 'bottom-left', padding: '8px 8px 0 8px'}
 });
+
+hideShowButton.setDisabled(true);
 
 var animWrapper = ui.Panel({
   layout: ui.Panel.Layout.flow('vertical'),
-  style: {width: '325px', position: 'bottom-left'}
+  style: {width: '333px', position: 'bottom-left', padding: '0 0 8px 8px'}
 });
 
 var panelWrapper = ui.Panel({
   widgets: [controlWrapper, animWrapper],
   layout: ui.Panel.Layout.flow('vertical'),
-  style: {width: '340px', position: 'bottom-left'}
+  style: {width: '340px', position: 'bottom-left', padding: '0'}
 });
 
 var animButtons = ui.Panel({
@@ -231,6 +233,7 @@ map.style().set({cursor:'crosshair'});
 map.setCenter(0,10,2);
 map.setOptions('Dark', {'Dark': baseMap.darkTheme});
 map.add(panelWrapper);
+map.setControlVisibility({layerList: false});
 
 var infoPanel = infoPanel();
 var yearSelectPanel = yearSelectPanel();
@@ -245,6 +248,9 @@ var inputVar = 'BA'; var unitsLabel = 'avg. % grid'; var maxVal = 50;
 var counter = 0;
 
 loadButton.onClick(function() {
+  
+  hideShowButton.setDisabled(false);
+  map.setControlVisibility({layerList: true});
   
   // Display panels
   map.clear();

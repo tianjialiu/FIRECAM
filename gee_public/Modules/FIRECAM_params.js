@@ -352,19 +352,13 @@ exports.getLULCmap = function(mapYr) {
   var mcd12q1Yr = ee.Image(ee.ImageCollection('MODIS/006/MCD12Q1')
     .filter(ee.Filter.calendarRange(mapYr,mapYr,'year')).first())
     .select('LC_Type1');
-
-  var BOR = mcd12q1Yr.eq(1).add(mcd12q1Yr.eq(3)).gt(0);
-  var TROP = mcd12q1Yr.eq(2).multiply(2);
-  var TEMP = mcd12q1Yr.eq(4).add(mcd12q1Yr.eq(5)).gt(0).multiply(3);
-  var WS = mcd12q1Yr.eq(6).add(mcd12q1Yr.eq(7)).add(mcd12q1Yr.eq(8))
-    .gt(0).multiply(4);
-  var SG = mcd12q1Yr.eq(9).add(mcd12q1Yr.eq(10)).add(mcd12q1Yr.eq(11))
-    .add(mcd12q1Yr.eq(14)).add(mcd12q1Yr.eq(16)).gt(0).multiply(5);
-  var CROP = mcd12q1Yr.eq(12).multiply(6);
-  var URBAN = mcd12q1Yr.eq(13).multiply(7);
+    
+  mcd12q1Yr = mcd12q1Yr.expression(
+    '(lc==1 | lc==3) + (lc==2)*2 + (lc>=4 & lc<=5)*3 + (lc>=6 & lc<=8)*4' +
+    '+ (lc>=9 & lc<=11 | lc==14 | lc==16)*5 + (lc==12)*6 + (lc==13)*7',
+      {lc: mcd12q1Yr});
   
-  return BOR.add(TROP).add(TEMP).add(WS).add(SG)
-    .add(CROP).add(URBAN).selfMask();
+  return mcd12q1Yr;
 };
 
 exports.lulc_colPal = ['#000000','#05450A','#92AF1F','#6A2424','#D99125','#F7E174','#FF0000'];

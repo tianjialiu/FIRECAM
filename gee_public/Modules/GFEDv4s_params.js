@@ -202,9 +202,9 @@ var getEmiByMonth = function(EFs, varType, sYear, eYear) {
       var BAsf = gfedMon.select('small_fire_fraction');
       
       var BA = BAfrac.addBands(BAfrac.multiply(BAsf))
-        .multiply(gridArea).divide(1e6).divide(1e3).rename(['BA','BAsf'])
+        .multiply(gridArea).divide(1e9).rename(['BA','BAsf'])
         .reproject({crs: crs, crsTransform: crsTrans})
-        .copyProperties(gfedMon,['system:time_start']);
+        .copyProperties(gfedMon,['system:time_start']); // sq. km, in thousands
       
       return BA;
     } else {

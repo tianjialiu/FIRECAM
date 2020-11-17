@@ -91,7 +91,7 @@ var imageToFeature = function(inImage,inRegion,gridScale) {
     reducer: ee.Reducer.sum().unweighted(),
     crs: gridScale,
     scale: gridScale.nominalScale()
-  }).toList(1,0).get(0);
+  }).first();
   return ee.Feature(inImageCol);
 };
 

@@ -9,7 +9,7 @@
 // https://doi.org/10.5194/essd-9-697-2017
 
 // @author Tianjia Liu (tianjialiu@g.harvard.edu)
-// Last updated: August 21, 2020
+// Last updated: November 17, 2020
 
 // =================================================================
 // **********************   --    Code    --   *********************
@@ -86,7 +86,7 @@ var updateOpts = gfed4_params.updateOpts;
 // Info Panel |
 // ------------
 var infoPanel = function() {
-  var GFEDLabelShort = ui.Label('GFEDv4s Explorer', {margin: '6px 0px 0px 8px', fontWeight: 'bold', fontSize: '24px', border: '1px solid black', padding: '3px 3px 3px 3px', backgroundColor: '#FFFFFF00'});
+  var GFEDLabelShort = ui.Label('GFEDv4s Explorer', {margin: '6px 0px 0px 8px', fontWeight: 'bold', fontSize: '24px', border: '1px solid black', padding: '5px', backgroundColor: '#FFFFFF00'});
   var GFEDLabelLong = ui.Label('Global Fire Emissions Database, version 4s', {margin: '8px 8px 0px 8px', fontSize: '16px'});
   var paperLabel = ui.Label('Citation: van der Werf et al. (2017, ESSD)', {margin: '5px 0px 5px 8px', fontSize: '12.5px'}, 'https://doi.org/10.5194/essd-9-697-2017');
   var websiteLabel = ui.Label('[Data]', {margin: '5px 0px 5px 8px', fontSize: '12.5px'}, 'https://www.globalfiredata.org/');
@@ -255,9 +255,7 @@ var setBounds = function(map) {
     
   map.onClick(function(coords) {
     regionSelectPanel.clear(); regionSelectPanel.add(boundsPanel);
-    var cursorBounds = ee.String('Print lon/lat coordinates of cursor: [' +
-      ee.Number(coords.lon).format('%.2f').getInfo() +
-      ', ' + ee.Number(coords.lat).format('%.2f').getInfo() + ']').getInfo();
+    var cursorBounds = cursorBoundsText(coords);
     regionSelectPanel.widgets().get(0).widgets().get(2).setValue(cursorBounds);
   });
   
@@ -370,12 +368,12 @@ var submitButton = ui.Button({label: 'Submit',  style: {stretch: 'horizontal'}})
 // --------
 // Legend
 // --------
-var emiLegend = function(speciesLabel, units, maxVal, sYear, eYear) {
+var emiLegend = function(speciesLabel, legendLabel, units, maxVal, sYear, eYear) {
   
-  var legendTitle = ui.Label('Average Annual Fire Emissions',
+  var legendTitle = ui.Label('Average Annual ' + legendLabel,
     {fontWeight: 'bold', fontSize: '16px', margin: '5px 0 6px 8px'});
 
-  var legendSubtitle = ui.Label(units + ' ' + speciesLabel + '/yr (' + sYear + '-' + eYear + ')',
+  var legendSubtitle = ui.Label(units + '/yr (' + sYear + '-' + eYear + ')',
     {margin: '-6px 0 6px 8px'});
 
   var vis = {min: 0, max: maxVal, palette: colPals.Spectral};
@@ -475,7 +473,7 @@ var addCharts = function(sYear, eYear, speciesLabel, regionShp, regionType) {
 // Control panel
 var controlPanel = ui.Panel({
   layout: ui.Panel.Layout.flow('vertical'),
-  style: {width: '345px', position: 'bottom-left', backgroundColor: '#FFFFFF00'}
+  style: {width: '345px', position: 'bottom-left', padding: '0'}
 });
 
 var controlWrapper = ui.Panel({
@@ -487,7 +485,7 @@ var controlWrapper = ui.Panel({
 // Plot panel
 var plotPanel = ui.Panel(null, null, {stretch: 'horizontal'});
 var plotPanelParent = ui.Panel([plotPanelLabel, plotPanel], null,
-  {width: '450px', height: '80%', position: 'bottom-right'});
+  {width: '450px', maxHeight: '80%', position: 'bottom-right'});
 
 // Map panel
 var map = ui.Map();
@@ -553,23 +551,33 @@ submitButton.onClick(function() {
   var speciesLabel = speciesList[speciesLong];
 
   // Default Map
-  var display_sp = 'DM'; var unitsLabel = 'Mg'; var maxVal = 500;
-  
+  var display_sp = 'DM'; var unitsLabel = 'Gg DM'; var maxVal = 500;
+  var legendLabel = 'Fire Emissions';
+  if (speciesLabel == 'BA') {
+    display_sp = 'BA'; unitsLabel = 'sq. km';
+    maxVal = 500; legendLabel = 'Burned Area';
+  }
+
   var EFs_display = ee.Image(EFlist[display_sp]).rename(LULC)
     .reproject({crs: crs, crsTransform: crsTrans});
   var emiByMonth_display = getEmiByMonth(EFs_display, display_sp, sYear, eYear);
   var emiByYr_display = getEmiByYr(emiByMonth_display, sYear, eYear);
-  var emiByYrMean_display = emiByYr_display.reduce(ee.Reducer.mean()).divide(1e6);
+  var emiByYrMean_display = emiByYr_display.reduce(ee.Reducer.mean()).multiply(1e3);
 
   // Display Maps:
-  var legendPanel = emiLegend(display_sp, unitsLabel, maxVal, sYear, eYear);
+  var legendPanel = emiLegend(display_sp, legendLabel, unitsLabel, maxVal, sYear, eYear);
   
   if (counter > 1) {controlPanel.remove(controlPanel.widgets().get(6))}
   map.add(controlWrapper); controlPanel.add(legendPanel);
-    
-  map.addLayer(emiByYrMean_display.select('Total.*').multiply(1e9).selfMask(),
-    {palette: colPals.Spectral, min: 0, max: maxVal}, 'GFEDv4s');
-
+  
+  if (speciesLabel == 'BA') {
+    map.addLayer(emiByYrMean_display.select('BA_mean').selfMask(),
+      {palette: colPals.Spectral, min: 0, max: maxVal}, 'GFEDv4s');
+  } else {
+    map.addLayer(emiByYrMean_display.select('Total.*').selfMask(),
+      {palette: colPals.Spectral, min: 0, max: maxVal}, 'GFEDv4s');
+  }
+  
   if (regionType == 'Basis Region' | regionType == 'Country/ Sub-Region') {
     var region = getRegions(regionSelectPanel);
     
