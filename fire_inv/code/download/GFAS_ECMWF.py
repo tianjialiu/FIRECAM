@@ -3,7 +3,7 @@
 # Download monthly GFASv1.2 files from ECMWF
 # for given parameters and time periods
 # ===========================================
-# last updated: Feb 20, 2019
+# last updated: Jan 12, 2021
 # Tianjia Liu
 
 import os
@@ -11,13 +11,14 @@ import os
 from ecmwfapi import ECMWFDataServer
 server = ECMWFDataServer()
 
-paramNames = ["CO","BC","OC","NOx","SO2"]
-xYears = range(2003,2004)
+paramNames = ["MAMI","APT","CO2","CO","CH4","NHMC","H2","NOx","N2O","PM2p5","TPM","TC","OC","BC","C","CR","SO2","CH3OH","C2H5OH","C3H8","C2H4","C3H6","C5H8","Terpenes","Toulene","HiAlkenes","HiAlkanes","CH2O","C2H4O","C3H6O","NH3","C2H6S","C2H6","C7H8","C6H6","C8H10","C4H8","C5H10","C6H12","C8H16","C4H10","C5H12","C6H14","C7H16","FRP"]
+xYears = range(2019,2020)
 xMonths = range(1,13)
 
 home_dir = '/Volumes/TLIU_DATA/FIRE_raw/GFASv1p2/'
 
 # https://confluence.ecmwf.int/pages/viewpage.action?pageId=88247734
+# GFAS variables and keys
 paramList = {
     "MAMI" : "119.210", # Mean altitude of maximum injection [m]
     "APT" : "120.210", # Altitude of plume top [m]
@@ -95,7 +96,7 @@ for inYear in xYears:
             nDays = str(calc_nDays(inYear, inMonth))
             
             paramName = paramNames[iParam]
-            paramKey = paramList.values()[paramList.keys().index(paramName)]
+            paramKey = list(paramList.values())[list(paramList.keys()).index(paramName)]
             
             outputName = "GFASv1.2_" + str(inYear) + "_" + "%02d" % (inMonth,) + "_" + paramName + ".nc"
             dateRange = str(inYear) + "-" + "%02d" % (inMonth,) + "-01/to/" + str(inYear) + "-" + "%02d" % (inMonth,) + "-" + nDays

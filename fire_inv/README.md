@@ -19,7 +19,7 @@ For me, the most time-consuming steps in working with global fire emissions inve
 
 ## Downloading
 ### 1. GFEDv4s
-Annual HDF5 (with monthly timesteps and daily fraction) can be downloaded [here](https://www.geo.vu.nl/~gwerf/GFED/GFED4/). [Ancillary files](https://www.geo.vu.nl/~gwerf/GFED/GFED4/ancill), in particular, the TXT file containing the emissions factors to convert from Dry Matter (DM), are also needed. You can download the entire directory using the `wget` command:
+Annual HDF5 (with monthly timesteps and daily fraction) can be downloaded [here](https://www.geo.vu.nl/~gwerf/GFED/GFED4/). [Ancillary files](https://www.geo.vu.nl/~gwerf/GFED/GFED4/ancill) – in particular, the TXT file containing the emissions factors to convert from Dry Matter (DM) - are also needed. You can download the entire directory using the `wget` command:
 ```
 wget -m -np -nH --cut-dirs=2 -A hdf5,csv,txt,xlsx https://www.geo.vu.nl/~gwerf/GFED/GFED4/
 ```
@@ -35,7 +35,7 @@ wget -m -np -nH --cut-dirs=3 -e robots=off -A gz  https://www.acom.ucar.edu/acre
 ```
 
 ### 3. GFASv1.2
-Monthly NetCDF files (with daily timesteps) can be downloaded from the ECMWF server. However, this process is very intensive and requires a lot of storage space, since each file (per species, per month) is not compressed (347-384 MB). Several species can be downloaded together and saved to the same file, but I prefer to download each species as a separate file. Do not download all parameters to the same file, as ECMWF has a 30GB limit per request. After you download your files, running a simple netCDF compression for each file in a batch shell script (`nccopy -d1 originalfile.nc newfile.nc`) can drastically reduce the file size (to a ~3 MB!).
+Monthly NetCDF files (with daily timesteps) can be downloaded from the ECMWF server. However, this process is very intensive and requires a lot of storage space, since each file (per species, per month) is not compressed (347-384 MB). Several species can be downloaded together and saved to the same file, but I prefer to download each species as a separate file. Do not download all parameters to the same file, as ECMWF has a 30GB limit per request. After you download your files, running a simple netCDF compression for each file in a batch shell (.sh) script (`nccopy -d1 originalfile.nc newfile.nc`) can drastically reduce the file size (to \~3 MB!).
 
 You must first [register for a ECMWF account](https://apps.ecmwf.int/registration/). Then, install the ECMWF key and Python library following the instructions [here](https://confluence.ecmwf.int//display/WEBAPI/Access+ECMWF+Public+Datasets#AccessECMWFPublicDatasets-key).
 
