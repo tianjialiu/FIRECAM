@@ -71,6 +71,7 @@ The repository should then appear in the top-left panel under 'Reader' as 'users
 Click the 'Apps/UI_FIRECAM.js' script in the 'users/tl2581/FIRECAM' repository. The script should appear in the code editor. Click 'Run' in the top-right corner of the code editor to activate the user interface. The repository also contains a script to export monthly and annual timeseries data ('Exports/UI_FIRECAM_Exports.js').
 
 ## Updates
+* February 2021: re-uploaded FINNv1.5 for 2018 and 2019 based on the most recent version of the annual text files; note that 2019 emissions were higher in the near-real-time files used before
 * August 2020: added FIRMS ancillary app
 * July 2020: added daily timeseries for GFEDv4s app
 * April 2020: updated FIRECAM and SMOKE-FIRECAM apps with 2019 emissions

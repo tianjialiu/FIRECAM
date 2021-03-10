@@ -12,7 +12,7 @@
 // GFEDv4s emissions?
 
 // @author Tianjia Liu (tianjialiu@g.harvard.edu)
-// Last updated: November 17, 2020
+// Last updated: February 18, 2021
 
 // =================================================================
 // **********************   --    Code    --   *********************
@@ -405,7 +405,7 @@ var emiLegend = function(speciesLabel, units, maxVal, sYear, eYear) {
 
   var legendPanel = ui.Panel({
     widgets: [legendTitle, legendSubtitle, colorBar, legendLabels],
-    style: {margin: '0px 0px -2px 0px'}
+    style: {margin: '0'}
   });
   
   return legendPanel;
@@ -495,7 +495,7 @@ var controlPanel = ui.Panel({
 var controlWrapper = ui.Panel({
   widgets: [controlPanel, hideShowButton],
   layout: ui.Panel.Layout.flow('horizontal'),
-  style: {width: '360px', position: 'bottom-left'}
+  style: {width: '360px', position: 'bottom-left', maxHeight: '90%'}
 });
 
 // Plot panel

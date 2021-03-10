@@ -1,12 +1,12 @@
 // *****************************************************************
 // =================================================================
-// ---------------- Instructions for FIRECAM Tool --------------- ||
+// ------------------------- FIRECAM Tool ----------------------- ||
 // =================================================================
 // *****************************************************************
 /*
 // Documentation: https://github.com/tianjialiu/FIRECAM
 // @author Tianjia Liu (tianjialiu@g.harvard.edu)
-// Last updated: August 6, 2020
+// Last updated: October 30, 2020
 
 // Purpose: explore regional differences in fire emissions from five
 // global fire emissions inventories (GFED, FINN, GFAS, QFED, FEER)
@@ -100,7 +100,7 @@ var peat = firecam.peat;
 // Info Panel |
 // ------------
 var infoPanel = function() {
-  var FIRECAMLabelShort = ui.Label('FIRECAM Online Tool', {margin: '14px 0px 0px 13px', fontWeight: 'bold', fontSize: '24px', border: '1px solid black', padding: '3px 3px 3px 3px'});
+  var FIRECAMLabelShort = ui.Label('FIRECAM Online Tool', {margin: '14px 0px 0px 13px', fontWeight: 'bold', fontSize: '24px', border: '1px solid black', padding: '5px'});
   var FIRECAMLabelLong = ui.Label('Fire Inventories: Regional Evaluation, Comparison, and Metrics', {margin: '8px 30px 0px 13px', fontSize: '16px', color: '#777'});
   var invLabel = ui.Label('GFEDv4s, FINNv1.5, GFASv1.2, QFEDv2.5r1, FEERv1.0-G1.2', {margin: '3px 5px 0px 13px', fontSize: '11.7px', color: '#999'});
   var websiteLabel = ui.Label('[Website]', {margin: '3px 5px 3px 13px', fontSize: '13px'}, 'https://sites.google.com/view/firecam/home');
@@ -664,7 +664,7 @@ submitButton.onClick(function() {
     }
     map.centerObject(regionShp);
     map.addLayer(ee.Image().byte().rename('Selected Region')
-    .paint(ee.FeatureCollection(regionShp), 0, 1), {palette: '#FF0000'}, 'Selected Region');
+      .paint(ee.FeatureCollection(regionShp), 0, 1), {palette: '#FF0000'}, 'Selected Region');
   }
   
   if (regionType == 'Pixel') {

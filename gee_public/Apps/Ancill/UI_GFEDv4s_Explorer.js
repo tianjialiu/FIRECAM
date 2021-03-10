@@ -9,7 +9,7 @@
 // https://doi.org/10.5194/essd-9-697-2017
 
 // @author Tianjia Liu (tianjialiu@g.harvard.edu)
-// Last updated: November 17, 2020
+// Last updated: February 17, 2020
 
 // =================================================================
 // **********************   --    Code    --   *********************
@@ -114,15 +114,15 @@ var hideShowButton = ui.Button({
     hideShowButton.setLabel(hideMode ? 'Hide': 'Show');
     if (!hideMode) {
       controlWrapper.remove(controlPanel);
-      hideShowButton.style().set({padding: '0 0 0 0', margin: '0 0 0 0'});
+      hideShowButton.style().set({padding: '0', margin: '0'});
       controlWrapper.style().set({width: '70px'});
     } else {
       controlWrapper.insert(0,controlPanel);
-      hideShowButton.style().set({padding: '0 0 0 0px', margin: '0 0 0 -55px'});
+      hideShowButton.style().set({padding: '0', margin: '0 0 0 -55px'});
       controlWrapper.style().set({width: '360px'});
     }
   },
-  style: {padding: '0 0 0 0px', margin: '0 0 0 -55px'}
+  style: {padding: '0', margin: '0 0 0 -55px'}
 });
   
 // ------------
@@ -409,7 +409,7 @@ var emiLegend = function(speciesLabel, legendLabel, units, maxVal, sYear, eYear)
 
   var legendPanel = ui.Panel({
     widgets: [legendTitle, legendSubtitle, colorBar, legendLabels],
-    style: {margin: '0px 0px -2px 0px'}
+    style: {margin: '0px 0px 0 0px'}
   });
   
   return legendPanel;
@@ -479,7 +479,7 @@ var controlPanel = ui.Panel({
 var controlWrapper = ui.Panel({
   widgets: [controlPanel, hideShowButton],
   layout: ui.Panel.Layout.flow('horizontal'),
-  style: {width: '360px', position: 'bottom-left'}
+  style: {width: '360px', position: 'bottom-left', maxHeight: '90%'}
 });
 
 // Plot panel

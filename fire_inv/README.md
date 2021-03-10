@@ -29,7 +29,7 @@ Annual TXT (with daily timesteps) can be downloaded [here](http://bai.acom.ucar.
 
 To standarize and break-up the annual TXT files into more manageable monthly TXT files, use the `FINN_txt_monthly.R` script under `code/preprocess/`. (Note that this pre-processing step is required to use the R code to process the FINN data.) The `FINNv1p5_scale_factors.csv` under `ancill/` converts FINN emissions to units of kg.
 
-FINNv1.5 flles for the most recent year can be downloaded from UCAR's ftp server (2019-present):
+FINN files for the most recent year can be downloaded from UCAR's ftp server. However, these estimates differ from the annual FINNv1.5 files that are later made available:
 ```
 wget -m -np -nH --cut-dirs=3 -e robots=off -A gz  https://www.acom.ucar.edu/acresp/MODELING/finn_emis_txt
 ```
