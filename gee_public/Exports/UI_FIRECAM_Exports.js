@@ -6,7 +6,7 @@
 /*
 // Documentation: https://github.com/tianjialiu/FIRECAM
 // Author: Tianjia Liu
-// Last updated: December 8, 2019
+// Last updated: July 19, 2021
 
 // Purpose: explore regional differences in fire emissions from five
 // global fire emissions inventories (GFED, FINN, GFAS, QFED, FEER)
@@ -113,7 +113,7 @@ var getEmiTS = function(imageCol, regionShp, timeFormat) {
 // Info Panel |
 // ------------
 var infoPanel = function() {
-  var FIRECAMLabelShort = ui.Label('FIRECAM Online Tool', {margin: '14px 0px 0px 8px', fontWeight: 'bold', fontSize: '24px', border: '1px solid black', padding: '3px 3px 3px 3px'});
+  var FIRECAMLabelShort = ui.Label('FIRECAM Online Tool', {margin: '14px 0px 0px 8px', fontWeight: 'bold', fontSize: '24px', border: '1px solid black', padding: '5px'});
   var FIRECAMLabelLong = ui.Label('Fire Inventories: Regional Evaluation, Comparison, and Metrics', {margin: '8px 30px 0px 8px', fontSize: '16px', color: '#777'});
   var websiteLabel = ui.Label('[Website]', {margin: '3px 5px 3px 8px', fontSize: '13px'}, 'https://sites.google.com/view/firecam/home');
   var githubRepoLabel = ui.Label('GitHub: Code/Info', {margin: '0px 8px 5px 8px', fontSize: '13px'}, 'https://github.com/tianjialiu/FIRECAM');
@@ -133,11 +133,11 @@ var infoPanel = function() {
 var yearSelectPanel = function() {
   var timeRangeLabel = ui.Label('1) Select Time Range:', {margin: '8px 8px 8px 13px', fontSize: '14.5px'});
   var startYearLabel = ui.Label('Start Year:', {margin: '3px 20px 8px 29px', fontSize: '14.5px'});
-  var startYearSlider = ui.Slider({min: 2003, max: 2019, value: 2005, step: 1, style: {margin: '3px 8px 8px 14px'}});
+  var startYearSlider = ui.Slider({min: 2003, max: 2020, value: 2005, step: 1, style: {margin: '3px 8px 8px 14px'}});
   startYearSlider.style().set('stretch', 'horizontal');
   
   var endYearLabel = ui.Label('End Year:', {margin: '3px 20px 8px 29px', fontSize: '14.5px'});
-  var endYearSlider = ui.Slider({min: 2003, max: 2019, value: 2015, step: 1, style: {margin: '3px 8px 8px 14px'}});
+  var endYearSlider = ui.Slider({min: 2003, max: 2020, value: 2015, step: 1, style: {margin: '3px 8px 8px 14px'}});
   endYearSlider.style().set('stretch', 'horizontal');
   
   var changeSliderYr = function() {

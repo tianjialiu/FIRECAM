@@ -13,7 +13,7 @@ Please see our [website](https://sites.google.com/view/firecam/home) for more in
 FIRECAM can be accessed through (1) Earth Engine Apps and (2) the Google Earth Engine (GEE) Javascript playground. While EE Apps facilitates access to FIRECAM for any user (GEE account not required), accessing the FIRECAM repository in the GEE playground allows rapid exports of timeseries and additional data analysis. The latter is also a fallback option if EE Apps is running too slowly.
 
 ### Ancillary Apps
-* [GFEDv4s Explorer](https://globalfires.earthengine.app/view/gfedv4s): Explore GFEDv4s emissions (1997-2016, 2017-2019 beta estimates) for burned area and all available chemical species, partitioned by land use/land cover
+* [GFEDv4s Explorer](https://globalfires.earthengine.app/view/gfedv4s): Explore GFEDv4s emissions (1997-2016, 2017-2020 beta estimates) for burned area and all available chemical species, partitioned by land use/land cover
     - *Note*: Burned area from small fires is approximate based on the small fire fraction for emissions
 * [GFEDv4s Animated Burned Area](https://globalfires.earthengine.app/view/gfedv4s-monthly-ba-animated): Visualize the seasonality of GFEDv4s burned area. 
     - *Note*: GFEDv4s BA is averaged into monthly means. Please wait until all the images load (check the layer list in the upper-right hand corner of the map) before clicking 'Play.'
@@ -71,7 +71,9 @@ The repository should then appear in the top-left panel under 'Reader' as 'users
 Click the 'Apps/UI_FIRECAM.js' script in the 'users/tl2581/FIRECAM' repository. The script should appear in the code editor. Click 'Run' in the top-right corner of the code editor to activate the user interface. The repository also contains a script to export monthly and annual timeseries data ('Exports/UI_FIRECAM_Exports.js').
 
 ## Updates
+* July 2021: updated FIRECAM, SMOKE-FIRECAM, and GFEDv4s apps with 2020 emissions
 * February 2021: re-uploaded FINNv1.5 for 2018 and 2019 based on the most recent version of the annual text files; note that 2019 emissions were higher in the near-real-time files used before
+* November 2020: added url support for saving the app state, cumulative sum plot, and pan map option in FIRMS app
 * August 2020: added FIRMS ancillary app
 * July 2020: added daily timeseries for GFEDv4s app
 * April 2020: updated FIRECAM and SMOKE-FIRECAM apps with 2019 emissions

@@ -102,7 +102,7 @@ var yearPanel = function() {
   var inputSectionLabel = ui.Label('Input Parameters', {margin: '8px 8px 5px 8px', fontWeight: 'bold', fontSize: '20px'});
   
   var inputYearLabel = ui.Label('1) Fire Emissions Year:', {fontSize: '14.5px'});
-  var inputYearSlider = ui.Slider({min: 2003, max: 2019, value: 2015, step: 1});
+  var inputYearSlider = ui.Slider({min: 2003, max: 2020, value: 2015, step: 1});
   inputYearSlider.style().set('stretch', 'horizontal');
   
   var metYearLabel = ui.Label('2) Meteorology Year:', {fontSize: '14.5px'});

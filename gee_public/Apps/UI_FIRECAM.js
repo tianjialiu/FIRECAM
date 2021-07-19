@@ -6,7 +6,7 @@
 /*
 // Documentation: https://github.com/tianjialiu/FIRECAM
 // @author Tianjia Liu (tianjialiu@g.harvard.edu)
-// Last updated: October 30, 2020
+// Last updated: July 15, 2021
 
 // Purpose: explore regional differences in fire emissions from five
 // global fire emissions inventories (GFED, FINN, GFAS, QFED, FEER)
@@ -123,11 +123,11 @@ var infoPanel = function() {
 var yearSelectPanel = function() {
   var timeRangeLabel = ui.Label('1) Select Time Range:', {margin: '8px 8px 8px 13px', fontSize: '14.5px'});
   var startYearLabel = ui.Label('Start Year:', {margin: '3px 20px 8px 29px', fontSize: '14.5px'});
-  var startYearSlider = ui.Slider({min: 2003, max: 2019, value: 2005, step: 1, style: {margin: '3px 8px 8px 14px'}});
+  var startYearSlider = ui.Slider({min: 2003, max: 2020, value: 2005, step: 1, style: {margin: '3px 8px 8px 14px'}});
   startYearSlider.style().set('stretch', 'horizontal');
   
   var endYearLabel = ui.Label('End Year:', {margin: '3px 27px 8px 29px', fontSize: '14.5px'});
-  var endYearSlider = ui.Slider({min: 2003, max: 2019, value: 2015, step: 1, style: {margin: '3px 8px 8px 14px'}});
+  var endYearSlider = ui.Slider({min: 2003, max: 2020, value: 2015, step: 1, style: {margin: '3px 8px 8px 14px'}});
   endYearSlider.style().set('stretch', 'horizontal');
   
   var changeSliderYr = function() {
@@ -139,7 +139,7 @@ var yearSelectPanel = function() {
   startYearSlider.onChange(changeSliderYr);
   endYearSlider.onChange(changeSliderYr);
   
-  var betaLabel = ui.Label('Note: GFEDv4s emissions for 2017-19 are preliminary',
+  var betaLabel = ui.Label('Note: GFEDv4s emissions for 2017-20 are preliminary',
     {margin: '3px 20px 8px 29px', fontSize: '12px', color: '#666'});
   
   return ui.Panel([
