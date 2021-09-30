@@ -307,10 +307,11 @@ function chartBurnedArea() {
 
   var nYear = ee.Number(endYear).subtract(ee.Number(startYear)).add(1);
   
-  var firmsRange = ee.ImageCollection('FIRMS').select(['T21'],['FireCount'])
+  var firmsFiltered = ee.ImageCollection('FIRMS').select(['T21'],['FireCount'])
     .filter(ee.Filter.calendarRange(startYear,endYear,'year'))
-    .filter(ee.Filter.calendarRange(startDay,endDay,'day_of_year'))
-    .map(function(x) {return x.gt(0).copyProperties(x,['system:time_start'])});
+    .filter(ee.Filter.calendarRange(startDay,endDay,'day_of_year'));
+    
+  var firmsRange = firmsFiltered.map(function(x) {return x.gt(0).copyProperties(x,['system:time_start'])});
 
   var firmsByYearCuml = ee.List.sequence(startYear,endYear,1).map(function(iYear) {
     
@@ -350,8 +351,11 @@ function chartBurnedArea() {
     }
     return firmsDay;
   });
-
-  var firmsYr = firmsRange.sum();
+  
+  var firmsYr = ee.ImageCollection(
+    ee.List.sequence(startYear,endYear,1).map(function(iYear) {
+      return firmsFiltered.filter(ee.Filter.calendarRange(iYear,iYear,'year')).sum().gt(0);
+    })).sum();
   
   var colPaln = colPal.get(ee.String(ee.Number(nYear).format())).getInfo();
   
