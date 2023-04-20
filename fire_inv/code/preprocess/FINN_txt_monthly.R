@@ -3,7 +3,7 @@
 # for quicker file loading and name
 # standarization
 # =========================================
-# last updated: Feb 21, 2019
+# last updated: Apr 13, 2023
 # Tianjia Liu
 
 rm(list=ls())
@@ -12,7 +12,7 @@ source('~/Google Drive/scripts/R/fire_inv/globalParams.R')
 # -------------
 # Input Params
 # -------------
-xYears <- 2003:2016
+xYears <- 2003:2020
 
 # Set input and output folders to read and write FINN txt files
 invName <- "FINNv1p5"

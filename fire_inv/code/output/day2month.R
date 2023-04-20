@@ -2,7 +2,7 @@
 # Converts daily tif files (kg/m2/s)
 # to monthly sum (kg)
 # =========================================
-# last updated: Sep 30, 2019
+# last updated: Apr 13, 2023
 # Tianjia Liu
 
 rm(list=ls())
@@ -11,7 +11,7 @@ source('~/Google Drive/scripts/R/fire_inv/globalParams.R')
 # -------------
 # Input Params
 # -------------
-xYears <- 2017:2018
+xYears <- 2003:2022
 xMonths <- 1:12
 invNameL <- c("FINNv1p5","GFASv1p2","QFEDv2p5r1","FEERv1p0_G1p2")
 varNameL <- c("CO","CO2","CH4","OC","BC","PM25")

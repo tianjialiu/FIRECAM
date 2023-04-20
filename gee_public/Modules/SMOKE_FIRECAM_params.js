@@ -328,7 +328,7 @@ exports.getPMtsChart = function(PMtsInv) {
     xProperty: 'system:time_start',
     yProperties: invNames
   }).setChartType('LineChart')
-    .setSeriesNames(['GFEDv4s','FINNv1.5','GFASv1.2','QFEDv2.5r1','FEERv1.0-G1.2'])
+    .setSeriesNames(invDispNames)
     .setOptions({
       title: 'Smoke PM2.5 Exposure',
       titleTextStyle: {fontSize: '13.5'},
@@ -350,7 +350,7 @@ exports.getPMavgChart = function(PMtsAvg) {
     xProperty: 'xName',
     yProperties: invNames
   }).setChartType('ColumnChart')
-    .setSeriesNames(['GFEDv4s','FINNv1.5','GFASv1.2','QFEDv2.5r1','FEERv1.0-G1.2'])
+    .setSeriesNames(invDispNames)
     .setOptions({
       title: 'Smoke PM2.5 Exposure',
       titleTextStyle: {fontSize: '13'},
@@ -427,6 +427,12 @@ exports.getEmissTotal = function(inEmiInvName,inputYear,metYear,inSpecies) {
 
 // Assign default adjoint year based on rainfall
 exports.closestMetYear = {
+  1981: 2007,
+  1982: 2006,
+  1983: 2007,
+  1984: 2005,
+  1985: 2005,
+  1986: 2007,
   1987: 2006,
   1988: 2008,
   1989: 2008,
@@ -460,5 +466,7 @@ exports.closestMetYear = {
   2017: 2008,
   2018: 2009,
   2019: 2006,
-  2020: 2008
+  2020: 2008,
+  2021: 2008,
+  2022: 2008
 };

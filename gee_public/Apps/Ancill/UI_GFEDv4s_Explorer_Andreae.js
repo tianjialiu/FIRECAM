@@ -12,7 +12,7 @@
 // GFEDv4s emissions?
 
 // @author Tianjia Liu (tianjialiu@g.harvard.edu)
-// Last updated: July 15, 2021
+// Last updated: April 15, 2023
 
 // =================================================================
 // **********************   --    Code    --   *********************
@@ -92,9 +92,9 @@ var infoPanel = function() {
   var GFEDLabelShort = ui.Label('GFEDv4s Explorer', {margin: '6px 0px 0px 8px', fontWeight: 'bold', fontSize: '24px', border: '1px solid black', padding: '5px', backgroundColor: '#FFFFFF00'});
   var GFEDLabelLong = ui.Label('Global Fire Emissions Database, version 4s', {margin: '8px 8px 0px 8px', fontSize: '16px'});
   var AndreaeLong = ui.Label('How much does the Andreae (2019, ACP) emissions factors update impact GFEDv4s emissions?', {margin: '5px 8px 0px 8px', fontSize: '12.5px'});
-  var paperLabel = ui.Label('Citation: van der Werf et al. (2017, ESSD)', {margin: '5px 0px 5px 8px', fontSize: '12.5px'}, 'https://doi.org/10.5194/essd-9-697-2017');
-  var websiteLabel = ui.Label('[Data]', {margin: '5px 0px 5px 8px', fontSize: '12.5px'}, 'https://www.globalfiredata.org/');
-  var codeLabel = ui.Label('[Code]', {margin: '5px 0px 5px 4px', fontSize: '12.5px'}, 'https://github.com/tianjialiu/FIRECAM/');
+  var paperLabel = ui.Label('Citation: van der Werf et al. (2017, ESSD)', {margin: '5px 0px 5px 8px', fontSize: '12.5px', color: '#5886E8'}, 'https://doi.org/10.5194/essd-9-697-2017');
+  var websiteLabel = ui.Label('[Data]', {margin: '5px 0px 5px 8px', fontSize: '12.5px', color: '#5886E8'}, 'https://www.globalfiredata.org/');
+  var codeLabel = ui.Label('[Code]', {margin: '5px 0px 5px 4px', fontSize: '12.5px', color: '#5886E8'}, 'https://github.com/tianjialiu/FIRECAM/');
   var inputParamsLabel = ui.Label('Input Parameters', {margin: '8px 8px 5px 8px', fontWeight: 'bold', fontSize: '20px'});
 
   return ui.Panel({
@@ -132,11 +132,11 @@ var hideShowButton = ui.Button({
 var yearSelectPanel = function() {
   var timeRangeLabel = ui.Label('1) Select Time Range:', {margin: '8px 8px 8px 8px', fontSize: '14.5px'});
   var startYearLabel = ui.Label('Start Year:', {margin: '3px 20px 8px 24px', fontSize: '14.5px'});
-  var startYearSlider = ui.Slider({min: 1997, max: 2020, value: 2005, step: 1, style: {margin: '3px 8px 8px 14px'}});
+  var startYearSlider = ui.Slider({min: 1997, max: 2022, value: 2005, step: 1, style: {margin: '3px 8px 8px 14px'}});
   startYearSlider.style().set('stretch', 'horizontal');
   
   var endYearLabel = ui.Label('End Year:', {margin: '3px 20px 8px 24px', fontSize: '14.5px'});
-  var endYearSlider = ui.Slider({min: 1997, max: 2020, value: 2015, step: 1, style: {margin: '3px 8px 8px 21px'}});
+  var endYearSlider = ui.Slider({min: 1997, max: 2022, value: 2015, step: 1, style: {margin: '3px 8px 8px 21px'}});
   endYearSlider.style().set('stretch', 'horizontal');
   
   var changeSliderYr = function() {
@@ -148,7 +148,7 @@ var yearSelectPanel = function() {
   startYearSlider.onChange(changeSliderYr);
   endYearSlider.onChange(changeSliderYr);
   
-  var betaLabel = ui.Label('Note: GFEDv4s emissions for 2017-20 are preliminary',
+  var betaLabel = ui.Label('Note: GFEDv4s emissions for 2017-22 are preliminary',
     {margin: '3px 20px 8px 24px', fontSize: '12px', color: '#666'});
 
   return ui.Panel([

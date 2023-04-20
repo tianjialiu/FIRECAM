@@ -3,7 +3,7 @@
 # for quicker file loading and name
 # standarization, NRT files
 # =========================================
-# last updated: Apr 18, 2020
+# last updated: Apr 13, 2023
 # Tianjia Liu
 
 rm(list=ls())
@@ -12,7 +12,7 @@ source('~/Google Drive/scripts/R/fire_inv/globalParams.R')
 # -------------
 # Input Params
 # -------------
-xYears <- 2019
+xYears <- 2021:2022
 xMonths <- 1:12
 
 # Set input and output folders to read and write FINN txt files

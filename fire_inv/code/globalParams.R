@@ -3,9 +3,12 @@ library("raster");library("rgeos");library("maptools");library("mapproj");
 library("maps");library("rgdal");library("spdep");library("sp");library("fields")
 library("plyr");library("ncdf4");library("rhdf5")
 
-inputDir <- "/Volumes/TLIU_DATA/FIRE_raw/"
-outputDir_nc <- "/Volumes/TLIU_DATA/FIRE_nc_daily/"
-outputDir_tif <- "/Volumes/TLIU_DATA/FIRE_tif_daily/"
+projectDir <- "/Volumes/TLIU_DATA/"
+inputDir <- file.path(projectDir,"FIRE_raw/")
+outputDir_nc <- file.path(projectDir,"FIRE_nc_daily/")
+outputDir_tif <- file.path(projectDir,"FIRE_tif_daily/")
+outputDirMonthly_tif <- file.path(projectDir,"FIRE_tif_monthly/")
+outputDirMonthly_gee_tif <- file.path(projectDir,"FIRE_tif_monthly_gee/")
 
 originDate <- "1985-01-01"
 varUnits <- "kg/m2/s"

@@ -1,5 +1,6 @@
 /**** Start of imports. If edited, may not auto-convert in the playground. ****/
-var firms = ee.ImageCollection("FIRMS"),
+var mod14a1 = ee.ImageCollection("MODIS/006/MOD14A1"),
+    myd14a1 = ee.ImageCollection("MODIS/006/MYD14A1"),
     geometry = /* color: #ffffff */ee.Geometry.Polygon(
         [[[15, 10],
           [15, 3.5],
@@ -8,13 +9,13 @@ var firms = ee.ImageCollection("FIRMS"),
 /***** End of imports. If edited, may not auto-convert in the playground. *****/
 // *****************************************************************
 // =================================================================
-// --------------- Instructions for FIRMS Explorer -------------- ||
+// --------------- Instructions for MODIS Explorer -------------- ||
 // =================================================================
 // *****************************************************************
 /*
 // Documentation: https://github.com/tianjialiu/FIRECAM
 // @author Tianjia Liu (tianjialiu@g.harvard.edu)
-// Last updated: April 15, 2023
+// Last updated: June 9, 2022
 
 // Purpose: plot timeseries of MODIS/FIRMS active fire counts
 // by region and day of year, across years
@@ -42,9 +43,9 @@ var symbol = {
 };
 
 // Set up a ui.Panel to hold instructions and the geometry drawing buttons.
-var startYearSlider = ui.Slider({min:2001,max:2023,value:2019,step:1,
+var startYearSlider = ui.Slider({min:2001,max:2022,value:2019,step:1,
   style:{stretch:'horizontal'}});
-var endYearSlider = ui.Slider({min:2001,max:2023,value:2023,step:1,
+var endYearSlider = ui.Slider({min:2001,max:2022,value:2022,step:1,
   style:{stretch:'horizontal'}});
 var doyText = ui.Textbox({placeholder:'1-100',value:'1-100',
   style:{stretch:'horizontal'}});
@@ -65,7 +66,7 @@ var submitButton = ui.Button({
       
 var mainPanel = ui.Panel({
   widgets: [
-    ui.Label('FIRMS Active Fires',{fontSize:'20px',fontWeight:'bold',margin: '6px 8px 2px 8px'}),
+    ui.Label('MODIS Active Fires',{fontSize:'20px',fontWeight:'bold',margin: '6px 8px 2px 8px'}),
     ui.Label('1) Select time range:',{fontSize:'14.5px'}),
     ui.Panel([ui.Label('Start Year: ',{color:'#777',margin:'8px 3px 8px 8px'}),startYearSlider],ui.Panel.Layout.Flow('horizontal'),{stretch:'horizontal',margin:'-5px -8px 0px 8px'}),
     ui.Panel([ui.Label('End Year: ',{color:'#777',margin:'8px 10px 8px 8px'}),endYearSlider],ui.Panel.Layout.Flow('horizontal'),{stretch:'horizontal',margin:'-7px -8px 0px 8px'}),
@@ -251,7 +252,7 @@ var continuousLegend = function(title, colPal, minVal, maxVal, units) {
   return ui.Panel([footDivider,legendTitle,unitsLabel,colorBar,legendLabels]);
 };
 
-var proj = firms.first().projection();
+var proj = mod14a1.first().projection();
 var scale = proj.nominalScale();
 
 if (ui.url.get('startYear') !== undefined) {
@@ -270,7 +271,7 @@ var geometry;
 if (ui.url.get('geometry') !== undefined) {
   geometry = ee.Deserializer.fromJSON(ui.url.get('geometry'));
 } else {
-  // Initialize a dummy GeometryLayer with default geometry acts as a placeholder
+  // Initialize a dummy GeometryLayer with null geometry acts as a placeholder
   // for drawn geometries.
   geometry = ee.Geometry.Rectangle([15,3.5,26,10]);
 }
@@ -284,9 +285,30 @@ var dummyGeometry = ui.Map.GeometryLayer(
 drawingTools.layers().add(dummyGeometry);
 Map.centerObject(geometry,4);
 
+var indexJoin = function(collectionA, collectionB, propertyName) {
+  var joined = ee.ImageCollection(ee.Join.saveFirst(propertyName).apply({
+    primary: collectionA,
+    secondary: collectionB,
+    condition: ee.Filter.equals({
+      leftField: 'system:index',
+      rightField: 'system:index'})
+  }));
+
+  return joined.map(function(image) {
+    return image.addBands(ee.Image(image.get(propertyName)));
+  });
+};
+
+var getFireMask = function(image) {
+
+  return ee.Image(image.reduce(ee.Reducer.max()).gte(7)
+    .copyProperties(image,['system:time_start']))
+    .rename('FireCount');
+};
+
 // Define function to generate chart and add it to the chart panel.
 var dirtyMap = false;
-function chartFire() {
+function chartActiveFires() {
   // Make the chart panel visible the first time.
   if (dirtyMap === false) {
     Map.add(chartPanelParent.add(hideShowChartButton).add(chartPanel).add(chartSelectPanel));
@@ -312,22 +334,32 @@ function chartFire() {
 
   var nYear = ee.Number(endYear).subtract(ee.Number(startYear)).add(1);
   
-  var firmsFiltered = ee.ImageCollection('FIRMS').select(['T21'],['FireCount'])
+ var mod14Filtered = ee.ImageCollection('MODIS/006/MOD14A1').select(['FireMask'],['FireCount'])
     .filter(ee.Filter.calendarRange(startYear,endYear,'year'))
     .filter(ee.Filter.calendarRange(startDay,endDay,'day_of_year'));
-    
-  var firmsRange = firmsFiltered.map(function(x) {return x.gt(0).copyProperties(x,['system:time_start'])});
+  
+  var myd14Filtered = ee.ImageCollection('MODIS/006/MYD14A1').select(['FireMask'],['FireCount'])
+    .filter(ee.Filter.calendarRange(startYear,endYear,'year'))
+    .filter(ee.Filter.calendarRange(startDay,endDay,'day_of_year'));
+  
+  var mxd14Filtered = indexJoin(mod14Filtered,myd14Filtered,'FireCount')
+    .map(getFireMask);
 
-  var firmsByYearCuml = ee.List.sequence(startYear,endYear,1).map(function(iYear) {
+  var mxd14Range = mxd14Filtered.map(function(x) {return x.gt(0).copyProperties(x,['system:time_start'])});
+
+  var mxd14ByYearCuml = ee.List.sequence(startYear,endYear,1).map(function(iYear) {
     
-    var firmsYr = firmsRange
+    var mxd14Yr = mxd14Range
       .filter(ee.Filter.calendarRange(iYear,iYear,'year'))
       .toBands();
-  
-    var bandNames = firmsYr.bandNames()
-      .map(function(x) {return ee.String(x).slice(4,7)});
-      
-    firmsYr = ee.Feature(firmsYr.rename(bandNames)
+
+    var bandNames = mxd14Yr.bandNames()
+      .map(function(x) {
+        return ee.Date.parse('YYYY_MM_dd',ee.String(x).slice(0,10))
+          .format('DDD');
+      });
+        
+    mxd14Yr = ee.Feature(mxd14Yr.rename(bandNames)
       .selfMask()
       .reduceRegions({
         collection: aoi,
@@ -336,42 +368,42 @@ function chartFire() {
         scale: scale,
       }).first());
     
-    var firmsYrCS = firmsYr.toArray(bandNames).accum(0);
+    var mxd14YrCS = mxd14Yr.toArray(bandNames).accum(0);
   
     return ee.Feature(null,{Year:iYear})
-      .set(ee.Dictionary.fromLists(bandNames,firmsYrCS.toList()));
+      .set(ee.Dictionary.fromLists(bandNames,mxd14YrCS.toList()));
   });
 
-  firmsByYearCuml = ee.FeatureCollection(firmsByYearCuml);
+  mxd14ByYearCuml = ee.FeatureCollection(mxd14ByYearCuml);
   var yrStr = ee.List.sequence(startYear,endYear,1)
     .map(function(x) {return ee.String(ee.Number(x).toInt())});
-  
-  var firmsByDayCuml = ee.List.sequence(startDay,endDay,1).map(function(JDay) {
-    var firmsDay = ee.Feature(null,{DOY:JDay});
+
+  var mxd14ByDayCuml = ee.List.sequence(startDay,endDay,1).map(function(JDay) {
+    var mxd14Day = ee.Feature(null,{DOY:JDay});
     
     for (var iYear = startYear; iYear <= endYear; iYear++) {
-      var firmsYr = firmsByYearCuml.filter(ee.Filter.eq('Year',iYear)).first();
-      firmsDay = firmsDay.set(ee.String(ee.Number(iYear).toInt()),
-        firmsYr.getNumber(ee.Number(JDay).format('%03d')));
+      var mxd14Yr = mxd14ByYearCuml.filter(ee.Filter.eq('Year',iYear)).first();
+      mxd14Day = mxd14Day.set(ee.String(ee.Number(iYear).toInt()),
+        mxd14Yr.getNumber(ee.Number(JDay).format('%03d')));
     }
-    return firmsDay;
+    return mxd14Day;
   });
-  
-  var firmsYr = ee.ImageCollection(
+
+  var mxd14Yr = ee.ImageCollection(
     ee.List.sequence(startYear,endYear,1).map(function(iYear) {
-      return firmsFiltered.filter(ee.Filter.calendarRange(iYear,iYear,'year')).sum().gt(0);
+      return mxd14Filtered.filter(ee.Filter.calendarRange(iYear,iYear,'year')).sum().gt(0);
     })).sum();
   
   var colPaln = colPal.get(ee.String(ee.Number(nYear).format())).getInfo();
   
   Map.layers().remove(Map.layers().get(0));
-  Map.addLayer(firmsYr.selfMask(),
+  Map.addLayer(mxd14Yr.selfMask(),
     {palette:colPaln, min: 1, max: endYear-startYear+1},
-    'FIRMS Count');
+    'Active Fire Count');
 
   var getChartByDOY = function() {
     return ui.Chart.image.doySeriesByYear({
-        imageCollection: firmsRange,
+        imageCollection: mxd14Range,
         bandName: 'FireCount',
         region: aoi,
         regionReducer: ee.Reducer.sum().unweighted(),
@@ -398,7 +430,7 @@ function chartFire() {
   };
   
   var getChartByDOYcuml = function() {
-    return ui.Chart.feature.byFeature(firmsByDayCuml,'DOY')
+    return ui.Chart.feature.byFeature(mxd14ByDayCuml,'DOY')
       .setChartType('LineChart')
       .setOptions({
         vAxis: {
@@ -443,4 +475,4 @@ function chartFire() {
   Map.centerObject(aoi);
 }
 
-submitButton.onClick(chartFire);
+submitButton.onClick(chartActiveFires);

@@ -9,7 +9,7 @@
 // https://github.com/tianjialiu/FIRECAM
 
 // @author Tianjia Liu (tianjialiu@g.harvard.edu)
-// Last updated: April 21, 2020
+// Last updated: April 15, 2023
 
 // Purpose: explore how the modeled impact of Indonesian fires
 // on smoke exposure in Equatorial Asia differs in using
@@ -89,12 +89,12 @@ var yearPanel = function() {
   
   var infoLabel = ui.Label('The SMOKE-FIRECAM Tool is a simplified version of the SMOKE Policy Tool that explores how the modeled impact of Indonesian fires on smoke exposure in Equatorial Asia differs in using five different fire emissions inventories.',
     {margin: '8px 20px 2px 8px', fontSize: '12px', color: '#777'});
-  var SMOKE_websiteLabel = ui.Label('[SMOKE Policy Tool]', {margin: '0px 0px 5px 8px', fontSize: '12.5px'}, 'https://sites.google.com/view/smokepolicytool/home');
-  var FIRECAM_websiteLabel = ui.Label('[FIRECAM]', {margin: '0px 0px 5px 8px', fontSize: '12.5px'}, 'https://sites.google.com/view/firecam/home');
+  var SMOKE_websiteLabel = ui.Label('[SMOKE Policy Tool]', {margin: '0px 0px 5px 8px', fontSize: '12.5px', color: '#5886E8'}, 'https://sites.google.com/view/smokepolicytool/home');
+  var FIRECAM_websiteLabel = ui.Label('[FIRECAM]', {margin: '0px 0px 5px 8px', fontSize: '12.5px', color: '#5886E8'}, 'https://sites.google.com/view/firecam/home');
   var websiteLabel = ui.Panel([SMOKE_websiteLabel, FIRECAM_websiteLabel],ui.Panel.Layout.flow('horizontal'));
   
-  var paperLabel = ui.Label('Citation: Liu et al. (2020, Remote Sens. Environ.)', {margin: '5px 0px 5px 8px', fontSize: '12.5px'}, 'https://doi.org/10.1016/j.rse.2019.111557');
-  var githubRepoLabel = ui.Label('GitHub: Code/Info', {margin: '0px 0px 5px 8px', fontSize: '12.5px'}, 'https://github.com/tianjialiu/SMOKE-Policy-Tool');
+  var paperLabel = ui.Label('Citation: Liu et al. (2020, Remote Sens. Environ.)', {margin: '5px 0px 5px 8px', fontSize: '12.5px', color: '#5886E8'}, 'https://doi.org/10.1016/j.rse.2019.111557');
+  var githubRepoLabel = ui.Label('GitHub: Code/Info', {margin: '0px 0px 5px 8px', fontSize: '12.5px', color: '#5886E8'}, 'https://github.com/tianjialiu/SMOKE-Policy-Tool');
 
   var headDivider = ui.Panel(ui.Label(),ui.Panel.Layout.flow('horizontal'),
     {margin: '10px 0px 5px 0px',height:'1.25px',border:'0.75px solid black',stretch:'horizontal'});
@@ -102,7 +102,7 @@ var yearPanel = function() {
   var inputSectionLabel = ui.Label('Input Parameters', {margin: '8px 8px 5px 8px', fontWeight: 'bold', fontSize: '20px'});
   
   var inputYearLabel = ui.Label('1) Fire Emissions Year:', {fontSize: '14.5px'});
-  var inputYearSlider = ui.Slider({min: 2003, max: 2020, value: 2015, step: 1});
+  var inputYearSlider = ui.Slider({min: 2003, max: 2022, value: 2015, step: 1});
   inputYearSlider.style().set('stretch', 'horizontal');
   
   var metYearLabel = ui.Label('2) Meteorology Year:', {fontSize: '14.5px'});

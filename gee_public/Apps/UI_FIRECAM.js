@@ -6,7 +6,7 @@
 /*
 // Documentation: https://github.com/tianjialiu/FIRECAM
 // @author Tianjia Liu (tianjialiu@g.harvard.edu)
-// Last updated: July 15, 2021
+// Last updated: April 15, 2023
 
 // Purpose: explore regional differences in fire emissions from five
 // global fire emissions inventories (GFED, FINN, GFAS, QFED, FEER)
@@ -103,9 +103,9 @@ var infoPanel = function() {
   var FIRECAMLabelShort = ui.Label('FIRECAM Online Tool', {margin: '14px 0px 0px 13px', fontWeight: 'bold', fontSize: '24px', border: '1px solid black', padding: '5px'});
   var FIRECAMLabelLong = ui.Label('Fire Inventories: Regional Evaluation, Comparison, and Metrics', {margin: '8px 30px 0px 13px', fontSize: '16px', color: '#777'});
   var invLabel = ui.Label('GFEDv4s, FINNv1.5, GFASv1.2, QFEDv2.5r1, FEERv1.0-G1.2', {margin: '3px 5px 0px 13px', fontSize: '11.7px', color: '#999'});
-  var websiteLabel = ui.Label('[Website]', {margin: '3px 5px 3px 13px', fontSize: '13px'}, 'https://sites.google.com/view/firecam/home');
-  var githubRepoLabel = ui.Label('GitHub: Code/Info', {margin: '0px 8px 5px 13px', fontSize: '13px'}, 'https://github.com/tianjialiu/FIRECAM');
-  var citationLabel = ui.Label('Citation: Liu et al. (2020, Remote Sens. Environ.)', {margin: '8px 8px 5px 13px', fontSize: '13px'}, 'https://doi.org/10.1016/j.rse.2019.111557');
+  var websiteLabel = ui.Label('[Website]', {margin: '3px 5px 3px 13px', fontSize: '13px', color: '#5886E8'}, 'https://sites.google.com/view/firecam/home');
+  var githubRepoLabel = ui.Label('GitHub: Code/Info', {margin: '0px 8px 5px 13px', fontSize: '13px', color: '#5886E8'}, 'https://github.com/tianjialiu/FIRECAM');
+  var citationLabel = ui.Label('Citation: Liu et al. (2020, Remote Sens. Environ.)', {margin: '8px 8px 5px 13px', fontSize: '13px', color: '#5886E8'}, 'https://doi.org/10.1016/j.rse.2019.111557');
   var headDivider = ui.Panel(ui.Label(),ui.Panel.Layout.flow('horizontal'),
     {margin: '10px 0px 5px 0px',height:'1.25px',border:'0.75px solid black',stretch:'horizontal'});
   var inputParamsLabel = ui.Label('Input Parameters', {margin: '8px 8px 5px 13px', fontWeight: 'bold', fontSize: '20px'});
@@ -123,11 +123,11 @@ var infoPanel = function() {
 var yearSelectPanel = function() {
   var timeRangeLabel = ui.Label('1) Select Time Range:', {margin: '8px 8px 8px 13px', fontSize: '14.5px'});
   var startYearLabel = ui.Label('Start Year:', {margin: '3px 20px 8px 29px', fontSize: '14.5px'});
-  var startYearSlider = ui.Slider({min: 2003, max: 2020, value: 2005, step: 1, style: {margin: '3px 8px 8px 14px'}});
+  var startYearSlider = ui.Slider({min: 2003, max: 2022, value: 2005, step: 1, style: {margin: '3px 8px 8px 14px'}});
   startYearSlider.style().set('stretch', 'horizontal');
   
   var endYearLabel = ui.Label('End Year:', {margin: '3px 27px 8px 29px', fontSize: '14.5px'});
-  var endYearSlider = ui.Slider({min: 2003, max: 2020, value: 2015, step: 1, style: {margin: '3px 8px 8px 14px'}});
+  var endYearSlider = ui.Slider({min: 2003, max: 2022, value: 2015, step: 1, style: {margin: '3px 8px 8px 14px'}});
   endYearSlider.style().set('stretch', 'horizontal');
   
   var changeSliderYr = function() {
@@ -139,7 +139,7 @@ var yearSelectPanel = function() {
   startYearSlider.onChange(changeSliderYr);
   endYearSlider.onChange(changeSliderYr);
   
-  var betaLabel = ui.Label('Note: GFEDv4s emissions for 2017-20 are preliminary',
+  var betaLabel = ui.Label('Note: GFEDv4s emissions for 2017-22 and FINNv1.5 emissions for 2021-22 are preliminary',
     {margin: '3px 20px 8px 29px', fontSize: '12px', color: '#666'});
   
   return ui.Panel([
@@ -521,7 +521,7 @@ var SmokeFIRECAMPanel = function() {
     margin: '0px 0px 3px 0px'});
   var description = ui.Label('View the SMOKE-FIRECAM Tool to see an example on Indonesia fires of how using different inventories can impact modeled smoke exposure estimates.',
     {fontSize: '11px', margin: '2px 0px 0px 0px'});
-  var link = ui.Label('[SMOKE-FIRECAM Tool]', {margin: '0px 0px 3px 0px', fontSize: '11.5px'}, 'https://globalfires.earthengine.app/view/smoke-firecam-tool');
+  var link = ui.Label('[SMOKE-FIRECAM Tool]', {margin: '0px 0px 3px 0px', fontSize: '11.5px', color: '#5886E8'}, 'https://globalfires.earthengine.app/view/smoke-firecam-tool');
   return ui.Panel({
     widgets: [titleLabel,link,description],
     style: {

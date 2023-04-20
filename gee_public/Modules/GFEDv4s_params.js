@@ -202,7 +202,7 @@ var getEmiByMonth = function(EFs, varType, sYear, eYear) {
       var BAsf = gfedMon.select('small_fire_fraction');
       
       var BA = BAfrac.addBands(BAfrac.multiply(BAsf))
-        .multiply(gridArea).divide(1e9).rename(['BA','BAsf'])
+        .multiply(gridArea).divide(1e9).rename(['BA','BA_smallfires'])
         .reproject({crs: crs, crsTransform: crsTrans})
         .copyProperties(gfedMon,['system:time_start']); // sq. km, in thousands
       
@@ -315,7 +315,7 @@ exports.getCountryShp = function(region) {
 exports.getGridShp = function(region) {
   return ee.Image(1).clip(region)
     .reproject({crs: crs, crsTransform: crsTrans}).gt(0)
-    .reduceToVectors({geometry: basisRegions.union()})
+    .reduceToVectors({geometry: basisRegions.union(), crs: crs, crsTransform: crsTrans})
     .geometry();
 };
 
@@ -338,15 +338,21 @@ exports.plotEmiTS = function(imageCol, regionShp,
   speciesLabel, timePeriod, dateFormat, 
   sYear, eYear, sMonth, eMonth) {
   
+  var featCol = imageCol.map(function(image) {
+      return image.reduceRegions({
+        collection: regionShp,
+        reducer: ee.Reducer.sum().unweighted(),
+        scale: scale
+      }).first().copyProperties(image,['system:time_start']);
+    });
+    
   if (speciesLabel == 'BA') {
-    return ui.Chart.image.series({
-      imageCollection: imageCol.select(['BA','BAsf'],['b1','b2']),
-      region: regionShp,
-      reducer: ee.Reducer.sum().unweighted(),
-      scale: scale,
+    return ui.Chart.feature.byFeature({
+      features: ee.FeatureCollection(featCol),
       xProperty: 'system:time_start',
+      yProperties: ['BA','BA_smallfires']
     }).setChartType('LineChart')
-      .setSeriesNames(['BA','small fire fraction'])
+      .setSeriesNames(['BA','BA, small fires'])
       .setOptions({
         title: timePeriod + ' Burned Area',
         titleTextStyle: {fontSize: '13.5'},
@@ -366,12 +372,10 @@ exports.plotEmiTS = function(imageCol, regionShp,
         series: colPalseries_BA,
       });
   } else {
-    return ui.Chart.image.series({
-      imageCollection: imageCol.select(LULCtot,['b1','b2','b3','b4','b5','b6','b7']),
-      region: regionShp,
-      reducer: ee.Reducer.sum().unweighted(),
-      scale: scale,
+    return ui.Chart.feature.byFeature({
+      features: ee.FeatureCollection(featCol),
       xProperty: 'system:time_start',
+      yProperties: LULCtot
     }).setChartType('LineChart')
       .setSeriesNames(LULCtot)
       .setOptions({
@@ -560,13 +564,19 @@ exports.plotEmiTS_Andreae = function(imageCol,
   regionShp, speciesLabel, timePeriod, dateFormat, 
   sYear, eYear, sMonth, eMonth) {
   
-  return ui.Chart.image.series({
-    imageCollection: imageCol.select(compNames,['b1','b2']),
-    region: regionShp,
-    reducer: ee.Reducer.sum().unweighted(),
-    scale: scale,
-    xProperty: 'system:time_start',
-  }).setChartType('LineChart')
+  var featCol = imageCol.map(function(image) {
+    return image.reduceRegions({
+      collection: regionShp,
+      reducer: ee.Reducer.sum().unweighted(),
+      scale: scale,
+    }).first().copyProperties(image,['system:time_start']);
+  });
+  
+  return ui.Chart.feature.byFeature({
+      features: ee.FeatureCollection(featCol),
+      xProperty: 'system:time_start',
+      yProperties: compNames
+    }).setChartType('LineChart')
     .setSeriesNames(['Old EFs', 'New EFs (Andreae 2019)'])
     .setOptions({
       title: timePeriod + ' Fire Emissions',
@@ -618,14 +628,19 @@ exports.updateOpts_Andreae = function(emiTS, speciesLabel, timePeriod, dateForma
 
 exports.plotCompTS = function(imageCol_mean, speciesLabel, regionShp) {
   
-  return ui.Chart.image.series({
-    imageCollection: imageCol_mean
-      .select(compNames,['b1','b2'])
-      .set('xName','Avg'),
-    region: regionShp,
-    reducer: ee.Reducer.sum().unweighted(),
-    scale: scale,
+  var featCol = ee.ImageCollection([imageCol_mean]).map(function(image) {
+    return image.reduceRegions({
+      collection: regionShp,
+      reducer: ee.Reducer.sum().unweighted(),
+      scale: scale
+    }).first().set('xName','')
+    .copyProperties(image,['system:time_start']);
+  });
+  
+  return ui.Chart.feature.byFeature({
+    features: ee.FeatureCollection(featCol),
     xProperty: 'xName',
+    yProperties: compNames
   }).setSeriesNames(['Old EFs', 'New EFs'])
     .setOptions({
       title: 'Average Annual Fire Emissions',

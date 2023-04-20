@@ -3,7 +3,7 @@
 # by species [kg m-2 s-1]
 # monthly files, daily timesteps, 0.1deg
 # ===================================================
-# last updated: Nov 20, 2019
+# last updated: Apr 13, 2023
 # Tianjia Liu
 
 rm(list=ls())
@@ -12,7 +12,7 @@ source('~/Google Drive/scripts/R/fire_inv/globalParams.R')
 # -------------
 # Input Params
 # -------------
-xYears <- 2003:2018
+xYears <- 2003:2022
 xMonths <- 1:12
 varNameL <- c("CO","CO2","CH4","OC","BC","PM25")
 outputType <- "nc"

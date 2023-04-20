@@ -1,13 +1,13 @@
 # =========================================
-# GFEDv4s: HDF5 to NetCDF, GeoTiff
+# GFEDv4s: HDF5 to GeoTiff
 # by species [kg m-2 s-1]
-# monthly files, daily timesteps, 0.25deg
+# monthly files, monthly timesteps, 0.25deg
 # =========================================
 # last updated: Apr 13, 2023
 # Tianjia Liu
 
 rm(list=ls())
-source('~/Google Drive/scripts/R/fire_inv/globalParams.R')
+source('~/Google Drive/My Drive/scripts/R/fire_inv/globalParams.R')
 
 # -------------
 # Input Params
@@ -15,9 +15,8 @@ source('~/Google Drive/scripts/R/fire_inv/globalParams.R')
 xYears <- 2003:2022
 xMonths <- 1:12
 varNameL <- c("CO","CO2","CH4","OC","BC","PM25")
-outputType <- "nc"
 
-GFEDv4s_pro <- function(varName, xYears, xMonths, outputType="tif") {
+GFEDv4s_pro_month <- function(varName, xYears, xMonths) {
   
   invName <- "GFEDv4s"
   message("TASKS: ",invName," || ",varName," (",xYears[1]," to ",xYears[length(xYears)],")")
@@ -26,8 +25,7 @@ GFEDv4s_pro <- function(varName, xYears, xMonths, outputType="tif") {
   
   # directories to input files, output NetCDFs, GeoTiffs
   inputFolder <- file.path(inputDir,invName)
-  if (outputType == "tif") {outputFolder <- file.path(outputDir_tif,invName)}
-  if (outputType == "nc") {outputFolder <- file.path(outputDir_nc,invName)}
+  outputFolder <- file.path(outputDirMonthly_tif,invName)
   
   # species names
   orig_varName <- as.character(spNames[which(spNames$Name==varName),invName])
@@ -57,23 +55,10 @@ GFEDv4s_pro <- function(varName, xYears, xMonths, outputType="tif") {
   
   datesYr <- blankDates(1,12,xYears)
   
-  # Setting dimensions
-  cellCoord <- coordinates(area_m2)
-  cellLon <- as.numeric(cellCoord[,1])
-  cellLat <- as.numeric(cellCoord[,2])
-  
-  LonVec <- unique(cellLon)
-  LatVec <- sort(unique(cellLat))
-  nLon <- length(LonVec)
-  nLat <- length(LatVec)
-  
   for (iYear in seq_along(xYears)) {
     if (xYears[iYear] <= 2016) {beta <- F} else {beta <- T}
     
     for (iMonth in xMonths) {
-      
-      monthDays <- datesYr$Julian[which(datesYr$Year==xYears[iYear] & datesYr$Month==iMonth)]
-      nDays <- length(monthDays)
       
       # -----------
       # read GFED
@@ -97,21 +82,9 @@ GFEDv4s_pro <- function(varName, xYears, xMonths, outputType="tif") {
       emi_sp <- emiDM * (emiDM_SAVA*EFs_sp$SAVA + emiDM_BORF*EFs_sp$BORF + emiDM_TEMF*EFs_sp$TEMF  + 
                            emiDM_DEFO*EFs_sp$DEFO + emiDM_PEAT*EFs_sp$PEAT + emiDM_AGRI*EFs_sp$AGRI)
       
-      if (outputType == "nc") {inv_sp <- array(0,dim=c(nLon,nLat,nDays))}
-      if (outputType == "tif") {inv_sp <- list()}
-      for (iDay in seq_along(monthDays)) {
-        # daily fraction
-        emi_frac <- readGFED(prefix,paste0("emissions/",monthStr,"/daily_fraction/day_",iDay),beta)
-        
-        # input species [kg/ m2/ s]
-        invDay_ras <-  emi_sp * emi_frac / (24*60*60) / 1000
-        if (outputType == "tif") {inv_sp[[iDay]] <- invDay_ras}
-        if (outputType == "nc") {
-          inv_sp[,,iDay] <- matrix(as.vector(invDay_ras),
-                                   nrow=nLon,ncol=nLat)[,order(unique(cellLat))]
-        }
-      }
-      
+       # input species [kg]
+      inv_sp <-  emi_sp * area_m2 / 1000
+
       # --------
       # Output
       # --------
@@ -124,44 +97,10 @@ GFEDv4s_pro <- function(varName, xYears, xMonths, outputType="tif") {
       # -----------------
       # Save Geotiff
       # -----------------
-      if (outputType == "tif") {
-        writeRaster(brick(inv_sp),paste0(outname,".tif"),format="GTiff",overwrite=T)
-      }
+      writeRaster(inv_sp,paste0(outname,".tif"),format="GTiff",overwrite=T)
       
       removeTmpFiles(h=1)
-      
-      # -----------------
-      # Save NetCDF
-      # -----------------
-      if (outputType == "nc") {
-        # initialize NetCDF
-        ncfname <- paste0(outname,".nc")
-        ifelse(file.exists(ncfname),file.remove(ncfname),F)
-        
-        # long, lat
-        lonDim <- ncdim_def("lon","degrees",as.double(LonVec),longname="longitude") 
-        latDim <- ncdim_def("lat","degrees",as.double(LatVec),longname="latitude") 
-        
-        # time
-        datesYrMon <- blankDates(iMonth,iMonth,xYears[iYear])
-        timeVec <- YMDtoHrsSince(datesYrMon$Year,datesYrMon$Month,datesYrMon$Day)
-        timeDim <- ncdim_def("time",paste("hours since",originDate,"00:00:00"),
-                             as.double(timeVec),longname="time")
-        
-        # input species
-        ncvar <- ncvar_def(varName,varUnits,list(lonDim,latDim,timeDim),fillval,
-                           varNameLong,compression=3)
-        
-        # add variables to NetCDF
-        ncout <- nc_create(ncfname,ncvar,force_v4=T)
-        ncvar_put(ncout,ncvar,inv_sp)
-        ncatt_put(ncout,"lon","axis","lon")
-        ncatt_put(ncout,"lat","axis","lat")
-        ncatt_put(ncout,"time","axis","time")
-        ncatt_put(ncout,"time","calendar","standard")
-        
-        nc_close(ncout)
-      }
+    
     }
   }
   timestamp(prefix=paste("Finished! ","##------ "))
@@ -169,7 +108,7 @@ GFEDv4s_pro <- function(varName, xYears, xMonths, outputType="tif") {
 
 cat("\014")
 for (varName in varNameL) {
-  GFEDv4s_pro(varName, xYears, xMonths, outputType)
+  GFEDv4s_pro_month(varName, xYears, xMonths)
 }
 
 exit()

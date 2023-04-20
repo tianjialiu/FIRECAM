@@ -23,23 +23,26 @@ Annual HDF5 (with monthly timesteps and daily fraction) can be downloaded [here]
 ```
 wget -m -np -nH --cut-dirs=2 -A hdf5,csv,txt,xlsx https://www.geo.vu.nl/~gwerf/GFED/GFED4/
 ```
+Note: GFEDv5 is in development. (A later version of FIRECAM will include GFEDv5 v2.6r1 emissions.)
 
 ### 2. FINNv1.5
 Annual TXT (with daily timesteps) can be downloaded [here](http://bai.acom.ucar.edu/Data/fire). After filling out some information, you can download the compressed tar.gz files containing the TXT files. Select the GEOS-Chem formatted files.
 
-To standarize and break-up the annual TXT files into more manageable monthly TXT files, use the `FINN_txt_monthly.R` script under `code/preprocess/`. (Note that this pre-processing step is required to use the R code to process the FINN data.) The `FINNv1p5_scale_factors.csv` under `ancill/` converts FINN emissions to units of kg.
+To standarize and break-up the annual TXT files into more manageable monthly TXT files, use the `FINN_txt_monthly.R` and `FINN_txt_monthly_NRT.R` scripts under `code/preprocess/`. (Note that this pre-processing step is required to use the R code to process the FINN data.) The `FINNv1p5_scale_factors.csv` under `ancill/` converts FINN emissions to units of kg.
 
-FINN files for the most recent year can be downloaded from UCAR's ftp server. However, these estimates differ from the annual FINNv1.5 files that are later made available:
+FINN files for the most recent year can be downloaded from UCAR's ftp server. (Currently in FIRECAM, NRT emissions are used for 2021-22. Some NRT daily files are missing in 2022.) However, these estimates differ from the annual FINNv1.5 files that are later made available. Below is an example for downloading all NRT files for 2021 (Note that the files need to be unzipped after downloading):
 ```
-wget -m -np -nH --cut-dirs=3 -e robots=off -A gz  https://www.acom.ucar.edu/acresp/MODELING/finn_emis_txt
+wget -r -np -nH --cut-dirs=3 -e robots=off -A gz 'GLOB_GEOSchem_2021*.txt.gz' https://www.acom.ucar.edu/acresp/MODELING/finn_emis_txt/
 ```
+Note: FINN has been updated to v2.5; this new version uses VIIRS active fires. (A later version of FIRECAM will include FINNv2.5 emissions.)
 
 ### 3. GFASv1.2
 Monthly NetCDF files (with daily timesteps) can be downloaded from the ECMWF server. However, this process is very intensive and requires a lot of storage space, since each file (per species, per month) is not compressed (347-384 MB). Several species can be downloaded together and saved to the same file, but I prefer to download each species as a separate file. Do not download all parameters to the same file, as ECMWF has a 30GB limit per request. After you download your files, running a simple netCDF compression for each file in a batch shell (.sh) script (`nccopy -d1 originalfile.nc newfile.nc`) can drastically reduce the file size (to \~3 MB!).
 
-You must first [register for a ECMWF account](https://apps.ecmwf.int/registration/). Then, install the ECMWF key and Python library following the instructions [here](https://confluence.ecmwf.int//display/WEBAPI/Access+ECMWF+Public+Datasets#AccessECMWFPublicDatasets-key).
+You must first [register for a ECMWF account](https://apps.ecmwf.int/registration/). Then, install CDS API key and client and Python library following the instructions [here](https://confluence.ecmwf.int//display/WEBAPI/Access+ECMWF+Public+Datasets#AccessECMWFPublicDatasets-key).
+You must first [register for a CDS account](https://cds.climate.copernicus.eu/user/register?destination=%2F%23!%2Fhome). Then, install the CDS API key and client following the instructions [here](https://cds.climate.copernicus.eu/api-how-to). Note that GFAS is no longer available from the previous ECMWF API.
 
-I modified the example Python script from ECMWF to automate download requests to the ECMWF server (`GFAS_ECMWF.py`), which can be found in `code/downloads/`.
+I wrote a Python script to automate download requests from the CDS API (`GFAS_CDS.py`), which can be found in `code/downloads/`.
 
 ### 4. QFEDv2.5r1
 Daily NetCDF files can be downloaded at the NASA NCCS data portal. You can download the entire directory using the `wget` command:
@@ -47,6 +50,7 @@ Daily NetCDF files can be downloaded at the NASA NCCS data portal. You can downl
 wget -m -np -nH --cut-dirs=7 -e robots=off -A nc4 \
 https://portal.nccs.nasa.gov/datashare/iesa/aerosol/emissions/QFED/v2.5r1/0.1/QFED/
 ```
+Note: QFED has been updated to v2.6r1. (A later version of FIRECAM will include QFED v2.6r1 emissions.)
 
 ### 5. FEERv1.0-G1.2
 Monthly NetCDF files (with daily timesteps) can be downloaded [here](https://feer.gsfc.nasa.gov/data/emissions/).
@@ -88,12 +92,33 @@ Fire_tif_daily/
     GFASv1p2/
     QFEDv2p5r1/
     FEERv1p0_G1p2/
+
+Fire_tif_monthly/
+    GFEDv4s/
+    FINNv1p5/
+    GFASv1p2/
+    QFEDv2p5r1/
+    FEERv1p0_G1p2/
+    
+Fire_tif_monthly_gee/
+    GFEDv4s/
+    FINNv1p5/
+    GFASv1p2/
+    QFEDv2p5r1/
+    FEERv1p0_G1p2/
+    FIRECAM/
 ```
 
-First, install the necessary R dependencies, which are listed in the `globalParams.R` script. Then, modify the `globalParams.R` script with your input and output directory paths. Make sure to also modify the `source('~/Google Drive/scripts/R/fire_inv/globalParams.R')` line with the correct path of the  `globalParams.R` script in the in the inventory-specific R scripts in `code/output_nc`. Finally, modify the input parameters (`xYears`, `xMonths`, and `varNameL`) to specify the time range and species list you want to output and source the inventory-specific R script!
+First, install the necessary R dependencies, which are listed in the `globalParams.R` script. Then, modify the `globalParams.R` script with your input and output directory paths. Make sure to also modify the `source('~/Google Drive/scripts/R/fire_inv/globalParams.R')` line with the correct path of the `globalParams.R` script in the in the inventory-specific R scripts in `code/output`. Finally, modify the input parameters (`xYears`, `xMonths`, and `varNameL`) to specify the time range and species list you want to output and source the inventory-specific R script!
+
+Steps:
+1. Download the raw emissions inventory files to `Fire_raw/`. FINNv1.5 and GFASv1.2 require pre-processing, as described above. 
+2. Process and output files to `Fire_tif_daily/`, using input files from `Fire_raw/`. The output files are daily timesteps of emissions, packaged in monthly raster bricks by species. Code scripts to run are `output/*sp_daily.R`.
+3. Process and output files to `Fire_tif_monthly/`, using input files from `Fire_tif_daily/` and `Fire_raw/` (GFED only). The output files are monthly of emissions, packaged in monthly rasters by species. Code scripts to run are `output/day2month.R` and `output/GFED_sp_monthly.R`.
+4. Process and output files to `Fire_tif_monthly_gee/`, using input files from `Fire_tif_monthly/`. The output files are monthly timesteps of emissions, packaged in monthly raster bricks of the relevant species. Code scripts are `*sp_daily.R`. Code scripts to run are `ee/convert2ee.R` and `ee/stackFIRECAM.R`. `stackFIRECAM.R` stacks the monthly tif files for all inventories at an upscaled spatial resolution of 0.5deg.
 
 ### Important Notes
-* GeoTiff outputs are in raster stacks, where each layer represents one timestep. GeoTiffs preserve the gridded format and are faster and more convenient to read and write in R. On default, the R routine removes temporary raster files saved to memory > 1 hour old to prevent storage issues: `removeTmpFiles(h=1)`
+* GeoTiff outputs are in raster bricks, where each layer represents one timestep. GeoTiffs preserve the gridded format and are faster and more convenient to read and write in R. On default, the R routine removes temporary raster files saved to memory > 1 hour old to prevent storage issues: `removeTmpFiles(h=1)`
 * NetCDF files are compressed to 2-3MB/file for GFED and 6-7MB/file for FINN, GFAS, QFED, and FEER using the [ncdf4](https://cran.r-project.org/web/packages/ncdf4/ncdf4.pdf) package. As the default, the R routine uses a compression factor of 3 (low = 1, high = 9). Note that this dramatically reduces the native file size of GFASv1.2 files downloaded from ECMWF.
 * To convert the emissions into units of per m<sup>2</sup>, I used the `raster::area` function. The `areaGrid.R` script outputs a NetCDF file with area in m<sup>2</sup> per grid cell. For GFEDv4s, the `areaGrid_GFED.R` script returns the original area included with all GFEDv4s HDF files as a NetCDF file. The GFEDv4s-calculated area has very minor differences with the `raster::area` function output.
 * Because the native FINN format is 1-km point locations (lat, long), FINN can essentially be gridded into any spatial resolution >1 km. The default is 0.1° x 0.1°, but you can specify another spatial resolution in the `FINNv1p5_sp_daily.R` script.

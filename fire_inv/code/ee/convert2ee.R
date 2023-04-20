@@ -2,7 +2,7 @@
 # Converts monthly tif files (kg/grid cell)
 # to monthly sum stacks for EE import
 # =========================================
-# last updated: Sep 30, 2019
+# last updated: Apr 13, 2023
 # Tianjia Liu
 
 rm(list=ls())
@@ -11,7 +11,7 @@ source('~/Google Drive/scripts/R/fire_inv/globalParams.R')
 # -------------
 # Input Params
 # -------------
-xYears <- 2017:2018
+xYears <- 2003:2022
 xMonths <- 1:12
 invNameL <- c("GFEDv4s","FINNv1p5","GFASv1p2","QFEDv2p5r1","FEERv1p0_G1p2")
 varNameL <- c("CO","CO2","CH4","OC","BC","PM25")
@@ -40,7 +40,7 @@ convert2ee <- function(varNameL, xYears, xMonths, invName) {
         fileName <- paste0(fileNamePrefix,"_",varNameL[iVar],".tif")
         invMon_sp[[iVar]] <- raster(fileName) # kg
       }
-      invMon_spAll <- stack(invMon_sp)
+      invMon_spAll <- brick(invMon_sp)
       names(invMon_spAll) <- varNameL
       
       # --------

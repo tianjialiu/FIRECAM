@@ -115,7 +115,7 @@ exports.getCountryShp = function(region) {
 exports.getGridShp = function(region) {
   return ee.Image(1).clip(region)
     .reproject({crs: crs, crsTransform: crsTrans}).gt(0)
-    .reduceToVectors({geometry: basisRegions.union()})
+    .reduceToVectors({geometry: basisRegions.union(), crs: crs, crsTransform: crsTrans})
     .geometry();
 };
 
@@ -157,18 +157,25 @@ var colPal = {
   3: {color: 'FDB751'},
   4: {color: '800080'},
 };
-      
+
 exports.plotEmiTS = function(imageCol, regionShp,
   speciesLabel, timePeriod, dateFormat, 
   sYear, eYear, sMonth, eMonth, nLines) {
   
-  return ui.Chart.image.series({
-    imageCollection: imageCol.select(invNames,['b1','b2','b3','b4','b5']),
-    region: regionShp,
-    reducer: ee.Reducer.sum().unweighted(),
-    scale: aggProj.nominalScale(),
-    xProperty: 'system:time_start',
-  }).setChartType('LineChart')
+  var featCol = imageCol.map(function(image) {
+    return image.reduceRegions({
+      collection: regionShp,
+      reducer: ee.Reducer.sum().unweighted(),
+      crs: aggProj,
+      scale: aggProj.nominalScale()
+    }).first().copyProperties(image,['system:time_start']);
+  });
+  
+  return ui.Chart.feature.byFeature({
+      features: ee.FeatureCollection(featCol),
+      xProperty: 'system:time_start',
+      yProperties: invNames
+    }).setChartType('LineChart')
     .setSeriesNames(invDispNames)
     .setOptions({
       title: timePeriod + ' Fire Emissions',
@@ -224,15 +231,22 @@ exports.updateOpts = function(emiTS, speciesLabel, timePeriod, dateFormat,
 exports.plotEmiBar = function(imageCol, regionShp,
   speciesLabel, timePeriod, sYear, eYear) {
   
-  return ui.Chart.image.series({
-    imageCollection: imageCol
-      .select(invNames,['b1','b2','b3','b4','b5'])
-      .set('xName',''),
-    region: regionShp,
-    reducer: ee.Reducer.sum().unweighted(),
-    scale: aggProj.nominalScale(),
+  var featCol = ee.ImageCollection([imageCol]).map(function(image) {
+    return image.reduceRegions({
+      collection: regionShp,
+      reducer: ee.Reducer.sum().unweighted(),
+      crs: aggProj,
+      scale: aggProj.nominalScale()
+    }).first().set('xName','')
+    .copyProperties(image,['system:time_start']);
+  });
+  
+  return ui.Chart.feature.byFeature({
+    features: ee.FeatureCollection(featCol),
     xProperty: 'xName',
+    yProperties: invNames
   }).setSeriesNames(invDispNames)
+    .setChartType('ColumnChart')
     .setOptions({
       title: 'Average ' + timePeriod + ' Fire Emissions (' + sYear + '-' + eYear + ')',
       titleTextStyle: {fontSize: '13.5'},
@@ -289,11 +303,11 @@ exports.plotEmiBarInt = function(imageCol, regionShp,
   
   var colNames = ee.List([[
     {label: 'Inventory', type: 'string'},
-    {label: 'GFEDv4s'}, {id: 'p25', role: 'interval'}, {id: 'p75', role: 'interval'},
-    {label: 'FINNv1.5'}, {id: 'p25', role: 'interval'}, {id: 'p75', role: 'interval'},
-    {label: 'GFASv1.2'}, {id: 'p25', role: 'interval'}, {id: 'p75', role: 'interval'},
-    {label: 'QFEDv2.5r1'}, {id: 'p25', role: 'interval'}, {id: 'p75', role: 'interval'},
-    {label: 'FEERv1.0-G1.2'}, {id: 'p25', role: 'interval'}, {id: 'p75', role: 'interval'}
+    {label: 'GFEDv4s'}, {id: 'min', role: 'interval'}, {id: 'max', role: 'interval'},
+    {label: 'FINNv1.5'}, {id: 'min', role: 'interval'}, {id: 'max', role: 'interval'},
+    {label: 'GFASv1.2'}, {id: 'min', role: 'interval'}, {id: 'max', role: 'interval'},
+    {label: 'QFEDv2.5r1'}, {id: 'min', role: 'interval'}, {id: 'max', role: 'interval'},
+    {label: 'FEERv1.0-G1.2'}, {id: 'min', role: 'interval'}, {id: 'max', role: 'interval'}
   ]]);
 
   dataTable = colNames.cat([dataTable]);
