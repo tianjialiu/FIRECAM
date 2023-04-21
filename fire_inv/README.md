@@ -7,7 +7,7 @@ For me, the most time-consuming steps in working with global fire emissions inve
 4. Quick Fire Emissions Dataset ([QFEDv2.5r1](https://gmao.gsfc.nasa.gov/research/science_snapshots/global_fire_emissions.php); Darmenov and da Silva, 2013)
 5. Fire Energetics and Emissions Research ([FEERv1.0-G1.2](https://feer.gsfc.nasa.gov/data/emissions/); Ichoku and Ellison, 2014)
 
-| Fire Inventory | File Type | Total File Size | Spatial Resolution |
+| Fire Inventory | File Type | Raw File Size | Spatial Resolution |
 | :--- | :--- | :--- | :--- |
 | GFEDv4s | HDF5 | ~72MB/yr | 0.25° x 0.25°|
 | FINNv1.5 | TXT | ~3.4GB/yr | 1 km x 1 km |
@@ -39,8 +39,8 @@ Note: FINN has been updated to v2.5; this new version uses VIIRS active fires. (
 ### 3. GFASv1.2
 Monthly NetCDF files (with daily timesteps) can be downloaded from the ECMWF server. However, this process is very intensive and requires a lot of storage space, since each file (per species, per month) is not compressed (347-384 MB). Several species can be downloaded together and saved to the same file, but I prefer to download each species as a separate file. Do not download all parameters to the same file, as ECMWF has a 30GB limit per request. After you download your files, running a simple netCDF compression for each file in a batch shell (.sh) script (`nccopy -d1 originalfile.nc newfile.nc`) can drastically reduce the file size (to \~3 MB!).
 
-You must first [register for a ECMWF account](https://apps.ecmwf.int/registration/). Then, install CDS API key and client and Python library following the instructions [here](https://confluence.ecmwf.int//display/WEBAPI/Access+ECMWF+Public+Datasets#AccessECMWFPublicDatasets-key).
-You must first [register for a CDS account](https://cds.climate.copernicus.eu/user/register?destination=%2F%23!%2Fhome). Then, install the CDS API key and client following the instructions [here](https://cds.climate.copernicus.eu/api-how-to). Note that GFAS is no longer available from the previous ECMWF API.
+You must first [register for a CDS account](https://cds.climate.copernicus.eu/user/register?destination=%2F%23!%2Fhome). Then, install CDS API key and Python client following the instructions [here](https://confluence.ecmwf.int//display/WEBAPI/Access+ECMWF+Public+Datasets#AccessECMWFPublicDatasets-key).
+ Then, install the CDS API key and client following the instructions [here](https://cds.climate.copernicus.eu/api-how-to). Note that GFAS is no longer available from the previous ECMWF API.
 
 I wrote a Python script to automate download requests from the CDS API (`GFAS_CDS.py`), which can be found in `code/downloads/`.
 
@@ -111,7 +111,7 @@ Fire_tif_monthly_gee/
 
 First, install the necessary R dependencies, which are listed in the `globalParams.R` script. Then, modify the `globalParams.R` script with your input and output directory paths. Make sure to also modify the `source('~/Google Drive/scripts/R/fire_inv/globalParams.R')` line with the correct path of the `globalParams.R` script in the in the inventory-specific R scripts in `code/output`. Finally, modify the input parameters (`xYears`, `xMonths`, and `varNameL`) to specify the time range and species list you want to output and source the inventory-specific R script!
 
-Steps:
+<b>Steps</b>:
 1. Download the raw emissions inventory files to `Fire_raw/`. FINNv1.5 and GFASv1.2 require pre-processing, as described above. 
 2. Process and output files to `Fire_tif_daily/`, using input files from `Fire_raw/`. The output files are daily timesteps of emissions, packaged in monthly raster bricks by species. Code scripts to run are `output/*sp_daily.R`.
 3. Process and output files to `Fire_tif_monthly/`, using input files from `Fire_tif_daily/` and `Fire_raw/` (GFED only). The output files are monthly of emissions, packaged in monthly rasters by species. Code scripts to run are `output/day2month.R` and `output/GFED_sp_monthly.R`.

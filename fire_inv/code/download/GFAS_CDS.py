@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-# =================================================
-# Download monthly GFASv1.2 files from the CDS API
-# for given parameters and time periods
-# =================================================
+# ========================================================
+# Download daily GFASv1.2 files in monthly chunks
+# from the CDS API for given parameters and time periods
+# ========================================================
 # last updated: Apr 13, 2023
 # Tianjia Liu
 
