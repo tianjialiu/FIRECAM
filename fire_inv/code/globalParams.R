@@ -30,9 +30,10 @@ blankDates <- function(sMonth,eMonth,inYears,NAcols=F) {
   sYear <- inYears[1]
   eYear <- inYears[length(inYears)]
   
-  if (inYears[length(inYears)] %% 4 == 0) {
-    nDays <- c(31,29,31,30,31,30,31,31,30,31,30,31)
-  } else {nDays <- c(31,28,31,30,31,30,31,31,30,31,30,31)}
+  nDays <- c(31,29,31,30,31,30,31,31,30,31,30,31)
+  if (eYear %% 4 != 0 | (eYear %% 400 != 0 & eYear %% 100 == 0)) {
+    nDays <- c(31,28,31,30,31,30,31,31,30,31,30,31)
+  }
   
   sDate <- paste0(sYear,"-",sprintf("%02d",sMonth),"-01")
   eDate <- paste0(eYear,"-",sprintf("%02d",eMonth),"-",sprintf("%02d",nDays[eMonth]))
