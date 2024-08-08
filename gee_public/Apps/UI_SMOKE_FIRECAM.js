@@ -8,8 +8,8 @@
 // https://github.com/tianjialiu/SMOKE-Policy-Tool
 // https://github.com/tianjialiu/FIRECAM
 
-// @author Tianjia Liu (tianjialiu@g.harvard.edu)
-// Last updated: April 15, 2023
+// @author Tianjia Liu (embrslab@gmail.com)
+// Last updated: January 19, 2023
 
 // Purpose: explore how the modeled impact of Indonesian fires
 // on smoke exposure in Equatorial Asia differs in using
@@ -97,7 +97,7 @@ var yearPanel = function() {
   var githubRepoLabel = ui.Label('GitHub: Code/Info', {margin: '0px 0px 5px 8px', fontSize: '12.5px', color: '#5886E8'}, 'https://github.com/tianjialiu/SMOKE-Policy-Tool');
 
   var headDivider = ui.Panel(ui.Label(),ui.Panel.Layout.flow('horizontal'),
-    {margin: '10px 0px 5px 0px',height:'1.25px',border:'0.75px solid black',stretch:'horizontal'});
+    {margin: '10px 0px 5px 0px',height:'1px',border:'0.75px solid black',stretch:'horizontal'});
  
   var inputSectionLabel = ui.Label('Input Parameters', {margin: '8px 8px 5px 8px', fontWeight: 'bold', fontSize: '20px'});
   
@@ -226,7 +226,7 @@ var continuousLegend = function(controlPanel, title, colPal, minVal,
 
 var legendPanel = function(controlPanel) {
   var footDivider = ui.Panel(ui.Label(),ui.Panel.Layout.flow('horizontal'),
-    {margin: '6px 0px 20px 0px',height:'1.25px',border:'0.75px solid black',stretch:'horizontal'});
+    {margin: '6px 0px 20px 0px',height:'1px',border:'0.75px solid black',stretch:'horizontal'});
   controlPanel.add(footDivider);
   controlPanel.add(ui.Label('Legends', {fontWeight: 'bold', fontSize: '20px', margin: '-3px 8px 8px 15px'}));
   

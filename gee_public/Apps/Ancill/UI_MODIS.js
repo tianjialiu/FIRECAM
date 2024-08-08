@@ -14,7 +14,7 @@ var mod14a1 = ee.ImageCollection("MODIS/006/MOD14A1"),
 // *****************************************************************
 /*
 // Documentation: https://github.com/tianjialiu/FIRECAM
-// @author Tianjia Liu (tianjialiu@g.harvard.edu)
+// @author Tianjia Liu (embrslab@gmail.com)
 // Last updated: June 9, 2022
 
 // Purpose: plot timeseries of MODIS/FIRMS active fire counts

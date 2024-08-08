@@ -5,7 +5,7 @@
 // *****************************************************************
 /*
 // Documentation: https://github.com/tianjialiu/FIRECAM
-// Author: Tianjia Liu
+// @author Tianjia Liu (embrslab@gmail.com)
 // Last updated: April 15, 2023
 
 // Purpose: explore regional differences in fire emissions from five

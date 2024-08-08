@@ -11,7 +11,7 @@
 // How do the new emissions factors from Andreae (2019) impact
 // GFEDv4s emissions?
 
-// @author Tianjia Liu (tianjialiu@g.harvard.edu)
+// @author Tianjia Liu (embrslab@gmail.com)
 // Last updated: April 15, 2023
 
 // =================================================================

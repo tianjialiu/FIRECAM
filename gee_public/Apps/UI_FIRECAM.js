@@ -5,7 +5,7 @@
 // *****************************************************************
 /*
 // Documentation: https://github.com/tianjialiu/FIRECAM
-// @author Tianjia Liu (tianjialiu@g.harvard.edu)
+// @author Tianjia Liu (embrslab@gmail.com)
 // Last updated: April 15, 2023
 
 // Purpose: explore regional differences in fire emissions from five
@@ -107,7 +107,7 @@ var infoPanel = function() {
   var githubRepoLabel = ui.Label('GitHub: Code/Info', {margin: '0px 8px 5px 13px', fontSize: '13px', color: '#5886E8'}, 'https://github.com/tianjialiu/FIRECAM');
   var citationLabel = ui.Label('Citation: Liu et al. (2020, Remote Sens. Environ.)', {margin: '8px 8px 5px 13px', fontSize: '13px', color: '#5886E8'}, 'https://doi.org/10.1016/j.rse.2019.111557');
   var headDivider = ui.Panel(ui.Label(),ui.Panel.Layout.flow('horizontal'),
-    {margin: '10px 0px 5px 0px',height:'1.25px',border:'0.75px solid black',stretch:'horizontal'});
+    {margin: '10px 0px 5px 0px',height:'1px',border:'0.75px solid black',stretch:'horizontal'});
   var inputParamsLabel = ui.Label('Input Parameters', {margin: '8px 8px 5px 13px', fontWeight: 'bold', fontSize: '20px'});
   
   return ui.Panel({
@@ -403,7 +403,7 @@ var continuousLegend = function(controlPanel, title, colPal, minVal, maxVal, uni
 
 var legendPanel = function(controlPanel) {
   var footDivider = ui.Panel(ui.Label(),ui.Panel.Layout.flow('horizontal'),
-    {margin: '10px 0px 6px 0px',height:'1.25px',border:'0.75px solid black',stretch:'horizontal'});
+    {margin: '10px 0px 6px 0px',height:'1px',border:'0.75px solid black',stretch:'horizontal'});
   controlPanel.add(footDivider);
   controlPanel.add(ui.Label('Legend', {fontWeight: 'bold', fontSize: '20px', margin: '10px 8px 8px 13px'}));
   controlPanel.add(ui.Label('', {margin: '0 0 0 0'}));

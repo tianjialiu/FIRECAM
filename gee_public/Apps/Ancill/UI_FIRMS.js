@@ -13,8 +13,8 @@ var firms = ee.ImageCollection("FIRMS"),
 // *****************************************************************
 /*
 // Documentation: https://github.com/tianjialiu/FIRECAM
-// @author Tianjia Liu (tianjialiu@g.harvard.edu)
-// Last updated: April 15, 2023
+// @author Tianjia Liu (embrslab@gmail.com)
+// Last updated: August 7, 2024
 
 // Purpose: plot timeseries of MODIS/FIRMS active fire counts
 // by region and day of year, across years
@@ -70,7 +70,7 @@ var mainPanel = ui.Panel({
     ui.Panel([ui.Label('Start Year: ',{color:'#777',margin:'8px 3px 8px 8px'}),startYearSlider],ui.Panel.Layout.Flow('horizontal'),{stretch:'horizontal',margin:'-5px -8px 0px 8px'}),
     ui.Panel([ui.Label('End Year: ',{color:'#777',margin:'8px 10px 8px 8px'}),endYearSlider],ui.Panel.Layout.Flow('horizontal'),{stretch:'horizontal',margin:'-7px -8px 0px 8px'}),
     ui.Label('Filter by the day of year [1-366]:',{color:'#333',fontSize:'12px',margin:'5px 0px 0px 16px'}),
-    ui.Label('NASA\'s Julian day calendar',{fontSize:'12px',margin:'2px 0px 5px 16px',color: '#5886E8'},'https://landweb.modaps.eosdis.nasa.gov/browse/calendar.html'),
+    ui.Label('Julian day calendar',{fontSize:'12px',margin:'2px 0px 5px 16px',color: '#5886E8'},'https://github.com/tianjialiu/FIRECAM?tab=readme-ov-file#julian-day-day-of-year'),
     ui.Panel([ui.Label('DOY Range: ',{color:'#777',margin:'12px 0 0 8px'}),doyText],ui.Panel.Layout.Flow('horizontal'),{stretch:'horizontal',margin:'-3px 8px 0px 8px'}),
     ui.Label('2) Select a drawing mode:',{fontSize:'14.5px',margin:'8px 8px 3px 8px'}),
     ui.Label('On the map, draw a geometry. Limit to small regions to reduce computational time. You can also edit and move the geometry after clicking on \'Pan Map\'.',
