@@ -668,5 +668,3 @@ exports.plotCompTS_text = function(imageCol_mean, regionShp) {
     scale: scale
   }).first();
 };
-
-  

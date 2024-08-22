@@ -35,11 +35,11 @@ var userShpName = 'CustomRegion';
 // --------------
 // Load Modules |
 // --------------
-var baseMap = require('users/tl2581/packages:baseMap.js');
-var baseRegions = require('users/tl2581/packages:baseRegions.js');
-var colPals = require('users/tl2581/packages:colorPalette.js');
-var gfed4_params = require('users/tl2581/FIRECAM:Modules/GFEDv4s_params.js');
-var firecam = require('users/tl2581/FIRECAM:Modules/FIRECAM_params.js');
+var baseMap = require('users/embrslab/packages:baseMap.js');
+var baseRegions = require('users/embrslab/packages:baseRegions.js');
+var colPals = require('users/tl2581/embrslab:colorPalette.js');
+var gfed4_params = require('users/embrslab/FIRECAM:Modules/GFEDv4s_params.js');
+var firecam = require('users/embrslab/FIRECAM:Modules/FIRECAM_params.js');
 
 // --------------
 // Input Params |

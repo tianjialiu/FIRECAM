@@ -29,7 +29,7 @@ var mod14a1 = ee.ImageCollection("MODIS/006/MOD14A1"),
 
 // Hide the drawing tools widget; we want a really simple interface.
 // We'll add our own buttons for geometry selection.
-var baseMap = require('users/tl2581/packages:baseMap.js');
+var baseMap = require('users/embrslab/packages:baseMap.js');
 Map.drawingTools().setShown(false);
 Map.setOptions('Dark', {'Dark': baseMap.darkTheme});
 Map.setCenter(20,10,4);

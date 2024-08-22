@@ -63,12 +63,12 @@ Google Earth Engine ([GEE](https://earthengine.google.com/)) is a powerful cloud
 ### Step 2: The FIRECAM online tool repository
 Copy and paste the following link in a tab in Google Chrome to enter the [GEE Javascript playground](https://code.earthengine.google.com/) and add the FIRECAM repository to your account under the read-only permissions folder in one step:
 ```
-https://code.earthengine.google.com/?accept_repo=users/tl2581/FIRECAM
+https://code.earthengine.google.com/?accept_repo=users/embrslab/FIRECAM
 ```
-The repository should then appear in the top-left panel under 'Reader' as 'users/tl2581/FIRECAM'. The GEE Javascript playground is a code editor with a map and console to display or print results.
+The repository should then appear in the top-left panel under 'Reader' as 'users/embrslab/FIRECAM'. The GEE Javascript playground is a code editor with a map and console to display or print results.
 
 ### Step 3: Diving into the GUI
-Click the 'Apps/UI_FIRECAM.js' script in the 'users/tl2581/FIRECAM' repository. The script should appear in the code editor. Click 'Run' in the top-right corner of the code editor to activate the user interface. The repository also contains a script to export monthly and annual timeseries data ('Exports/UI_FIRECAM_Exports.js').
+Click the 'Apps/UI_FIRECAM.js' script in the 'users/embrslab/FIRECAM' repository. The script should appear in the code editor. Click 'Run' in the top-right corner of the code editor to activate the user interface. The repository also contains a script to export monthly and annual timeseries data ('Exports/UI_FIRECAM_Exports.js').
 
 ## Julian Day (Day of Year)
 <b>Non-Leap Years</b>

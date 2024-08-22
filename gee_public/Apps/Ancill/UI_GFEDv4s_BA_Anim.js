@@ -17,10 +17,10 @@
 // --------------
 // Load Modules |
 // --------------
-var baseMap = require('users/tl2581/packages:baseMap.js');
-var baseRegions = require('users/tl2581/packages:baseRegions.js');
-var colPals = require('users/tl2581/packages:colorPalette.js');
-var gfed4_params = require('users/tl2581/FIRECAM:Modules/GFEDv4s_params.js');
+var baseMap = require('users/embrslab/packages:baseMap.js');
+var baseRegions = require('users/embrslab/packages:baseRegions.js');
+var colPals = require('users/embrslab/packages:colorPalette.js');
+var gfed4_params = require('users/embrslab/FIRECAM:Modules/GFEDv4s_params.js');
 
 // --------------
 // Input Params |

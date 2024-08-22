@@ -28,7 +28,7 @@ var firms = ee.ImageCollection("FIRMS"),
 
 // Hide the drawing tools widget; we want a really simple interface.
 // We'll add our own buttons for geometry selection.
-var baseMap = require('users/tl2581/packages:baseMap.js');
+var baseMap = require('users/embrslab/packages:baseMap.js');
 Map.drawingTools().setShown(false);
 Map.setOptions('Dark', {'Dark': baseMap.darkTheme});
 Map.setCenter(20,10,4);
@@ -41,10 +41,12 @@ var symbol = {
   pan: '🤚'
 };
 
+var endYr = 2024;
+
 // Set up a ui.Panel to hold instructions and the geometry drawing buttons.
-var startYearSlider = ui.Slider({min:2001,max:2023,value:2019,step:1,
+var startYearSlider = ui.Slider({min:2001,max:endYr,value:2019,step:1,
   style:{stretch:'horizontal'}});
-var endYearSlider = ui.Slider({min:2001,max:2023,value:2023,step:1,
+var endYearSlider = ui.Slider({min:2001,max:endYr,value:2023,step:1,
   style:{stretch:'horizontal'}});
 var doyText = ui.Textbox({placeholder:'1-100',value:'1-100',
   style:{stretch:'horizontal'}});

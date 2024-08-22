@@ -59,10 +59,10 @@
 // ----------------
 // Import Modules |
 // ----------------
-var smokePM = require('users/tl2581/FIRECAM:Modules/SMOKE_FIRECAM_params.js');
-var firecam = require('users/tl2581/FIRECAM:Modules/FIRECAM_params.js');
-var baseMap = require('users/tl2581/packages:baseMap.js');
-var colPals = require('users/tl2581/packages:colorPalette.js');
+var smokePM = require('users/embrslab/FIRECAM:Modules/SMOKE_FIRECAM_params.js');
+var firecam = require('users/embrslab/FIRECAM:Modules/FIRECAM_params.js');
+var baseMap = require('users/embrslab/packages:baseMap.js');
+var colPals = require('users/embrslab/packages:colorPalette.js');
 
 // ----------------------------------
 // Relative Fire Confidence Metrics
