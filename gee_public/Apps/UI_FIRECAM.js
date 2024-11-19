@@ -413,9 +413,9 @@ var legendPanel = function(controlPanel) {
   continuousLegend(controlPanel,'Cloud/Haze Obscuration',
     colPals.Blues, 0, 1, 'Metric 2: fractional, FRP-weighted');
   continuousLegend(controlPanel,'Burn Size/Fragmentation',
-    colPals.OrRed, 0, 2, 'Metric 3: sq. km / fragment');
+    colPals.OrRed, 0, '> 2', 'Metric 3: sq. km / fragment');
   continuousLegend(controlPanel,'Topography Variance',
-    colPals.Grays, 0, 1000, 'Metric 4: sq. m');
+    colPals.Grays, 0, '> 1000', 'Metric 4: sq. m');
   continuousLegend(controlPanel,'VIIRS FRP Outside MODIS Burn Extent',
     colPals.Sunset, 0, 1, 'Metric 5: fractional');
 };

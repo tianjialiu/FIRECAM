@@ -9,7 +9,7 @@
 // https://github.com/tianjialiu/FIRECAM
 
 // @author Tianjia Liu (embrslab@gmail.com)
-// Last updated: January 19, 2023
+// Last updated: November 18, 2024
 
 // Purpose: explore how the modeled impact of Indonesian fires
 // on smoke exposure in Equatorial Asia differs in using
@@ -117,7 +117,7 @@ var yearPanel = function() {
     {margin: '2px 8px 6px 15px', color: '#888', fontSize: '12px'});
   var metYearDescription = ui.Label('Jul-Oct Rainfall Rank: 0 (driest) - 10 (wettest)',
     {margin: '1px 0px 0px 25px', color: '#888', fontSize: '13.8px', fontWeight:'410'});
-  var metYearRanking = ui.Label('2005: [7], 2006: [1.5], 2007: [6], 2008: [9], 2009: [3.5]',
+  var metYearRanking = ui.Label('2005: [6.5], 2006: [1.5], 2007: [6], 2008: [9], 2009: [3.5]',
     {margin: '3px 0px 8px 12px', color: '#999', fontSize: '13.5px'});
 
   return ui.Panel([
@@ -235,32 +235,32 @@ var legendPanel = function(controlPanel) {
   
   // SMOKE layers
   continuousLegend(controlPanel,'GEOS-Chem Adjoint Sensitivity',
-    smokePM.sensColRamp, 0, '10⁵', 'Jul-Oct Average, (μg m⁻³) / (g m⁻² s⁻¹)', 13.8, 291);
+    smokePM.sensColRamp, 0, '> 10⁵', 'Jul-Oct Average, (μg m⁻³) / (g m⁻² s⁻¹)', 13.8, 280);
   
-  continuousLegend(controlPanel,'PM2.5 Exposure',
-    smokePM.PMColRamp, 0, 20, 'Jul-Oct Average, μg m⁻³, scaled by 100', 18.975, 293);
+  continuousLegend(controlPanel,'PM2.5 Exposure Contribution',
+    smokePM.PMColRamp, 0, '> 20', 'Jul-Oct Average, μg m⁻³, scaled by 100', 18.975, 284);
     
-  continuousLegend(controlPanel,'OC + BC Emissions',
-    smokePM.emissColRamp, 0, 5, 'Jul-Oct Average, μg m⁻² s⁻¹', 18.975, 300);
+  continuousLegend(controlPanel,'OC + BC Fire Emissions',
+    smokePM.emissColRamp, 0, '> 5', 'Jul-Oct Average, μg m⁻² s⁻¹', 18.975, 292);
   
   controlPanel.add(ui.Label('FIRECAM Metrics',
     {margin: '15px 0px 8px 15px', fontSize: '18.5px', fontWeight: '100'}));
   
   // FIRECAM metrics
   continuousLegend(controlPanel,'BA-AFA Discrepancy',
-    colPals.RdBu, -1, 1, 'Metric 1: normalized difference', 21.686, 302);
+    colPals.RdBu, -1, 1, 'Metric 1: normalized difference', 21.686, 304);
   
   continuousLegend(controlPanel,'Cloud/Haze Obscuration',
-    colPals.Blues, 0, 1, 'Metric 2: fractional, FRP-weighted', 18.975, 302);
+    colPals.Blues, 0, 1, 'Metric 2: fractional, FRP-weighted', 18.975, 304);
 
   continuousLegend(controlPanel,'Burn Size/Fragmentation',
-    colPals.OrRed, 0, 2, 'Metric 3: km² / fragment', 18.975, 302);
+    colPals.OrRed, 0, '> 2', 'Metric 3: km² / fragment', 18.975, 292);
   
   continuousLegend(controlPanel,'Topography Variance',
-    colPals.Grays, 0, 1000, 'Metric 4: m²', 21.686, 279);
+    colPals.Grays, 0, '> 1000', 'Metric 4: m²', 21.686, 269);
 
   continuousLegend(controlPanel,'VIIRS FRP Outside MODIS Burn Extent',
-    colPals.Sunset, 0, 1, 'Metric 5: fractional', 21.686, 302);
+    colPals.Sunset, 0, 1, 'Metric 5: fractional', 21.686, 304);
     
   controlPanel.add(ui.Label('', {margin: '0px 0px 5px 0px'}));
 };

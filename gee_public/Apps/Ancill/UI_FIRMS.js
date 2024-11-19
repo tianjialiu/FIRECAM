@@ -364,7 +364,7 @@ function chartFire() {
       return firmsFiltered.filter(ee.Filter.calendarRange(iYear,iYear,'year')).sum().gt(0);
     })).sum();
   
-  var colPaln = colPal.get(ee.String(ee.Number(nYear).format())).getInfo();
+  var colPaln = colPal.get(ee.Number(nYear).format()).getInfo();
   
   Map.layers().remove(Map.layers().get(0));
   Map.addLayer(firmsYr.selfMask(),

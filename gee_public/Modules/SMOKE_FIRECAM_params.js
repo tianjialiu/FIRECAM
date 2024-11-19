@@ -7,7 +7,7 @@ var gcArea = ee.Image("users/smokepolicytool/area_m2/GC_grid"),
 // Monthly Smoke PM2.5
 // ===============================
 var outputRegion = ee.Geometry.Rectangle([95,-11,141,6],'EPSG:4326',false);
-var projFolder = 'users/smokepolicytool/';
+var projFolder = 'projects/IndonesiaPolicyTool/';
 var globalFiresFolder = 'projects/GlobalFires/';
 var adjointFolder = projFolder + 'GC_adjoint_sensitivities/';
 
@@ -39,6 +39,14 @@ var adjResList = {
   'FEERv1p0_G1p2': '0p1deg'
 };
 
+var crsTransformList = {
+  'GFEDv4s': [0.25,0,-180,0,-0.25,90],
+  'FINNv1p5': [0.1,0,-180,0,-0.1,90],
+  'GFASv1p2': [0.1,0,-180,0,-0.1,90],
+  'QFEDv2p5r1': [0.1,0,-180,0,-0.1,90],
+  'FEERv1p0_G1p2': [0.1,0,-180,0,-0.1,90]
+};
+
 var getInEmiInv = function(inEmiInvName) {
   return ee.ImageCollection(globalFiresFolder + inEmiInvName);
 };
@@ -48,8 +56,10 @@ var getGridScale = function(inEmiInv) {
 };
 
 var getGridArea = function(inEmiInv) {
+  var gridScale = getGridScale(inEmiInv);
   return ee.Image(inEmiInv.select('OC').first()).unmask(0).gte(0)
-    .multiply(ee.Image.pixelArea());
+    .multiply(ee.Image.pixelArea())
+    .reproject({crs: gridScale, scale: gridScale.nominalScale()});
 };
 
 var getRegionMask = function(gridScale) {
@@ -64,7 +74,7 @@ exports.getInvName = function(invName) {
 var sMonth = 7; var eMonth = 10; // Fire season (Jul-Oct)
 
 // Conversion factors
-var sf_timeSteps = 24 * 24 * 3; // account for number of physical time steps in adjoint simulation run
+var sf_adjoint = 24 * 24 * 3; // account for number of physical time steps in adjoint simulation run
 var sf_timeDay = 24 * 60 * 60; // seconds per day
 
 // Find 3-letter code to using full name of receptor
@@ -155,8 +165,8 @@ var getEmissReceptorMon = function(inEmiInvName,inMonth,inYear,metYear,inSens) {
   var bc_phobic = bc_emiss.multiply(0.8);
   var bc_philic = bc_emiss.multiply(0.2);
     
-  var emiss_philic = oc_philic.add(bc_philic).rename('b1');
-  var emiss_phobic = oc_phobic.add(bc_phobic).rename('b2');
+  var emiss_philic = oc_philic.add(bc_philic).rename('PI');
+  var emiss_phobic = oc_phobic.add(bc_phobic).rename('PO');
   
   // 1. Convert OC + BC emissions from kg/grid cell/month to μg/m2/day
   var emissPart = emiss_philic.addBands(emiss_phobic)
@@ -166,7 +176,7 @@ var getEmissReceptorMon = function(inEmiInvName,inMonth,inYear,metYear,inSens) {
   // 2. Convert downscaled accumulated monthly sensitivity (0.25deg) from
   // (μg/m3)/(kg/grid cell/timestep) to (μg/m3)/(μg/m2/day)
   var sensPart = sensMon.multiply(gridArea).multiply(1e-9)
-    .divide(sf_timeSteps).divide(nDays)
+    .divide(sf_adjoint).divide(nDays)
     .reproject({crs: gridScale, scale: gridScale.nominalScale()});
     
   // 3. Multiply OC + BC emissions rate by sensitivity
@@ -253,18 +263,18 @@ exports.getSensMap = function(metYear,receptor) {
   var sensAvg = sensFilter.map(function(sensMon) {
       var nDays = ee.Number(sensMon.get('ndays'));
       return sensMon.multiply(gcArea).divide(nDays).multiply(1e-3)
-        .divide(sf_timeSteps).multiply(sf_timeDay)
+        .divide(sf_adjoint).multiply(sf_timeDay)
         .reproject({crs: crsLatLon, crsTransform: sens_gridRes});
     });
   
-  return ee.ImageCollection(sensAvg).mean().rename(['hydrophilic','hydrophobic']).select('hydrophilic')
+  return ee.ImageCollection(sensAvg).mean().select('PI')
     .reproject({crs: crsLatLon, crsTransform: sens_gridRes});
 };
 
 exports.sensColRamp = ['#FFFFFF','#C7E6F8','#8DBEE2','#5990BB','#64A96C','#A9CB65',
   '#F4D46A','#E58143','#D14D36','#B1322E','#872723'];
 
-// PM2.5 exposure, Jul-Oct average (μg m-3)
+// PM2.5 exposure contribution, Jul-Oct average (μg m-3)
 exports.getPMmap = function(inEmiInvName,inputYear,metYear,receptor) {
   var inEmiInv = getInEmiInv(inEmiInvName);
   
@@ -420,8 +430,8 @@ exports.getEmissTotal = function(inEmiInvName,inputYear,metYear,inSpecies) {
       return imageToFeature(oc_bc_emiss,outputRegion,gridScale);
     });
    
-  return ee.Number(ee.FeatureCollection(emissPartTotal)
-    .aggregate_sum('sum')).format('%.2f');
+  return ee.FeatureCollection(emissPartTotal).aggregate_sum('sum')
+    .format('%.2f');
 };
 
 // Assign default adjoint year based on rainfall
@@ -468,5 +478,6 @@ exports.closestMetYear = {
   2020: 2008,
   2021: 2008,
   2022: 2008,
-  2023: 2009
+  2023: 2009,
+  2024: 2007
 };

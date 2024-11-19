@@ -142,6 +142,7 @@ Click the 'Apps/UI_FIRECAM.js' script in the 'users/embrslab/FIRECAM' repository
 | 31 | 31 | 91 | | 152 | | 213 | 244 | | 305 | | 366 |
 
 ## Updates
+* November 2024: update GFEDv4s apps with 2023 emissions
 * April 2023: updated FIRECAM, SMOKE-FIRECAM, and GFEDv4s apps with 2022 emissions; added python code to download GFAS from the new CDS API; updated readme in `fire_inv`.
 * February 2022: updated FIRECAM, SMOKE-FIRECAM, and GFEDv4s apps with 2021 emissions
 * July 2021: updated FIRECAM, SMOKE-FIRECAM, and GFEDv4s apps with 2020 emissions
